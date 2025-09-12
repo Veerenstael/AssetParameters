@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Veerenstael KPI Tool</title>
   <link rel="stylesheet" href="style.css"/>
-
-  <!-- Favicon (zelfde aanpak als je bestaande project) -->
   <link rel="icon" href="favicon.png" type="image/png"/>
 </head>
 <body>
@@ -23,8 +21,7 @@
     <div class="main-card">
       <div class="header center-header">
         <p>
-          Deze Veerenstael-tool berekent MTTF, MTBF, MTTR, Beschikbaarheid, Failure rate (λ),
-          FIT, MTBM en MCMT op basis van jouw invoer. Stijl en lay-out sluiten aan op je bestaande tool:contentReference[oaicite:2]{index=2}.
+          Bereken MTTF, MTBF, MTTR, Beschikbaarheid, λ, FIT, MTBM en MCMT. De grafiek toont MTTF, MTTR, MTBM en MTBF.
         </p>
       </div>
 
@@ -32,14 +29,28 @@
         <!-- Invoer -->
         <section class="input-pane">
           <form id="kpi-form" autocomplete="off">
-            <label for="totItemsHours">Totale bedrijfstijd van alle items (uren)</label>
-            <input type="number" id="totItemsHours" value="200000" step="1" min="0"/>
+            <label for="totItemsValue">Totale bedrijfstijd van alle items</label>
+            <div class="unit-row">
+              <input type="number" id="totItemsValue" value="200000" step="1" min="0"/>
+              <select id="totItemsUnit" aria-label="Eenheid totale bedrijfstijd van alle items">
+                <option value="hours" selected>uren</option>
+                <option value="days">dagen</option>
+                <option value="years">jaren</option>
+              </select>
+            </div>
 
             <label for="failedItems">Aantal falende items</label>
             <input type="number" id="failedItems" value="10" step="1" min="0"/>
 
-            <label for="totHours">Totale bedrijfstijd (uren)</label>
-            <input type="number" id="totHours" value="35000" step="1" min="0"/>
+            <label for="totHoursValue">Totale bedrijfstijd</label>
+            <div class="unit-row">
+              <input type="number" id="totHoursValue" value="35000" step="1" min="0"/>
+              <select id="totHoursUnit" aria-label="Eenheid totale bedrijfstijd">
+                <option value="hours" selected>uren</option>
+                <option value="days">dagen</option>
+                <option value="years">jaren</option>
+              </select>
+            </div>
 
             <label for="failures">Aantal storingen</label>
             <input type="number" id="failures" value="7" step="1" min="0"/>
@@ -79,7 +90,7 @@
           </div>
 
           <div class="info-block">
-            <p><strong>Definities in deze tool</strong></p>
+            <p><strong>Definities</strong></p>
             <ul>
               <li>MTTF = totale bedrijfstijd van alle items ÷ aantal falende items</li>
               <li>MTBF = totale bedrijfstijd ÷ aantal storingen</li>
@@ -90,17 +101,13 @@
               <li>MTBM = totale bedrijfstijd ÷ (geplande + ongeplande acties)</li>
               <li>MCMT = totale hersteltijd ÷ aantal ongeplande acties</li>
             </ul>
-            <p class="small-note">
-              Aanname: totale hersteltijd betreft herstel (correctief). Voor MCMT wordt deze verdeeld over
-              het aantal ongeplande acties. Pas desgewenst aan naar jouw registratiepraktijk.
-            </p>
           </div>
         </section>
       </div>
 
-      <!-- Grafiek -->
+      <!-- Grafiek (alleen MTTF, MTTR, MTBM, MTBF) -->
       <div class="chart-card">
-        <h2 class="chart-title">Overzichtsgrafiek</h2>
+        <h2 class="chart-title">Overzichtsgrafiek (uren)</h2>
         <canvas id="kpiChart" height="120"></canvas>
       </div>
     </div>
