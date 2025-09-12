@@ -92,14 +92,14 @@
           <div class="info-block">
             <p><strong>Definities</strong></p>
             <ul>
-              <li>MTTF = totale bedrijfstijd van alle items ÷ aantal falende items</li>
-              <li>MTBF = totale bedrijfstijd ÷ aantal storingen</li>
-              <li>MTTR = totale hersteltijd ÷ aantal storingen</li>
-              <li>Beschikbaarheid [A] = MTBF ÷ (MTBF + MTTR)</li>
-              <li>Failure rate [λ] = aantal storingen ÷ totale bedrijfstijd</li>
-              <li>FIT (Failures in Time) = λ × 10^9</li>
-              <li>MTBM = totale bedrijfstijd ÷ (geplande + ongeplande acties)</li>
-              <li>MCMT = totale hersteltijd ÷ aantal ongeplande acties</li>
+              <li>MTTF = [Totale bedrijfstijd van alle items] ÷ [aantal falende items]</li>
+              <li>MTBF = [Totale bedrijfstijd] / [Aantal storingen]</li>
+              <li>MTTR = [Totale hersteltijd] / [Aantal storingen]</li>
+              <li>Beschikbaarheid [A] = MTBF / (MTBF + MTTR)</li>
+              <li>Failure rate [λ] = [Aantal storingen] / [Totale bedrijfstijd]</li>
+              <li>FIT (Failures in Time) = [λ] × 10^9</li>
+              <li>MTBM = [Totale bedrijfstijd] / ([Geplande acties] + [Ongeplande acties])</li>
+              <li>MCMT = [Totale hersteltijd] / [Aantal ongeplande acties]</li>
             </ul>
           </div>
         </section>
@@ -107,7 +107,7 @@
 
       <!-- Grafiek (alleen MTTF, MTTR, MTBM, MTBF) -->
       <div class="chart-card">
-        <h2 class="chart-title">Overzichtsgrafiek (uren)</h2>
+        <h2 class="chart-title">MTTF, MTTR, MTBM, MTBF in uren</h2>
         <canvas id="kpiChart" height="120"></canvas>
       </div>
     </div>
@@ -119,5 +119,6 @@
   <script src="main.js"></script>
 </body>
 </html>
+
 
 
