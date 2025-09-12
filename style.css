@@ -1,3 +1,4 @@
+/* Gebaseerd op je bestaande stijl (donker, cards, knoppen):contentReference[oaicite:4]{index=4} */
 body {
   margin: 0;
   font-family: 'Inter', Arial, sans-serif;
@@ -44,7 +45,7 @@ body {
   border-radius: 18px;
   box-shadow: 0 8px 32px #0004;
   padding: 32px 40px;
-  max-width: 950px;
+  max-width: 1100px;
   width: 100%;
   color: #fff;
   margin-left: auto;
@@ -60,11 +61,12 @@ body {
   gap: 40px;
   margin-top: 28px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 .input-pane, .output-pane {
   flex: 1 1 0;
-  max-width: 400px;
-  margin: auto;
+  max-width: 480px;
+  min-width: 320px;
 }
 
 form label {
@@ -113,16 +115,18 @@ button.reset-btn:hover { background: #3b4970; }
 .result-block {
   background: #232b3a;
   border-radius: 12px;
-  padding: 28px 24px 18px;
+  padding: 24px;
   margin-bottom: 18px;
-  text-align: center;
 }
 .result-block h2 { color: #b8c7e0; }
-.result-bedrag {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #13d17c;
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 10px 16px;
+  font-size: 1rem;
 }
+.result-grid div { color: #e5ecff; }
 
 .info-block {
   background: #232b3a;
@@ -131,4 +135,18 @@ button.reset-btn:hover { background: #3b4970; }
   color: #b8c7e0;
   font-size: 0.95rem;
   margin-top: 8px;
+}
+.small-note { color: #93a4c9; font-size: 0.9rem; }
+
+.chart-card {
+  background: #232b3a;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 26px;
+  height: 420px; /* ruimte voor de chart */
+}
+.chart-title {
+  color: #b8c7e0;
+  margin: 0 0 12px;
+  text-align: center;
 }
