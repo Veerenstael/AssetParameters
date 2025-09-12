@@ -1,49 +1,64 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SparePart Tool</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Veerenstael KPI Tool</title>
+  <link rel="stylesheet" href="style.css"/>
 
-  <!-- Favicon -->
-  <link rel="icon" href="favicon.png" type="image/png">
+  <!-- Favicon (zelfde aanpak als je bestaande project) -->
+  <link rel="icon" href="favicon.png" type="image/png"/>
 </head>
 <body>
   <div class="dashboard-bg">
     <header class="logo-header">
-      <img src="https://www.veerenstael.nl/wp-content/uploads/2020/06/logo-veerenstael-wit.png" alt="Veerenstael Logo" class="veerenstael-logo" />
-      <div class="subtitle-title">SparePart Tool</div>
+      <img
+        src="https://www.veerenstael.nl/wp-content/uploads/2020/06/logo-veerenstael-wit.png"
+        alt="Veerenstael Logo"
+        class="veerenstael-logo"
+      />
+      <div class="subtitle-title">KPI & Betrouwbaarheid Tool</div>
     </header>
 
     <div class="main-card">
       <div class="header center-header">
-        <p>Deze Veerenstael-tool berekent de run-out kans, stilstanduren per jaar en (on)beschikbaarheid van je systeem op basis van componenten, faalfrequentie en aanlevertijden.</p>
+        <p>
+          Deze Veerenstael-tool berekent MTTF, MTBF, MTTR, Beschikbaarheid, Failure rate (λ),
+          FIT, MTBM en MCMT op basis van jouw invoer. Stijl en lay-out sluiten aan op je bestaande tool:contentReference[oaicite:2]{index=2}.
+        </p>
       </div>
 
       <div class="content-grid">
         <!-- Invoer -->
         <section class="input-pane">
-          <form id="spares-form">
-            <label for="m">Aantal componenten (m)</label>
-            <input type="number" id="m" value="10" step="1" min="0">
+          <form id="kpi-form" autocomplete="off">
+            <label for="totItemsHours">Totale bedrijfstijd van alle items (uren)</label>
+            <input type="number" id="totItemsHours" value="200000" step="1" min="0"/>
 
-            <label for="lambda">Faalfrequentie λ (/jaar)</label>
-            <input type="number" id="lambda" value="0.2" step="0.01" min="0">
+            <label for="failedItems">Aantal falende items</label>
+            <input type="number" id="failedItems" value="10" step="1" min="0"/>
 
-            <label for="n">Aantal spares (n)</label>
-            <input type="number" id="n" value="2" step="1" min="0">
+            <label for="totHours">Totale bedrijfstijd (uren)</label>
+            <input type="number" id="totHours" value="35000" step="1" min="0"/>
 
-            <label for="tstm">Stilstand met voorraad (TstM, uren)</label>
-            <input type="number" id="tstm" value="8" step="0.1" min="0">
+            <label for="failures">Aantal storingen</label>
+            <input type="number" id="failures" value="7" step="1" min="0"/>
 
-            <label for="tstz">Stilstand zonder voorraad (TstZ, uren)</label>
-            <input type="number" id="tstz" value="200" step="0.1" min="0">
+            <label for="totRepairHours">Totale hersteltijd (uren)</label>
+            <input type="number" id="totRepairHours" value="56" step="0.1" min="0"/>
+
+            <label for="pmCount">Aantal geplande onderhoudsacties</label>
+            <input type="number" id="pmCount" value="22" step="1" min="0"/>
+
+            <label for="cmCount">Aantal ongeplande onderhoudsacties</label>
+            <input type="number" id="cmCount" value="9" step="1" min="0"/>
 
             <div class="button-row">
               <button type="submit" class="green">Bereken</button>
               <button type="reset" class="reset-btn">Reset</button>
             </div>
+
+            <div id="warn" class="info-block" style="color:#ffcc99" hidden></div>
           </form>
         </section>
 
@@ -51,25 +66,49 @@
         <section class="output-pane">
           <div class="result-block">
             <h2>Resultaten</h2>
-            <div class="result-bedrag">
-              Run-out kans: <span id="outP">—</span>
+            <div class="result-grid">
+              <div><strong>MTTF (uur):</strong> <span id="outMTTF">—</span></div>
+              <div><strong>MTBF (uur):</strong> <span id="outMTBF">—</span></div>
+              <div><strong>MTTR (uur):</strong> <span id="outMTTR">—</span></div>
+              <div><strong>Beschikbaarheid A:</strong> <span id="outA">—</span></div>
+              <div><strong>λ (per uur):</strong> <span id="outLambda">—</span></div>
+              <div><strong>FIT (per 10^9 uur):</strong> <span id="outFIT">—</span></div>
+              <div><strong>MTBM (uur):</strong> <span id="outMTBM">—</span></div>
+              <div><strong>MCMT (uur):</strong> <span id="outMCMT">—</span></div>
             </div>
           </div>
 
           <div class="info-block">
-            <p><strong>Stilstanduren/jaar:</strong> <span id="outDT">—</span></p>
-            <p><strong>Onbeschikbaarheid:</strong> <span id="outUA">—</span></p>
-            <p><strong>Beschikbaarheid:</strong> <span id="outAV">—</span></p>
-            <p><strong>T<sub>a</sub> (jaren):</strong> <span id="outTa">—</span></p>
-            <p><strong>μ = m·λ·T<sub>a</sub>:</strong> <span id="outMu">—</span></p>
-            <p><strong>Poisson CDF (t/m n−1):</strong> <span id="outCDF">—</span></p>
+            <p><strong>Definities in deze tool</strong></p>
+            <ul>
+              <li>MTTF = totale bedrijfstijd van alle items ÷ aantal falende items</li>
+              <li>MTBF = totale bedrijfstijd ÷ aantal storingen</li>
+              <li>MTTR = totale hersteltijd ÷ aantal storingen</li>
+              <li>A = MTBF ÷ (MTBF + MTTR)</li>
+              <li>λ = aantal storingen ÷ totale bedrijfstijd</li>
+              <li>FIT = λ × 10^9</li>
+              <li>MTBM = totale bedrijfstijd ÷ (geplande + ongeplande acties)</li>
+              <li>MCMT = totale hersteltijd ÷ aantal ongeplande acties</li>
+            </ul>
+            <p class="small-note">
+              Aanname: totale hersteltijd betreft herstel (correctief). Voor MCMT wordt deze verdeeld over
+              het aantal ongeplande acties. Pas desgewenst aan naar jouw registratiepraktijk.
+            </p>
           </div>
-
-          <div id="warn" class="info-block" style="color:#ffcc99" hidden></div>
         </section>
+      </div>
+
+      <!-- Grafiek -->
+      <div class="chart-card">
+        <h2 class="chart-title">Overzichtsgrafiek</h2>
+        <canvas id="kpiChart" height="120"></canvas>
       </div>
     </div>
   </div>
+
+  <!-- Chart.js (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Logica -->
   <script src="main.js"></script>
 </body>
 </html>
