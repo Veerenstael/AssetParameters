@@ -1,4 +1,4 @@
-/* Gebaseerd op je bestaande stijl (donker, cards, knoppen):contentReference[oaicite:4]{index=4} */
+/* Donkere dashboardstijl zoals je vorige tool:contentReference[oaicite:4]{index=4} */
 body {
   margin: 0;
   font-family: 'Inter', Arial, sans-serif;
@@ -75,7 +75,7 @@ form label {
   font-weight: 500;
   color: #e0e6f0;
 }
-form input {
+form input, form select {
   width: 100%;
   background: #1a2230;
   color: #e0e0e0;
@@ -86,7 +86,15 @@ form input {
   font-size: 1rem;
   box-sizing: border-box;
 }
-form input:focus { outline: 2px solid #3e70ff; }
+form input:focus, form select:focus { outline: 2px solid #3e70ff; }
+
+/* input + unit selector naast elkaar */
+.unit-row {
+  display: grid;
+  grid-template-columns: 1fr 150px;
+  gap: 12px;
+  align-items: center;
+}
 
 .button-row {
   display: flex;
