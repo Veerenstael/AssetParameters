@@ -21,8 +21,26 @@
     <div class="main-card">
       <div class="header center-header">
         <p>
-          Bereken en krijg inzicht in o.a. MTTF, MTBF, MTTR, MTBM, MCMT, Beschikbaarheid [A], Failure rate [λ], FIT. De grafiek toont MTTF, MTTR, MTBM en MTBF.
+          Bereken betrouwbaarheids- en onderhoudsparameters voor uw installaties en machines.
         </p>
+      </div>
+
+      <!-- Definitie-sectie -->
+      <div class="definitions-section">
+        <h3 class="definitions-title">📚 KPI Definities - Klik voor uitleg</h3>
+        <div class="definitions-grid">
+          <button type="button" class="def-btn" data-kpi="mttf">MTTF</button>
+          <button type="button" class="def-btn" data-kpi="mtbf">MTBF</button>
+          <button type="button" class="def-btn" data-kpi="mttr">MTTR</button>
+          <button type="button" class="def-btn" data-kpi="availability">Beschikbaarheid [A]</button>
+          <button type="button" class="def-btn" data-kpi="lambda">Failure Rate [λ]</button>
+          <button type="button" class="def-btn" data-kpi="fit">FIT</button>
+          <button type="button" class="def-btn" data-kpi="mtbm">MTBM</button>
+          <button type="button" class="def-btn" data-kpi="mcmt">MCMT</button>
+        </div>
+        <div id="def-explanation" class="def-explanation" hidden>
+          <div class="def-content"></div>
+        </div>
       </div>
 
       <div class="content-grid">
@@ -67,6 +85,7 @@
             <div class="button-row">
               <button type="submit" class="green">Bereken</button>
               <button type="reset" class="reset-btn">Reset</button>
+              <button type="button" class="export-btn" id="exportPDF">📄 Exporteer PDF</button>
             </div>
 
             <div id="warn" class="info-block" style="color:#ffcc99" hidden></div>
@@ -90,17 +109,76 @@
           </div>
 
           <div class="info-block">
-            <p><strong>Definities</strong></p>
-            <ul>
-              <li>MTTF = [Totale bedrijfstijd van alle items] ÷ [aantal falende items]</li>
-              <li>MTBF = [Totale bedrijfstijd] / [Aantal storingen]</li>
-              <li>MTTR = [Totale hersteltijd] / [Aantal storingen]</li>
-              <li>Beschikbaarheid [A] = MTBF / (MTBF + MTTR)</li>
-              <li>Failure rate [λ] = [Aantal storingen] / [Totale bedrijfstijd]</li>
-              <li>FIT (Failures in Time) = [λ] × 10^9</li>
-              <li>MTBM = [Totale bedrijfstijd] / ([Geplande acties] + [Ongeplande acties])</li>
-              <li>MCMT = [Totale hersteltijd] / [Aantal ongeplande acties]</li>
-            </ul>
+            <p><strong>Berekeningsformules</strong></p>
+            <div class="formulas">
+              <div class="formula-item">
+                <span class="formula-label">MTTF =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale bedrijfstijd van alle items]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal falende items]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MTBF =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale bedrijfstijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal storingen]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MTTR =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale hersteltijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal storingen]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">Beschikbaarheid [A] =</span>
+                <div class="fraction">
+                  <span class="frac-num">MTBF</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">(MTBF + MTTR)</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">Failure rate [λ] =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Aantal storingen]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Totale bedrijfstijd]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">FIT =</span>
+                <span class="formula-simple">[λ] × 10<sup>9</sup></span>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MTBM =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale bedrijfstijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">([Geplande acties] + [Ongeplande acties])</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MCMT =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale hersteltijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal ongeplande acties]</span>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -115,10 +193,10 @@
 
   <!-- Chart.js (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- jsPDF voor PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <!-- Logica -->
   <script src="main.js"></script>
 </body>
 </html>
-
-
-
