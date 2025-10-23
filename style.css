@@ -1,4 +1,4 @@
-/* Donkere dashboardstijl zoals je vorige tool:contentReference[oaicite:4]{index=4} */
+/* Donkere dashboardstijl zoals je vorige tool */
 body {
   margin: 0;
   font-family: 'Inter', Arial, sans-serif;
@@ -56,6 +56,81 @@ body {
 .header { text-align: center; }
 .header p { color: #b8c7e0; }
 
+/* Definitie-sectie */
+.definitions-section {
+  background: #1a2230;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.definitions-title {
+  color: #e0e6f0;
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.definitions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.def-btn {
+  background: #2a3847;
+  color: #e0e6f0;
+  border: 2px solid #3a4858;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.def-btn:hover {
+  background: #3a4858;
+  border-color: #4a5868;
+  transform: translateY(-2px);
+}
+
+.def-btn.active {
+  background: #3e70ff;
+  border-color: #3e70ff;
+  color: #fff;
+}
+
+.def-explanation {
+  background: #232b3a;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 16px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.def-content {
+  color: #d0dae8;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.def-content strong {
+  color: #e0e6f0;
+}
+
 .content-grid {
   display: flex;
   gap: 40px;
@@ -99,6 +174,7 @@ form input:focus, form select:focus { outline: 2px solid #3e70ff; }
 .button-row {
   display: flex;
   gap: 18px;
+  flex-wrap: wrap;
 }
 button {
   border: none;
@@ -119,6 +195,11 @@ button.reset-btn {
   color: #fff;
 }
 button.reset-btn:hover { background: #3b4970; }
+button.export-btn {
+  background: #ff6b35;
+  color: #fff;
+}
+button.export-btn:hover { background: #e55a28; }
 
 .result-block {
   background: #232b3a;
@@ -144,6 +225,61 @@ button.reset-btn:hover { background: #3b4970; }
   font-size: 0.95rem;
   margin-top: 8px;
 }
+
+/* Wetenschappelijke formule-notatie */
+.formulas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.formula-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #2a3442;
+}
+
+.formula-item:last-child {
+  border-bottom: none;
+}
+
+.formula-label {
+  font-weight: 600;
+  color: #e0e6f0;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.frac-num,
+.frac-den {
+  color: #d0dae8;
+  padding: 2px 8px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.frac-line {
+  width: 100%;
+  height: 1px;
+  background: #7a8a9e;
+  margin: 2px 0;
+}
+
+.formula-simple {
+  color: #d0dae8;
+  font-size: 0.95rem;
+}
+
 .small-note { color: #93a4c9; font-size: 0.9rem; }
 
 .chart-card {
@@ -157,4 +293,23 @@ button.reset-btn:hover { background: #3b4970; }
   color: #b8c7e0;
   margin: 0 0 12px;
   text-align: center;
+}
+
+/* Responsive aanpassingen */
+@media (max-width: 768px) {
+  .definitions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .button-row {
+    flex-direction: column;
+  }
+  
+  button {
+    width: 100%;
+  }
 }
