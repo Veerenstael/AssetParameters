@@ -73,7 +73,7 @@ body {
 
 .definitions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -132,16 +132,32 @@ body {
 }
 
 .content-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 40px;
   margin-top: 28px;
-  justify-content: center;
-  flex-wrap: wrap;
 }
-.input-pane, .output-pane {
-  flex: 1 1 0;
-  max-width: 480px;
-  min-width: 320px;
+
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.input-section,
+.result-section,
+.formulas-section {
+  background: #232b3a;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.section-title {
+  color: #e0e6f0;
+  font-size: 1.4rem;
+  margin: 0 0 20px 0;
+  font-weight: 600;
 }
 
 form label {
@@ -198,39 +214,39 @@ button.reset-btn:hover { background: #3b4970; }
 button.export-btn {
   background: #ff6b35;
   color: #fff;
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 0;
 }
 button.export-btn:hover { background: #e55a28; }
 
-.result-block {
-  background: #232b3a;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 18px;
+.result-section {
+  display: flex;
+  flex-direction: column;
 }
-.result-block h2 { color: #b8c7e0; }
 
 .result-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 1fr));
-  gap: 10px 16px;
+  grid-template-columns: 1fr;
+  gap: 10px;
   font-size: 1rem;
+  margin-bottom: 0;
 }
 .result-grid div { color: #e5ecff; }
-
-.info-block {
-  background: #232b3a;
-  border-radius: 12px;
-  padding: 14px 16px;
-  color: #b8c7e0;
-  font-size: 0.95rem;
-  margin-top: 8px;
-}
 
 /* Wetenschappelijke formule-notatie */
 .formulas {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-top: 12px;
+}
+
+.info-block {
+  background: #2a3442;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
   margin-top: 12px;
 }
 
@@ -296,7 +312,11 @@ button.export-btn:hover { background: #e55a28; }
 }
 
 /* Responsive aanpassingen */
-@media (max-width: 768px) {
+@media (max-width: 968px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
   .definitions-grid {
     grid-template-columns: repeat(2, 1fr);
   }
