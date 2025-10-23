@@ -7,35 +7,35 @@
   // KPI Definities - consistent uitgelegd
   const kpiDefinitions = {
     mttf: {
-      title: 'MTTF - Mean Time To Failure',
+      title: 'MTTF - Mean Time To Failure (Gemiddelde Tijd Tot Falen)',
       text: '<strong>Wat het is:</strong> MTTF meet de gemiddelde tijd totdat een niet-repareerbaar component faalt. Dit is de verwachte levensduur van items die na een storing vervangen worden (zoals lampen, batterijen of wegwerponderdelen). <strong>Waarom belangrijk:</strong> MTTF helpt bij het inschatten van de levensduur van componenten en het plannen van vervangingsmomenten. Een hogere MTTF betekent dat onderdelen langer meegaan. <strong>Interpretatie:</strong> Bij een MTTF van 20.000 uur verwacht je dat een component gemiddeld 20.000 uur meegaat voordat deze moet worden vervangen.'
     },
     mtbf: {
-      title: 'MTBF - Mean Time Between Failures',
+      title: 'MTBF - Mean Time Between Failures (Gemiddelde Tijd Tussen Storingen)',
       text: '<strong>Wat het is:</strong> MTBF meet de gemiddelde tijd tussen opeenvolgende storingen van een repareerbaar systeem. Dit geeft aan hoe vaak een machine of installatie uitvalt tijdens de bedrijfstijd. <strong>Waarom belangrijk:</strong> MTBF is een cruciale maatstaf voor de betrouwbaarheid van productiemiddelen. Een hogere MTBF betekent minder frequente storingen en stabielere productie. <strong>Interpretatie:</strong> Een MTBF van 5.000 uur betekent dat je gemiddeld elke 5.000 draaiuren een storing verwacht. Dit helpt bij het plannen van onderhoud en het optimaliseren van productieprocessen.'
     },
     mttr: {
-      title: 'MTTR - Mean Time To Repair',
+      title: 'MTTR - Mean Time To Repair (Gemiddelde Hersteltijd)',
       text: '<strong>Wat het is:</strong> MTTR meet de gemiddelde tijd die nodig is om een storing te herstellen, van het moment dat de storing wordt gedetecteerd tot het moment dat het systeem weer operationeel is. <strong>Waarom belangrijk:</strong> MTTR is direct gekoppeld aan de productiviteit: hoe korter de hersteltijd, hoe minder productieverliezen. Dit geeft inzicht in de effectiviteit van uw onderhoudsorganisatie. <strong>Interpretatie:</strong> Een MTTR van 8 uur betekent dat storingen gemiddeld binnen 8 uur zijn opgelost. Verlaging van MTTR kan door betere reserveonderdelenvoorraad, training van technici of verbeterde diagnostiek.'
     },
     availability: {
-      title: 'Beschikbaarheid [A] - Availability',
+      title: 'Beschikbaarheid [A] - Availability (Beschikbaarheidsgraad)',
       text: '<strong>Wat het is:</strong> Beschikbaarheid geeft aan welk percentage van de tijd een systeem operationeel en beschikbaar is voor productie. Het is de verhouding tussen de tijd dat het systeem werkt en de totale tijd (inclusief stilstand). <strong>Waarom belangrijk:</strong> Beschikbaarheid is een directe maatstaf voor productiecapaciteit en efficiency. Een hogere beschikbaarheid betekent meer productietijd en hogere output. <strong>Interpretatie:</strong> Een beschikbaarheid van 95% betekent dat de installatie 95% van de tijd productieklaar is en 5% stilstaat voor onderhoud of storing. Voor kritieke processen streeft men vaak naar >99% beschikbaarheid.'
     },
     lambda: {
-      title: 'Failure Rate [λ] - Storingsfrequentie',
+      title: 'Failure Rate [λ] - Storingsfrequentie (Faalkans)',
       text: '<strong>Wat het is:</strong> De failure rate (λ, lambda) geeft het aantal storingen per tijdseenheid weer. Het is het omgekeerde van MTBF en drukt uit hoe vaak storingen optreden. <strong>Waarom belangrijk:</strong> Lambda wordt gebruikt in betrouwbaarheidsberekeningen en helpt bij het vergelijken van verschillende systemen of componenten. Een lagere lambda betekent een betrouwbaarder systeem. <strong>Interpretatie:</strong> Een λ van 0,0002 per uur betekent 0,02% kans op storing per uur, oftewel gemiddeld één storing per 5.000 uur. Dit wordt vaak gebruikt in probabilistische analyses en veiligheidsberekeningen.'
     },
     fit: {
-      title: 'FIT - Failures In Time',
+      title: 'FIT - Failures In Time (Storingen per Miljard Uur)',
       text: '<strong>Wat het is:</strong> FIT is een gestandaardiseerde maat voor betrouwbaarheid die het aantal storingen per miljard (10⁹) bedrijfsuren weergeeft. Het is een praktische manier om zeer betrouwbare systemen te vergelijken. <strong>Waarom belangrijk:</strong> FIT is vooral nuttig bij elektronische componenten en systemen waar storingen zeldzaam zijn. Het maakt vergelijking tussen leveranciers en producten eenvoudiger. <strong>Interpretatie:</strong> Een FIT van 200 betekent 200 storingen per miljard uur, oftewel gemiddeld één storing per 5 miljoen uur. FIT-waarden worden vaak door fabrikanten opgegeven voor kwaliteitsgaranties.'
     },
     mtbm: {
-      title: 'MTBM - Mean Time Between Maintenance',
+      title: 'MTBM - Mean Time Between Maintenance (Gemiddelde Tijd Tussen Onderhoud)',
       text: '<strong>Wat het is:</strong> MTBM meet de gemiddelde tijd tussen alle onderhoudsacties (zowel gepland preventief onderhoud als ongepland correctief onderhoud). Dit geeft de totale onderhoudsfrequentie weer. <strong>Waarom belangrijk:</strong> MTBM helpt bij het plannen van onderhoudsresources en capaciteit. Het toont de totale onderhoudslast van een systeem en helpt bij het optimaliseren van onderhoudsstrategieën. <strong>Interpretatie:</strong> Een MTBM van 1.000 uur betekent dat er gemiddeld elke 1.000 uur een onderhoudsactie plaatsvindt. Door preventief onderhoud te optimaliseren kan MTBM worden verlengd en ongepland onderhoud verminderd.'
     },
     mcmt: {
-      title: 'MCMT - Mean Corrective Maintenance Time',
+      title: 'MCMT - Mean Corrective Maintenance Time (Gemiddelde Correctieve Onderhoudstijd)',
       text: '<strong>Wat het is:</strong> MCMT meet de gemiddelde tijd die nodig is voor correctief (ongepland) onderhoud per storing. Dit is vergelijkbaar met MTTR maar focust specifiek op correctieve acties. <strong>Waarom belangrijk:</strong> MCMT geeft inzicht in de complexiteit en impact van ongeplande storingen. Een hoge MCMT duidt op complexe of moeilijk toegankelijke problemen die veel tijd kosten. <strong>Interpretatie:</strong> Een MCMT van 6 uur betekent dat ongeplande reparaties gemiddeld 6 uur duren. Verlaging kan door betere foutdiagnose, training, of technische verbeteringen aan de installatie.'
     }
   };
