@@ -97,15 +97,49 @@
           <!-- Resultaten -->
           <div class="result-section">
             <h2 class="section-title">Resultaten</h2>
+            
+            <div class="result-unit-selector">
+              <label for="resultUnit">Weergave eenheid:</label>
+              <select id="resultUnit">
+                <option value="hours" selected>Uren</option>
+                <option value="days">Dagen</option>
+                <option value="years">Jaren</option>
+              </select>
+            </div>
+            
             <div class="result-grid">
-              <div><strong>MTTF (uur):</strong> <span id="outMTTF">—</span></div>
-              <div><strong>MTBF (uur):</strong> <span id="outMTBF">—</span></div>
-              <div><strong>MTTR (uur):</strong> <span id="outMTTR">—</span></div>
-              <div><strong>Beschikbaarheid [A]:</strong> <span id="outA">—</span></div>
-              <div><strong>Failure Rate [λ] (per uur):</strong> <span id="outLambda">—</span></div>
-              <div><strong>FIT (per 10^9 uur):</strong> <span id="outFIT">—</span></div>
-              <div><strong>MTBM (uur):</strong> <span id="outMTBM">—</span></div>
-              <div><strong>MCMT (uur):</strong> <span id="outMCMT">—</span></div>
+              <div class="result-row">
+                <span class="result-label">MTTF:</span>
+                <span class="result-value"><span id="outMTTF">—</span> <span id="unitMTTF">uur</span></span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">MTBF:</span>
+                <span class="result-value"><span id="outMTBF">—</span> <span id="unitMTBF">uur</span></span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">MTTR:</span>
+                <span class="result-value"><span id="outMTTR">—</span> <span id="unitMTTR">uur</span></span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Beschikbaarheid [A]:</span>
+                <span class="result-value" id="outA">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Failure Rate [λ]:</span>
+                <span class="result-value"><span id="outLambda">—</span> per uur</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">FIT:</span>
+                <span class="result-value"><span id="outFIT">—</span> per 10<sup>9</sup> uur</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">MTBM:</span>
+                <span class="result-value"><span id="outMTBM">—</span> <span id="unitMTBM">uur</span></span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">MCMT:</span>
+                <span class="result-value"><span id="outMCMT">—</span> <span id="unitMCMT">uur</span></span>
+              </div>
             </div>
             
             <button type="button" class="export-btn" id="exportPDF">📄 Exporteer PDF</button>
