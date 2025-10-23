@@ -44,58 +44,59 @@
       </div>
 
       <div class="content-grid">
-        <!-- Invoer -->
-        <section class="input-pane">
-          <form id="kpi-form" autocomplete="off">
-            <label for="totItemsValue">Totale bedrijfstijd van alle items</label>
-            <div class="unit-row">
-              <input type="number" id="totItemsValue" value="200000" step="1" min="0"/>
-              <select id="totItemsUnit" aria-label="Eenheid totale bedrijfstijd van alle items">
-                <option value="hours" selected>uren</option>
-                <option value="days">dagen</option>
-                <option value="years">jaren</option>
-              </select>
-            </div>
+        <!-- Linker kolom: Input + Resultaten -->
+        <section class="left-column">
+          <!-- Invoer -->
+          <div class="input-section">
+            <h2 class="section-title">Invoervelden</h2>
+            <form id="kpi-form" autocomplete="off">
+              <label for="totItemsValue">Totale bedrijfstijd van alle items</label>
+              <div class="unit-row">
+                <input type="number" id="totItemsValue" value="200000" step="1" min="0"/>
+                <select id="totItemsUnit" aria-label="Eenheid totale bedrijfstijd van alle items">
+                  <option value="hours" selected>uren</option>
+                  <option value="days">dagen</option>
+                  <option value="years">jaren</option>
+                </select>
+              </div>
 
-            <label for="failedItems">Aantal falende items</label>
-            <input type="number" id="failedItems" value="10" step="1" min="0"/>
+              <label for="failedItems">Aantal falende items</label>
+              <input type="number" id="failedItems" value="10" step="1" min="0"/>
 
-            <label for="totHoursValue">Totale bedrijfstijd</label>
-            <div class="unit-row">
-              <input type="number" id="totHoursValue" value="35000" step="1" min="0"/>
-              <select id="totHoursUnit" aria-label="Eenheid totale bedrijfstijd">
-                <option value="hours" selected>uren</option>
-                <option value="days">dagen</option>
-                <option value="years">jaren</option>
-              </select>
-            </div>
+              <label for="totHoursValue">Totale bedrijfstijd</label>
+              <div class="unit-row">
+                <input type="number" id="totHoursValue" value="35000" step="1" min="0"/>
+                <select id="totHoursUnit" aria-label="Eenheid totale bedrijfstijd">
+                  <option value="hours" selected>uren</option>
+                  <option value="days">dagen</option>
+                  <option value="years">jaren</option>
+                </select>
+              </div>
 
-            <label for="failures">Aantal storingen</label>
-            <input type="number" id="failures" value="7" step="1" min="0"/>
+              <label for="failures">Aantal storingen</label>
+              <input type="number" id="failures" value="7" step="1" min="0"/>
 
-            <label for="totRepairHours">Totale hersteltijd (uren)</label>
-            <input type="number" id="totRepairHours" value="56" step="0.1" min="0"/>
+              <label for="totRepairHours">Totale hersteltijd (uren)</label>
+              <input type="number" id="totRepairHours" value="56" step="0.1" min="0"/>
 
-            <label for="pmCount">Aantal geplande onderhoudsacties</label>
-            <input type="number" id="pmCount" value="22" step="1" min="0"/>
+              <label for="pmCount">Aantal geplande onderhoudsacties</label>
+              <input type="number" id="pmCount" value="22" step="1" min="0"/>
 
-            <label for="cmCount">Aantal ongeplande onderhoudsacties</label>
-            <input type="number" id="cmCount" value="9" step="1" min="0"/>
+              <label for="cmCount">Aantal ongeplande onderhoudsacties</label>
+              <input type="number" id="cmCount" value="9" step="1" min="0"/>
 
-            <div class="button-row">
-              <button type="submit" class="green">Bereken</button>
-              <button type="reset" class="reset-btn">Reset</button>
-              <button type="button" class="export-btn" id="exportPDF">📄 Exporteer PDF</button>
-            </div>
+              <div class="button-row">
+                <button type="submit" class="green">Bereken</button>
+                <button type="reset" class="reset-btn">Reset</button>
+              </div>
 
-            <div id="warn" class="info-block" style="color:#ffcc99" hidden></div>
-          </form>
-        </section>
+              <div id="warn" class="info-block" style="color:#ffcc99" hidden></div>
+            </form>
+          </div>
 
-        <!-- Uitvoer -->
-        <section class="output-pane">
-          <div class="result-block">
-            <h2>Resultaten</h2>
+          <!-- Resultaten -->
+          <div class="result-section">
+            <h2 class="section-title">Resultaten</h2>
             <div class="result-grid">
               <div><strong>MTTF (uur):</strong> <span id="outMTTF">—</span></div>
               <div><strong>MTBF (uur):</strong> <span id="outMTBF">—</span></div>
@@ -106,10 +107,15 @@
               <div><strong>MTBM (uur):</strong> <span id="outMTBM">—</span></div>
               <div><strong>MCMT (uur):</strong> <span id="outMCMT">—</span></div>
             </div>
+            
+            <button type="button" class="export-btn" id="exportPDF">📄 Exporteer PDF</button>
           </div>
+        </section>
 
-          <div class="info-block">
-            <p><strong>Berekeningsformules</strong></p>
+        <!-- Rechter kolom: Berekeningsformules -->
+        <section class="right-column">
+          <div class="formulas-section">
+            <h2 class="section-title">Berekeningsformules</h2>
             <div class="formulas">
               <div class="formula-item">
                 <span class="formula-label">MTTF =</span>
