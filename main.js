@@ -60,6 +60,25 @@
     }
   }
 
+  function fromHours(hours, unit) {
+    if (!isFinite(hours)) return NaN;
+    switch (unit) {
+      case 'hours': return hours;
+      case 'days':  return hours / HOURS_PER_DAY;
+      case 'years': return hours / HOURS_PER_YEAR;
+      default:      return NaN;
+    }
+  }
+
+  function getUnitLabel(unit) {
+    switch (unit) {
+      case 'hours': return 'uur';
+      case 'days':  return 'dagen';
+      case 'years': return 'jaren';
+      default:      return 'uur';
+    }
+  }
+
   // Definitie knoppen - interactieve uitleg
   document.querySelectorAll('.def-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -148,14 +167,25 @@
 
   // UI bijwerken
   function updateUI(r) {
-    document.getElementById('outMTTF').textContent = fmtNum(r.MTTF, 2);
-    document.getElementById('outMTBF').textContent = fmtNum(r.MTBF, 2);
-    document.getElementById('outMTTR').textContent = fmtNum(r.MTTR, 2);
+    const resultUnit = document.getElementById('resultUnit').value;
+    const unitLabel = getUnitLabel(resultUnit);
+    
+    // Converteer waarden naar geselecteerde eenheid
+    document.getElementById('outMTTF').textContent = fmtNum(fromHours(r.MTTF, resultUnit), 2);
+    document.getElementById('outMTBF').textContent = fmtNum(fromHours(r.MTBF, resultUnit), 2);
+    document.getElementById('outMTTR').textContent = fmtNum(fromHours(r.MTTR, resultUnit), 2);
     document.getElementById('outA').textContent    = fmtPct(r.availability, 4);
     document.getElementById('outLambda').textContent = fmtNum(r.lambda, 6);
     document.getElementById('outFIT').textContent    = fmtNum(r.FIT, 2);
-    document.getElementById('outMTBM').textContent   = fmtNum(r.MTBM, 2);
-    document.getElementById('outMCMT').textContent   = fmtNum(r.MCMT, 2);
+    document.getElementById('outMTBM').textContent   = fmtNum(fromHours(r.MTBM, resultUnit), 2);
+    document.getElementById('outMCMT').textContent   = fmtNum(fromHours(r.MCMT, resultUnit), 2);
+    
+    // Update eenheidslabels
+    document.getElementById('unitMTTF').textContent = unitLabel;
+    document.getElementById('unitMTBF').textContent = unitLabel;
+    document.getElementById('unitMTTR').textContent = unitLabel;
+    document.getElementById('unitMTBM').textContent = unitLabel;
+    document.getElementById('unitMCMT').textContent = unitLabel;
   }
 
   // Grafiek: alleen MTTF, MTTR, MTBM, MTBF (bars, één as in uren)
@@ -211,6 +241,8 @@
     
     const inputs = readInputs();
     const results = compute(inputs);
+    const resultUnit = document.getElementById('resultUnit').value;
+    const unitLabel = getUnitLabel(resultUnit);
     
     let yPos = 20;
     const leftMargin = 20;
@@ -219,7 +251,7 @@
     // Logo en header
     pdf.setFontSize(20);
     pdf.setTextColor(34, 44, 56);
-    pdf.text('Veerenstael KPI Tool', leftMargin, yPos);
+    pdf.text('Veerenstael - Tooling', leftMargin, yPos);
     yPos += 8;
     
     pdf.setFontSize(10);
@@ -274,21 +306,21 @@
     pdf.setFontSize(10);
     pdf.setTextColor(60, 60, 60);
     
-    pdf.text(`MTTF (Mean Time To Failure): ${fmtNum(results.MTTF, 2)} uur`, leftMargin + 5, yPos);
+    pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`MTBF (Mean Time Between Failures): ${fmtNum(results.MTBF, 2)} uur`, leftMargin + 5, yPos);
+    pdf.text(`MTBF: ${fmtNum(fromHours(results.MTBF, resultUnit), 2)} ${unitLabel}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`MTTR (Mean Time To Repair): ${fmtNum(results.MTTR, 2)} uur`, leftMargin + 5, yPos);
+    pdf.text(`MTTR: ${fmtNum(fromHours(results.MTTR, resultUnit), 2)} ${unitLabel}`, leftMargin + 5, yPos);
     yPos += 6;
     pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`Failure Rate [λ]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 5, yPos);
+    pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 5, yPos);
     yPos += 6;
     pdf.text(`FIT (Failures In Time): ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`MTBM (Mean Time Between Maintenance): ${fmtNum(results.MTBM, 2)} uur`, leftMargin + 5, yPos);
+    pdf.text(`MTBM: ${fmtNum(fromHours(results.MTBM, resultUnit), 2)} ${unitLabel}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`MCMT (Mean Corrective Maintenance Time): ${fmtNum(results.MCMT, 2)} uur`, leftMargin + 5, yPos);
+    pdf.text(`MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, leftMargin + 5, yPos);
     yPos += 15;
     
     // Formules
@@ -339,7 +371,7 @@
     pdf.text('FIT = [λ] × 10^9', leftMargin + 5, yPos);
     yPos += 5;
     pdf.setTextColor(100, 100, 100);
-    pdf.text(`      = ${fmtNum(results.lambda, 6)} × 1.000.000.000 = ${fmtNum(results.FIT, 2)}`, leftMargin + 5, yPos);
+    pdf.text(`      = ${fmtNum(results.lambda, 6)} x 1.000.000.000 = ${fmtNum(results.FIT, 2)}`, leftMargin + 5, yPos);
     yPos += 7;
     
     pdf.setTextColor(60, 60, 60);
@@ -373,7 +405,7 @@
     // Footer met logo en links
     pdf.setFontSize(10);
     pdf.setTextColor(34, 44, 56);
-    pdf.text('Gegenereerd met Veerenstael KPI Tool', leftMargin, yPos);
+    pdf.text('Gegenereerd met Veerenstael - Tooling', leftMargin, yPos);
     yPos += 6;
     
     pdf.setFontSize(9);
@@ -383,7 +415,7 @@
     pdf.textWithLink('LinkedIn: Veerenstael', leftMargin, yPos, { url: 'https://www.linkedin.com/company/veerenstael' });
     
     // PDF opslaan
-    pdf.save(`Veerenstael_KPI_Analyse_${dateStr.replace(/\s/g, '_')}.pdf`);
+    pdf.save(`Veerenstael_Tooling_Analyse_${dateStr.replace(/\s/g, '_')}.pdf`);
   }
 
   // Event listeners
@@ -394,6 +426,13 @@
     const results = compute(inputs);
     updateUI(results);
     updateChart(results);
+  });
+  
+  // Unit selector voor resultaten
+  document.getElementById('resultUnit').addEventListener('change', () => {
+    const inputs = readInputs();
+    const results = compute(inputs);
+    updateUI(results);
   });
   
   document.getElementById('exportPDF').addEventListener('click', exportToPDF);
