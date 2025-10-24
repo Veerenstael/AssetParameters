@@ -286,10 +286,24 @@
       line.setAttribute('marker-end', 'url(#arrowhead)');
       g.appendChild(line);
       
+      // Background rectangle for label (to prevent overlap)
+      const textWidth = label.length * 8 + value.length * 7;
+      const rectX = (x1 + x2) / 2 - textWidth / 2;
+      const rectY = y - 35;
+      
+      const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bgRect.setAttribute('x', rectX - 5);
+      bgRect.setAttribute('y', rectY);
+      bgRect.setAttribute('width', textWidth + 10);
+      bgRect.setAttribute('height', 28);
+      bgRect.setAttribute('fill', '#232b3a');
+      bgRect.setAttribute('rx', '4');
+      g.appendChild(bgRect);
+      
       // Label above arrow
       const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       text.setAttribute('x', (x1 + x2) / 2);
-      text.setAttribute('y', y - 15);
+      text.setAttribute('y', y - 20);
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('fill', '#e0e6f0');
       text.setAttribute('font-size', '14');
@@ -300,7 +314,7 @@
       // Value below label
       const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       valueText.setAttribute('x', (x1 + x2) / 2);
-      valueText.setAttribute('y', y - 2);
+      valueText.setAttribute('y', y - 7);
       valueText.setAttribute('text-anchor', 'middle');
       valueText.setAttribute('fill', '#b8c7e0');
       valueText.setAttribute('font-size', '12');
@@ -478,10 +492,10 @@
     centerCircle.setAttribute('fill', '#e5ecff');
     svg.appendChild(centerCircle);
     
-    // Labels (0%, 50%, 100%)
-    addGaugeLabel(svg, centerX - radius - 10, centerY + 5, '0%');
-    addGaugeLabel(svg, centerX, centerY - radius - 10, '50%');
-    addGaugeLabel(svg, centerX + radius + 10, centerY + 5, '100%');
+    // Labels (0%, 50%, 100%) - positioned outside the arc
+    addGaugeLabel(svg, centerX - radius - 20, centerY + 5, '0%');
+    addGaugeLabel(svg, centerX, centerY - radius - 15, '50%');
+    addGaugeLabel(svg, centerX + radius + 20, centerY + 5, '100%');
     
     // Update gauge value display
     document.getElementById('gaugeValue').textContent = fmtPct(availability, 2);
@@ -715,19 +729,7 @@
     pdf.text(`      = ${fmtNum(inputs.totRepairHours, 2)} / ${fmtNum(inputs.cmCount, 0)} = ${fmtNum(results.MCMT, 2)} uur`, leftMargin + 5, yPos);
     yPos += 15;
     
-    // Visualisatie toevoegen
-    // Converteer timeline SVG naar image
-    const timelineSvg = document.getElementById('timelineSvg');
-    const gaugeSvg = document.getElementById('availabilityGauge');
-    
-    // Serialize SVG to data URL
-    const serializer = new XMLSerializer();
-    const timelineSvgStr = serializer.serializeToString(timelineSvg);
-    const gaugeSvgStr = serializer.serializeToString(gaugeSvg);
-    
-    const timelineDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(timelineSvgStr)));
-    const gaugeDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(gaugeSvgStr)));
-    
+    // Visualisatie toevoegen met html2canvas voor betere SVG support
     pdf.addPage();
     
     // Blauwe header ook op pagina 2
@@ -759,32 +761,52 @@
     pdf.text('Betrouwbaarheidsvisualisatie', leftMargin, yPos);
     yPos += 10;
     
-    // Timeline diagram
-    pdf.addImage(timelineDataUrl, 'PNG', leftMargin, yPos, 140, 50);
-    yPos += 55;
+    // Converteer visualisatie containers naar canvas met html2canvas
+    const timelineSection = document.querySelector('.timeline-section');
+    const gaugeSection = document.querySelector('.gauge-section');
     
-    // Beschikbaarheid gauge
-    pdf.setFontSize(12);
-    pdf.text('Beschikbaarheid:', leftMargin, yPos);
-    pdf.addImage(gaugeDataUrl, 'PNG', leftMargin, yPos + 5, 60, 40);
-    pdf.text(fmtPct(results.availability, 2), leftMargin + 70, yPos + 25);
-    yPos += 50;
+    try {
+      // Timeline
+      const timelineCanvas = await html2canvas(timelineSection, {
+        backgroundColor: '#232b3a',
+        scale: 2
+      });
+      const timelineImg = timelineCanvas.toDataURL('image/png');
+      pdf.addImage(timelineImg, 'PNG', leftMargin, yPos, 140, 50);
+      
+      // Gauge (naast timeline info)
+      const gaugeCanvas = await html2canvas(gaugeSection, {
+        backgroundColor: '#1a2230',
+        scale: 2
+      });
+      const gaugeImg = gaugeCanvas.toDataURL('image/png');
+      pdf.addImage(gaugeImg, 'PNG', 140, yPos + 10, 50, 35);
+      
+    } catch (error) {
+      console.error('Error rendering visualization:', error);
+      // Fallback: text-only
+      pdf.setFontSize(10);
+      pdf.text('Visualisatie kon niet worden geladen', leftMargin, yPos);
+    }
+    
+    yPos += 60;
     
     // MTBM & MCMT info
     pdf.setFontSize(11);
-    pdf.text(`MTBM: ${fmtNum(fromHours(results.MTBM, resultUnit), 2)} ${unitLabel}`, leftMargin, yPos);
+    pdf.setTextColor(60, 60, 60);
+    pdf.text(`📅 MTBM: ${fmtNum(fromHours(results.MTBM, resultUnit), 2)} ${unitLabel}`, leftMargin, yPos);
     yPos += 6;
-    pdf.text(`MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, leftMargin, yPos);
+    pdf.text(`⚙️ MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, leftMargin, yPos);
     yPos += 10;
     
     // Failure rate
-    pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin, yPos);
+    pdf.text(`⚠️ Failure Rate [lambda]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin, yPos);
     if (isFinite(results.lambda) && results.lambda > 0) {
       const hoursPerFailure = 1 / results.lambda;
       yPos += 5;
       pdf.setFontSize(9);
       pdf.setTextColor(100, 100, 100);
-      pdf.text(`Verwachting: 1 storing per ${fmtNum(hoursPerFailure, 0)} uur`, leftMargin + 5, yPos);
+      pdf.text(`   Verwachting: 1 storing per ${fmtNum(hoursPerFailure, 0)} uur`, leftMargin, yPos);
     }
     yPos += 15;
     
