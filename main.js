@@ -23,16 +23,16 @@
       text: '<strong>Wat het is:</strong> Beschikbaarheid geeft aan welk percentage van de tijd een systeem operationeel en beschikbaar is voor productie. Het is de verhouding tussen de tijd dat het systeem werkt en de totale tijd (inclusief stilstand). <strong>Waarom belangrijk:</strong> Beschikbaarheid is een directe maatstaf voor productiecapaciteit en efficiency. Een hogere beschikbaarheid betekent meer productietijd en hogere output. <strong>Interpretatie:</strong> Een beschikbaarheid van 95% betekent dat de installatie 95% van de tijd productieklaar is en 5% stilstaat voor onderhoud of storing. Voor kritieke processen streeft men vaak naar >99% beschikbaarheid.'
     },
     lambda: {
-      title: 'Failure Rate [λ] - Storingsfrequentie (Faalkans)',
-      text: '<strong>Wat het is:</strong> De failure rate (λ, lambda) geeft het aantal storingen per tijdseenheid weer. Het is het omgekeerde van MTBF en drukt uit hoe vaak storingen optreden. <strong>Waarom belangrijk:</strong> Lambda wordt gebruikt in betrouwbaarheidsberekeningen en helpt bij het vergelijken van verschillende systemen of componenten. Een lagere lambda betekent een betrouwbaarder systeem. <strong>Interpretatie:</strong> Een λ van 0,0002 per uur betekent 0,02% kans op storing per uur, oftewel gemiddeld één storing per 5.000 uur. Dit wordt vaak gebruikt in probabilistische analyses en veiligheidsberekeningen.'
+      title: 'Failure Rate [Î»] - Storingsfrequentie (Faalkans)',
+      text: '<strong>Wat het is:</strong> De failure rate (Î», lambda) geeft het aantal storingen per tijdseenheid weer. Het is het omgekeerde van MTBF en drukt uit hoe vaak storingen optreden. <strong>Waarom belangrijk:</strong> Lambda wordt gebruikt in betrouwbaarheidsberekeningen en helpt bij het vergelijken van verschillende systemen of componenten. Een lagere lambda betekent een betrouwbaarder systeem. <strong>Interpretatie:</strong> Een Î» van 0,0002 per uur betekent 0,02% kans op storing per uur, oftewel gemiddeld Ã©Ã©n storing per 5.000 uur. Dit wordt vaak gebruikt in probabilistische analyses en veiligheidsberekeningen.'
     },
     fit: {
       title: 'FIT - Failures In Time (Storingen per Miljard Uur)',
-      text: '<strong>Wat het is:</strong> FIT is een gestandaardiseerde maat voor betrouwbaarheid die het aantal storingen per miljard (10⁹) bedrijfsuren weergeeft. Het is een praktische manier om zeer betrouwbare systemen te vergelijken. <strong>Waarom belangrijk:</strong> FIT is vooral nuttig bij elektronische componenten en systemen waar storingen zeldzaam zijn. Het maakt vergelijking tussen leveranciers en producten eenvoudiger. <strong>Interpretatie:</strong> Een FIT van 200 betekent 200 storingen per miljard uur, oftewel gemiddeld één storing per 5 miljoen uur. FIT-waarden worden vaak door fabrikanten opgegeven voor kwaliteitsgaranties.'
+      text: '<strong>Wat het is:</strong> FIT is een gestandaardiseerde maat voor betrouwbaarheid die het aantal storingen per miljard (10â¹) bedrijfsuren weergeeft. Het is een praktische manier om zeer betrouwbare systemen te vergelijken. <strong>Waarom belangrijk:</strong> FIT is vooral nuttig bij elektronische componenten en systemen waar storingen zeldzaam zijn. Het maakt vergelijking tussen leveranciers en producten eenvoudiger. <strong>Interpretatie:</strong> Een FIT van 200 betekent 200 storingen per miljard uur, oftewel gemiddeld Ã©Ã©n storing per 5 miljoen uur. FIT-waarden worden vaak door fabrikanten opgegeven voor kwaliteitsgaranties.'
     },
     mtbm: {
       title: 'MTBM - Mean Time Between Maintenance (Gemiddelde Tijd Tussen Onderhoud)',
-      text: '<strong>Wat het is:</strong> MTBM meet de gemiddelde tijd tussen alle onderhoudsacties (zowel gepland preventief onderhoud als ongepland correctief onderhoud). Dit geeft de totale onderhoudsfrequentie weer. <strong>Waarom belangrijk:</strong> MTBM helpt bij het plannen van onderhoudsresources en capaciteit. Het toont de totale onderhoudslast van een systeem en helpt bij het optimaliseren van onderhoudsstrategieën. <strong>Interpretatie:</strong> Een MTBM van 1.000 uur betekent dat er gemiddeld elke 1.000 uur een onderhoudsactie plaatsvindt. Door preventief onderhoud te optimaliseren kan MTBM worden verlengd en ongepland onderhoud verminderd.'
+      text: '<strong>Wat het is:</strong> MTBM meet de gemiddelde tijd tussen alle onderhoudsacties (zowel gepland preventief onderhoud als ongepland correctief onderhoud). Dit geeft de totale onderhoudsfrequentie weer. <strong>Waarom belangrijk:</strong> MTBM helpt bij het plannen van onderhoudsresources en capaciteit. Het toont de totale onderhoudslast van een systeem en helpt bij het optimaliseren van onderhoudsstrategieÃ«n. <strong>Interpretatie:</strong> Een MTBM van 1.000 uur betekent dat er gemiddeld elke 1.000 uur een onderhoudsactie plaatsvindt. Door preventief onderhoud te optimaliseren kan MTBM worden verlengd en ongepland onderhoud verminderd.'
     },
     mcmt: {
       title: 'MCMT - Mean Corrective Maintenance Time (Gemiddelde Correctieve Onderhoudstijd)',
@@ -46,8 +46,8 @@
   const pf = (d = 4) =>
     new Intl.NumberFormat('nl-NL', { style: 'percent', minimumFractionDigits: d, maximumFractionDigits: d });
 
-  const fmtNum = (x, d = 2) => (isFinite(x) ? nf(d).format(x) : '—');
-  const fmtPct = (x, d = 4) => (isFinite(x) ? pf(d).format(x) : '—');
+  const fmtNum = (x, d = 2) => (isFinite(x) ? nf(d).format(x) : 'â€”');
+  const fmtPct = (x, d = 4) => (isFinite(x) ? pf(d).format(x) : 'â€”');
   const safeDiv = (num, den) => (den > 0 ? num / den : NaN);
 
   function toHours(value, unit) {
@@ -146,27 +146,66 @@
   }
 
   // Kernberekeningen
-  function compute(v) {
-    const MTTF = safeDiv(v.totItemsHours, v.failedItems); // niet-repareerbaar perspectief
-    const MTBF = safeDiv(v.totHours, v.failures);         // repareerbaar perspectief
-    const MTTR = safeDiv(v.totRepairHours, v.failures);   // herstel per storing
-
-    const availability = (isFinite(MTBF) && isFinite(MTTR) && MTBF > 0 && MTTR >= 0)
-      ? MTBF / (MTBF + MTTR)
-      : NaN;
-
-    const lambda = safeDiv(v.failures, v.totHours);       // storingen per uur
-    const FIT = isFinite(lambda) ? lambda * 1e9 : NaN;    // per 10^9 uur
-
-    const totalMaint = v.pmCount + v.cmCount;
-    const MTBM = safeDiv(v.totHours, totalMaint);         // tijd tussen onderhoud
-    const MCMT = safeDiv(v.totRepairHours, v.cmCount);    // gemiddelde duur correctief
+  function compute(v, isRepairable) {
+    // MTTF: Altijd berekend op basis van totItemsHours en failedItems
+    const MTTF = safeDiv(v.totItemsHours, v.failedItems);
+    
+    let MTBF, MTTR, availability, lambda, FIT, MTBM, MCMT;
+    
+    if (isRepairable) {
+      // REPAREERBAAR SYSTEEM
+      // MTBF = Totale bedrijfstijd / Aantal storingen
+      MTBF = safeDiv(v.totHours, v.failures);
+      
+      // MTTR = Totale reparatietijd / Aantal reparaties
+      MTTR = safeDiv(v.totRepairHours, v.failures);
+      
+      // Beschikbaarheid [A] = MTBF / (MTBF + MTTR)
+      availability = (isFinite(MTBF) && isFinite(MTTR) && MTBF > 0 && MTTR >= 0)
+        ? MTBF / (MTBF + MTTR)
+        : NaN;
+      
+      // Failure Rate [λ] = 1 / MTBF
+      lambda = isFinite(MTBF) && MTBF > 0 ? 1 / MTBF : NaN;
+      
+      // FIT = λ × 10^9
+      FIT = isFinite(lambda) ? lambda * 1e9 : NaN;
+      
+      // MTBM = Totaal aantal bedrijfsuren / Aantal onderhoudsbeurten
+      const totalMaint = v.pmCount + v.cmCount;
+      MTBM = safeDiv(v.totHours, totalMaint);
+      
+      // MCMT = Totale tijd voor correctief onderhoud / Aantal correctieve onderhoudsbeurten
+      MCMT = safeDiv(v.totRepairHours, v.cmCount);
+      
+    } else {
+      // NIET-REPAREERBAAR COMPONENT
+      // MTBF = MTTF voor niet-repareerbare componenten
+      MTBF = MTTF;
+      
+      // MTTR is niet van toepassing (component wordt vervangen, niet gerepareerd)
+      MTTR = NaN;
+      
+      // Beschikbaarheid [A] = MTTF / (MTTF + MTTR)
+      // Voor niet-repareerbaar is dit vaak niet relevant
+      availability = NaN;
+      
+      // Failure Rate [λ] = 1 / MTTF
+      lambda = isFinite(MTTF) && MTTF > 0 ? 1 / MTTF : NaN;
+      
+      // FIT = λ × 10^9
+      FIT = isFinite(lambda) ? lambda * 1e9 : NaN;
+      
+      // MTBM en MCMT zijn niet van toepassing voor niet-repareerbare componenten
+      MTBM = NaN;
+      MCMT = NaN;
+    }
 
     return { MTTF, MTBF, MTTR, availability, lambda, FIT, MTBM, MCMT };
   }
 
   // UI bijwerken
-  function updateUI(r) {
+  function updateUI(r, isRepairable) {
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
     
@@ -186,6 +225,35 @@
     document.getElementById('unitMTTR').textContent = unitLabel;
     document.getElementById('unitMTBM').textContent = unitLabel;
     document.getElementById('unitMCMT').textContent = unitLabel;
+    
+    // Toon/verberg elementen op basis van type analyse
+    const mtbfRelated = document.querySelectorAll('.mtbf-related');
+    const availabilityRelated = document.querySelectorAll('.availability-related');
+    const lambdaRelated = document.querySelectorAll('.lambda-related');
+    
+    if (isRepairable) {
+      // Toon alle velden voor repareerbare systemen
+      mtbfRelated.forEach(el => el.style.display = '');
+      availabilityRelated.forEach(el => el.style.display = '');
+      lambdaRelated.forEach(el => el.style.display = '');
+      
+      // Update formules voor repareerbaar
+      document.getElementById('availFormulaNumerator').textContent = 'MTBF';
+      document.getElementById('availFormulaDenominator').textContent = '(MTBF + MTTR)';
+      document.getElementById('lambdaFormulaNumerator').textContent = '1';
+      document.getElementById('lambdaFormulaDenominator').textContent = 'MTBF';
+    } else {
+      // Verberg MTBF-specifieke velden voor niet-repareerbare componenten
+      mtbfRelated.forEach(el => el.style.display = 'none');
+      availabilityRelated.forEach(el => el.style.display = 'none');
+      
+      // Toon wel lambda en FIT (deze zijn relevant voor niet-repareerbaar)
+      lambdaRelated.forEach(el => el.style.display = '');
+      
+      // Update formules voor niet-repareerbaar
+      document.getElementById('lambdaFormulaNumerator').textContent = '1';
+      document.getElementById('lambdaFormulaDenominator').textContent = 'MTTF';
+    }
   }
 
   // SVG Timeline Diagram
@@ -325,7 +393,7 @@
     // Icon 5: Second Failure
     svg.appendChild(createIcon(currentX, y, 'failure-end', 'Tweede Storing'));
     
-    // MTBF arrow (over volledige cyclus: herstel → volgende storing)
+    // MTBF arrow (over volledige cyclus: herstel â†’ volgende storing)
     const mtbfStart = startX + mttfWidth + 25;
     const mtbfEnd = currentX - 25;
     svg.appendChild(createArrow(mtbfStart, mtbfEnd, 25, 'MTBF (tussen storingen)', `${fmtNum(mtbf, 1)} ${unitLabel}`));
@@ -394,9 +462,9 @@
       text.setAttribute('font-size', '20');
       text.setAttribute('font-weight', 'bold');
       
-      if (type === 'success') text.textContent = '✓';
-      else if (type === 'failure' || type === 'failure-end') text.textContent = '✗';
-      else if (type === 'repair') text.textContent = '🔧';
+      if (type === 'success') text.textContent = 'âœ“';
+      else if (type === 'failure' || type === 'failure-end') text.textContent = 'âœ—';
+      else if (type === 'repair') text.textContent = 'ðŸ”§';
       
       g.appendChild(text);
       
@@ -726,7 +794,8 @@
     const pdf = new jsPDF('p', 'mm', 'a4');
     
     const inputs = readInputs();
-    const results = compute(inputs);
+    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
+    const results = compute(inputs, isRepairable);
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
     
@@ -790,19 +859,19 @@
       years: 'jaren'
     };
     
-    pdf.text(`• Totale bedrijfstijd van alle items: ${fmtNum(inputs.totItemsValue, 0)} ${unitLabels[inputs.totItemsUnit]}`, leftMargin + 5, yPos);
+    pdf.text(`â€¢ Totale bedrijfstijd van alle items: ${fmtNum(inputs.totItemsValue, 0)} ${unitLabels[inputs.totItemsUnit]}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`• Aantal falende items: ${fmtNum(inputs.failedItems, 0)}`, leftMargin + 5, yPos);
+    pdf.text(`â€¢ Aantal falende items: ${fmtNum(inputs.failedItems, 0)}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`• Totale bedrijfstijd: ${fmtNum(inputs.totHoursValue, 0)} ${unitLabels[inputs.totHoursUnit]}`, leftMargin + 5, yPos);
+    pdf.text(`â€¢ Totale bedrijfstijd: ${fmtNum(inputs.totHoursValue, 0)} ${unitLabels[inputs.totHoursUnit]}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`• Aantal storingen: ${fmtNum(inputs.failures, 0)}`, leftMargin + 5, yPos);
+    pdf.text(`â€¢ Aantal storingen: ${fmtNum(inputs.failures, 0)}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`• Totale hersteltijd: ${fmtNum(inputs.totRepairHours, 2)} uren`, leftMargin + 5, yPos);
+    pdf.text(`â€¢ Totale hersteltijd: ${fmtNum(inputs.totRepairHours, 2)} uren`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`• Aantal geplande onderhoudsacties: ${fmtNum(inputs.pmCount, 0)}`, leftMargin + 5, yPos);
+    pdf.text(`â€¢ Aantal geplande onderhoudsacties: ${fmtNum(inputs.pmCount, 0)}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`• Aantal ongeplande onderhoudsacties: ${fmtNum(inputs.cmCount, 0)}`, leftMargin + 5, yPos);
+    pdf.text(`â€¢ Aantal ongeplande onderhoudsacties: ${fmtNum(inputs.cmCount, 0)}`, leftMargin + 5, yPos);
     yPos += 15;
     
     // Resultaten
@@ -869,14 +938,14 @@
     yPos += 7;
     
     pdf.setTextColor(60, 60, 60);
-    pdf.text('Failure Rate [λ] = [Aantal storingen] / [Totale bedrijfstijd]', leftMargin + 5, yPos);
+    pdf.text('Failure Rate [Î»] = [Aantal storingen] / [Totale bedrijfstijd]', leftMargin + 5, yPos);
     yPos += 5;
     pdf.setTextColor(100, 100, 100);
     pdf.text(`      = ${fmtNum(inputs.failures, 0)} / ${fmtNum(inputs.totHours, 2)} = ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 5, yPos);
     yPos += 7;
     
     pdf.setTextColor(60, 60, 60);
-    pdf.text('FIT = [λ] × 10^9', leftMargin + 5, yPos);
+    pdf.text('FIT = [Î»] Ã— 10^9', leftMargin + 5, yPos);
     yPos += 5;
     pdf.setTextColor(100, 100, 100);
     pdf.text(`      = ${fmtNum(results.lambda, 6)} x 1.000.000.000 = ${fmtNum(results.FIT, 2)}`, leftMargin + 5, yPos);
@@ -904,19 +973,19 @@
   document.getElementById('kpi-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const inputs = readInputs();
-    validate(inputs);
-    const results = compute(inputs);
     const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
-    updateUI(results);
+    validate(inputs);
+    const results = compute(inputs, isRepairable);
+    updateUI(results, isRepairable);
     updateVisualization(results, isRepairable);
   });
   
   // Unit selector voor resultaten
   document.getElementById('resultUnit').addEventListener('change', () => {
     const inputs = readInputs();
-    const results = compute(inputs);
     const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
-    updateUI(results);
+    const results = compute(inputs, isRepairable);
+    updateUI(results, isRepairable);
     updateVisualization(results, isRepairable);
   });
   
@@ -937,16 +1006,17 @@
       // Herbereken en update visualisatie
       const inputs = readInputs();
       validate(inputs);
-      const results = compute(inputs);
-      updateUI(results);
+      const results = compute(inputs, isRepairable);
+      updateUI(results, isRepairable);
       updateVisualization(results, isRepairable);
     });
   });
 
   // Init met default waarden
   const initVals = readInputs();
+  const initIsRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
   validate(initVals);
-  const initResults = compute(initVals);
-  updateUI(initResults);
-  updateVisualization(initResults, true); // Default: repairable
+  const initResults = compute(initVals, initIsRepairable);
+  updateUI(initResults, initIsRepairable);
+  updateVisualization(initResults, initIsRepairable);
 })();
