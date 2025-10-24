@@ -10,22 +10,16 @@
 <body>
   <div class="dashboard-bg">
     <header class="logo-header">
-      <img
-        src="logo-veerenstael-wit.png"
-        alt="Veerenstael Logo"
-        class="veerenstael-logo"
-      />
+      <img src="logo-veerenstael-wit.png" alt="Veerenstael Logo" class="veerenstael-logo"/>
       <div class="subtitle-title">Inzicht in Betrouwbaarheids- en Onderhoudsparameters</div>
     </header>
 
     <div class="main-card">
       <div class="header center-header">
-        <p>
-          Bereken betrouwbaarheids- en onderhoudsparameters voor uw installaties en machines.
-        </p>
+        <p>Bereken betrouwbaarheids- en onderhoudsparameters voor uw installaties en machines.</p>
       </div>
 
-      <!-- Definitie-sectie -->
+      <!-- KPI Definities -->
       <div class="definitions-section">
         <h3 class="definitions-title">📚 KPI Definities - Klik voor uitleg</h3>
         <div class="definitions-grid">
@@ -44,37 +38,36 @@
       </div>
 
       <div class="content-grid">
-        <!-- Linker kolom: Input + Resultaten -->
+        <!-- Linker kolom -->
         <section class="left-column">
+          <!-- Type Selectie -->
+          <div class="input-section">
+            <h2 class="section-title">Type Analyse</h2>
+            <div class="analysis-type-toggle">
+              <label class="radio-option">
+                <input type="radio" name="analysisType" value="repairable" checked>
+                <span class="radio-text">🔧 Repareerbaar (systemen/machines)</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="analysisType" value="non-repairable">
+                <span class="radio-text">💡 Niet-repareerbaar (componenten)</span>
+              </label>
+            </div>
+          </div>
+
           <!-- Invoer -->
           <div class="input-section">
             <h2 class="section-title">Invoervelden</h2>
             
-            <!-- Type analyse toggle -->
-            <div class="analysis-type-toggle">
-              <label class="toggle-label">Type analyse:</label>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="analysisType" value="repairable" checked>
-                  <span class="radio-text">Repareerbaar (systemen/machines)</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="analysisType" value="non-repairable">
-                  <span class="radio-text">Niet-repareerbaar (componenten)</span>
-                </label>
-              </div>
-            </div>
-            
             <form id="kpi-form" autocomplete="off">
-              <!-- MTTF Sectie (altijd zichtbaar) -->
+              <!-- MTTF -->
               <div class="input-group mttf-group">
-                <h3 class="group-title">MTTF Gegevens (tijd tot eerste storing)</h3>
+                <h3 class="group-title">MTTF Gegevens</h3>
                 
                 <label for="totItemsValue">Totale bedrijfstijd van alle items</label>
-                <div class="input-subtitle">Opgetelde draaiuren van alle geteste componenten</div>
                 <div class="unit-row">
                   <input type="number" id="totItemsValue" value="200000" step="1" min="0"/>
-                  <select id="totItemsUnit" aria-label="Eenheid totale bedrijfstijd van alle items">
+                  <select id="totItemsUnit">
                     <option value="hours" selected>uren</option>
                     <option value="days">dagen</option>
                     <option value="years">jaren</option>
@@ -85,15 +78,14 @@
                 <input type="number" id="failedItems" value="10" step="1" min="0"/>
               </div>
               
-              <!-- MTBF Sectie (alleen bij repareerbaar) -->
+              <!-- MTBF -->
               <div class="input-group mtbf-group">
-                <h3 class="group-title">MTBF Gegevens (cyclus tussen storingen)</h3>
+                <h3 class="group-title">MTBF Gegevens</h3>
 
                 <label for="totHoursValue">Totale bedrijfstijd</label>
-                <div class="input-subtitle">Totale draaiuren van de machine/installatie</div>
                 <div class="unit-row">
                   <input type="number" id="totHoursValue" value="35000" step="1" min="0"/>
-                  <select id="totHoursUnit" aria-label="Eenheid totale bedrijfstijd">
+                  <select id="totHoursUnit">
                     <option value="hours" selected>uren</option>
                     <option value="days">dagen</option>
                     <option value="years">jaren</option>
@@ -117,8 +109,6 @@
                 <button type="submit" class="green">Bereken</button>
                 <button type="reset" class="reset-btn">Reset</button>
               </div>
-
-              <div id="warn" class="info-block" style="color:#ffcc99" hidden></div>
             </form>
           </div>
 
@@ -148,15 +138,15 @@
                 <span class="result-label">MTTR:</span>
                 <span class="result-value"><span id="outMTTR">—</span> <span id="unitMTTR">uur</span></span>
               </div>
-              <div class="result-row availability-related">
+              <div class="result-row mtbf-related">
                 <span class="result-label">Beschikbaarheid [A]:</span>
                 <span class="result-value" id="outA">—</span>
               </div>
-              <div class="result-row lambda-related">
+              <div class="result-row">
                 <span class="result-label">Failure Rate [λ]:</span>
                 <span class="result-value"><span id="outLambda">—</span> per uur</span>
               </div>
-              <div class="result-row lambda-related">
+              <div class="result-row">
                 <span class="result-label">FIT:</span>
                 <span class="result-value"><span id="outFIT">—</span> per 10<sup>9</sup> uur</span>
               </div>
@@ -169,12 +159,10 @@
                 <span class="result-value"><span id="outMCMT">—</span> <span id="unitMCMT">uur</span></span>
               </div>
             </div>
-            
-            <button type="button" class="export-btn" id="exportPDF">📄 Exporteer PDF</button>
           </div>
         </section>
 
-        <!-- Rechter kolom: Berekeningsformules -->
+        <!-- Rechter kolom -->
         <section class="right-column">
           <div class="formulas-section">
             <h2 class="section-title">Berekeningsformules</h2>
@@ -182,7 +170,7 @@
               <div class="formula-item">
                 <span class="formula-label">MTTF =</span>
                 <div class="fraction">
-                  <span class="frac-num">[Totale bedrijfstijd van alle items]</span>
+                  <span class="frac-num">[Totale bedrijfstijd items]</span>
                   <span class="frac-line"></span>
                   <span class="frac-den">[Aantal falende items]</span>
                 </div>
@@ -206,25 +194,25 @@
                 </div>
               </div>
               
-              <div class="formula-item availability-related">
+              <div class="formula-item mtbf-related">
                 <span class="formula-label">Beschikbaarheid [A] =</span>
                 <div class="fraction">
-                  <span class="frac-num" id="availFormulaNumerator">MTBF</span>
+                  <span class="frac-num">MTBF</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den" id="availFormulaDenominator">(MTBF + MTTR)</span>
+                  <span class="frac-den">(MTBF + MTTR)</span>
                 </div>
               </div>
               
-              <div class="formula-item lambda-related">
+              <div class="formula-item">
                 <span class="formula-label">Failure rate [λ] =</span>
                 <div class="fraction">
-                  <span class="frac-num" id="lambdaFormulaNumerator">1</span>
+                  <span class="frac-num">1</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den" id="lambdaFormulaDenominator">MTBF</span>
+                  <span class="frac-den" id="lambdaFormula">MTBF</span>
                 </div>
               </div>
               
-              <div class="formula-item lambda-related">
+              <div class="formula-item">
                 <span class="formula-label">FIT =</span>
                 <span class="formula-simple">[λ] × 10<sup>9</sup></span>
               </div>
@@ -234,7 +222,7 @@
                 <div class="fraction">
                   <span class="frac-num">[Totale bedrijfstijd]</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den">([Geplande acties] + [Ongeplande acties])</span>
+                  <span class="frac-den">([Geplande] + [Ongeplande])</span>
                 </div>
               </div>
               
@@ -243,70 +231,16 @@
                 <div class="fraction">
                   <span class="frac-num">[Totale hersteltijd]</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den">[Aantal ongeplande acties]</span>
+                  <span class="frac-den">[Ongeplande acties]</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
       </div>
-
-      <!-- Betrouwbaarheidsvisualisatie -->
-      <div class="visualization-card">
-        <h2 class="chart-title">Betrouwbaarheidsvisualisatie</h2>
-        
-        <div class="visualization-grid">
-          <!-- Linker kolom: Timeline diagram -->
-          <div class="timeline-section">
-            <svg id="timelineSvg" width="100%" height="280" viewBox="0 0 800 280">
-              <!-- Timeline wordt door JavaScript gevuld -->
-            </svg>
-            
-            <!-- Info boxes voor MTBM en MCMT -->
-            <div class="info-boxes mtbf-related">
-              <div class="info-box mtbm-box">
-                <span class="info-icon">📅</span>
-                <div class="info-content">
-                  <div class="info-label">MTBM</div>
-                  <div class="info-value" id="visMTBM">—</div>
-                </div>
-              </div>
-              <div class="info-box mcmt-box">
-                <span class="info-icon">⚙️</span>
-                <div class="info-content">
-                  <div class="info-label">MCMT</div>
-                  <div class="info-value" id="visMCMT">—</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Rechter kolom: Beschikbaarheid gauge -->
-          <div class="gauge-section availability-related">
-            <h3 class="gauge-title">Beschikbaarheid</h3>
-            <svg id="availabilityGauge" width="100%" height="200" viewBox="0 0 240 160">
-              <!-- Gauge wordt door JavaScript gevuld -->
-            </svg>
-            <div class="gauge-value" id="gaugeValue">—</div>
-          </div>
-        </div>
-        
-        <!-- Failure Rate onderaan -->
-        <div class="failure-rate-section lambda-related">
-          <span class="failure-icon">⚠️</span>
-          <span class="failure-text">
-            Failure Rate [λ]: <strong id="visLambda">—</strong> per uur
-            <span class="failure-interpretation" id="visLambdaInterpretation"></span>
-          </span>
-        </div>
-      </div>
     </div>
   </div>
 
-  <!-- jsPDF voor PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <!-- Logica -->
   <script src="main.js"></script>
 </body>
 </html>
