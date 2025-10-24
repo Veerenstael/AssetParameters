@@ -259,7 +259,7 @@
     pdf.setFontSize(12);
     pdf.setTextColor(34, 44, 56);
     pdf.setFont(undefined, 'bold');
-    pdf.text('KPI Analyse Rapport', leftMargin, yPos);
+    pdf.text('Rapport - Onderhoudsparameters', leftMargin, yPos);
     pdf.setFont(undefined, 'normal');
     yPos += 7;
     
@@ -323,7 +323,7 @@
       yPos += 5;
     }
     
-    pdf.text(`Failure Rate [λ]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 3, yPos);
+    pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 3, yPos);
     yPos += 5;
     pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 3, yPos);
     yPos += 5;
@@ -361,7 +361,7 @@
       yPos += 5;
     }
     
-    pdf.text('FIT = [λ] × 10^9', leftMargin + 3, yPos);
+    pdf.text('FIT = [lambda] × 10^9', leftMargin + 3, yPos);
     yPos += 5;
     
     if (isRepairable) {
@@ -371,8 +371,9 @@
     }
     
     // Opslaan
-    const fileName = `Veerenstael_KPI_Rapport_${dateStr.replace(/\s/g, '_')}.pdf`;
+    const fileName = `Veerenstael_Rapport_${dateStr.replace(/\s/g, '_')}.pdf`;
     pdf.save(fileName);
   });
 })();
+
 
