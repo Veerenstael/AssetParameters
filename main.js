@@ -244,15 +244,17 @@
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
     
-    let yPos = 20;
+    let yPos = 0;
     const leftMargin = 20;
     const pageWidth = 170;
     
-    // Logo bovenaan (van GitHub)
-    // We gebruiken het logo van de pagina zelf
+    // Blauwe header balk bovenaan (zoals Veerenstael stijl)
+    pdf.setFillColor(34, 48, 64); // Donkerblauw (#223040)
+    pdf.rect(0, 0, 210, 25, 'F'); // Volle breedte, 25mm hoog
+    
+    // Logo in het midden van de blauwe balk
     const logoImg = document.querySelector('.veerenstael-logo');
     if (logoImg && logoImg.complete) {
-      // Logo als base64
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = logoImg.naturalWidth;
@@ -260,17 +262,23 @@
       ctx.drawImage(logoImg, 0, 0);
       const logoDataUrl = canvas.toDataURL('image/png');
       
-      // Logo toevoegen aan PDF (120mm breed, proportioneel geschaald)
-      const logoWidth = 80;
+      // Logo gecentreerd in de blauwe balk
+      const logoWidth = 60;
       const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth;
-      pdf.addImage(logoDataUrl, 'PNG', leftMargin, yPos, logoWidth, logoHeight);
-      yPos += logoHeight + 10;
+      const logoX = (210 - logoWidth) / 2; // Gecentreerd op A4 breedte (210mm)
+      const logoY = (25 - logoHeight) / 2 + 2; // Gecentreerd verticaal in de balk
+      
+      pdf.addImage(logoDataUrl, 'PNG', logoX, logoY, logoWidth, logoHeight);
     }
     
+    yPos = 35; // Start content onder de blauwe balk
+    
     // Subtitle
-    pdf.setFontSize(10);
-    pdf.setTextColor(100, 100, 100);
+    pdf.setFontSize(11);
+    pdf.setTextColor(34, 44, 56);
+    pdf.setFont(undefined, 'bold');
     pdf.text('Betrouwbaarheids- en Onderhoudsparameters Analyse', leftMargin, yPos);
+    pdf.setFont(undefined, 'normal');
     yPos += 10;
     
     // Datum
@@ -406,7 +414,30 @@
     const canvas = document.getElementById('kpiChart');
     const chartImage = canvas.toDataURL('image/png');
     pdf.addPage();
-    yPos = 20;
+    
+    // Blauwe header ook op pagina 2
+    yPos = 0;
+    pdf.setFillColor(34, 48, 64);
+    pdf.rect(0, 0, 210, 25, 'F');
+    
+    // Logo op pagina 2
+    if (logoImg && logoImg.complete) {
+      const canvas2 = document.createElement('canvas');
+      const ctx2 = canvas2.getContext('2d');
+      canvas2.width = logoImg.naturalWidth;
+      canvas2.height = logoImg.naturalHeight;
+      ctx2.drawImage(logoImg, 0, 0);
+      const logoDataUrl2 = canvas2.toDataURL('image/png');
+      
+      const logoWidth = 60;
+      const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth;
+      const logoX = (210 - logoWidth) / 2;
+      const logoY = (25 - logoHeight) / 2 + 2;
+      
+      pdf.addImage(logoDataUrl2, 'PNG', logoX, logoY, logoWidth, logoHeight);
+    }
+    
+    yPos = 35;
     
     pdf.setFontSize(14);
     pdf.setTextColor(34, 44, 56);
