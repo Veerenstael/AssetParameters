@@ -356,6 +356,117 @@ button.export-btn:hover { background: #e55a28; }
 
 .small-note { color: #93a4c9; font-size: 0.9rem; }
 
+/* Betrouwbaarheidsvisualisatie */
+.visualization-card {
+  background: #232b3a;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 26px;
+}
+
+.visualization-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.timeline-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.info-box {
+  background: #1a2230;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid #2a3442;
+}
+
+.info-icon {
+  font-size: 2rem;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #93a4c9;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #e5ecff;
+}
+
+.gauge-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #1a2230;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.gauge-title {
+  color: #b8c7e0;
+  font-size: 1.1rem;
+  margin: 0 0 10px 0;
+}
+
+.gauge-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e5ecff;
+  margin-top: 10px;
+}
+
+.failure-rate-section {
+  margin-top: 20px;
+  padding: 16px;
+  background: #1a2230;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 4px solid #ffcc00;
+}
+
+.failure-icon {
+  font-size: 1.5rem;
+}
+
+.failure-text {
+  color: #d0dae8;
+  font-size: 0.95rem;
+}
+
+.failure-text strong {
+  color: #e5ecff;
+  font-weight: 600;
+}
+
+.failure-interpretation {
+  color: #93a4c9;
+  font-style: italic;
+  margin-left: 8px;
+}
+
 .chart-card {
   background: #232b3a;
   border-radius: 12px;
@@ -372,6 +483,10 @@ button.export-btn:hover { background: #e55a28; }
 /* Responsive aanpassingen */
 @media (max-width: 968px) {
   .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .visualization-grid {
     grid-template-columns: 1fr;
   }
   
