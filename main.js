@@ -210,4 +210,166 @@
   const initInputs = readInputs();
   const initResults = compute(initInputs, initIsRepairable);
   updateUI(initResults, initIsRepairable);
+
+  // PDF Export
+  document.getElementById('exportPDF').addEventListener('click', function() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
+    const inputs = readInputs();
+    const results = compute(inputs, isRepairable);
+    const resultUnit = document.getElementById('resultUnit').value;
+    const unitLabel = getUnitLabel(resultUnit);
+    
+    let yPos = 0;
+    const leftMargin = 20;
+    
+    // Blauwe header met logo
+    pdf.setFillColor(34, 48, 64);
+    pdf.rect(0, 0, 210, 25, 'F');
+    
+    // Logo (als beschikbaar)
+    const logoImg = document.querySelector('.veerenstael-logo');
+    if (logoImg && logoImg.complete) {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = logoImg.naturalWidth;
+        canvas.height = logoImg.naturalHeight;
+        ctx.drawImage(logoImg, 0, 0);
+        const logoDataUrl = canvas.toDataURL('image/png');
+        
+        const logoWidth = 60;
+        const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth;
+        const logoX = (210 - logoWidth) / 2;
+        const logoY = (25 - logoHeight) / 2 + 2;
+        
+        pdf.addImage(logoDataUrl, 'PNG', logoX, logoY, logoWidth, logoHeight);
+      } catch(e) {
+        console.log('Logo niet beschikbaar voor PDF');
+      }
+    }
+    
+    yPos = 35;
+    
+    // Titel
+    pdf.setFontSize(12);
+    pdf.setTextColor(34, 44, 56);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('KPI Analyse Rapport', leftMargin, yPos);
+    pdf.setFont(undefined, 'normal');
+    yPos += 7;
+    
+    // Type analyse
+    pdf.setFontSize(10);
+    pdf.text(`Type: ${isRepairable ? 'Repareerbaar (systemen/machines)' : 'Niet-repareerbaar (componenten)'}`, leftMargin, yPos);
+    yPos += 7;
+    
+    // Datum
+    const dateStr = new Date().toLocaleDateString('nl-NL', { 
+      year: 'numeric', month: 'long', day: 'numeric' 
+    });
+    pdf.setFontSize(9);
+    pdf.text(`Gegenereerd op: ${dateStr}`, leftMargin, yPos);
+    yPos += 12;
+    
+    // Invoergegevens
+    pdf.setFontSize(13);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Invoergegevens', leftMargin, yPos);
+    pdf.setFont(undefined, 'normal');
+    yPos += 7;
+    
+    pdf.setFontSize(10);
+    pdf.text(`• Totale bedrijfstijd items: ${fmtNum(inputs.totItemsHours, 0)} uur`, leftMargin + 3, yPos);
+    yPos += 5;
+    pdf.text(`• Aantal falende items: ${fmtNum(inputs.failedItems, 0)}`, leftMargin + 3, yPos);
+    yPos += 5;
+    
+    if (isRepairable) {
+      pdf.text(`• Totale bedrijfstijd: ${fmtNum(inputs.totHours, 0)} uur`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`• Aantal storingen: ${fmtNum(inputs.failures, 0)}`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`• Totale hersteltijd: ${fmtNum(inputs.totRepairHours, 2)} uur`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`• Geplande onderhoudsacties: ${fmtNum(inputs.pmCount, 0)}`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`• Ongeplande onderhoudsacties: ${fmtNum(inputs.cmCount, 0)}`, leftMargin + 3, yPos);
+      yPos += 5;
+    }
+    yPos += 8;
+    
+    // Resultaten
+    pdf.setFontSize(13);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Berekende Resultaten', leftMargin, yPos);
+    pdf.setFont(undefined, 'normal');
+    yPos += 7;
+    
+    pdf.setFontSize(10);
+    pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
+    yPos += 5;
+    
+    if (isRepairable) {
+      pdf.text(`MTBF: ${fmtNum(fromHours(results.MTBF, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`MTTR: ${fmtNum(fromHours(results.MTTR, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, leftMargin + 3, yPos);
+      yPos += 5;
+    }
+    
+    pdf.text(`Failure Rate [λ]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 3, yPos);
+    yPos += 5;
+    pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 3, yPos);
+    yPos += 5;
+    
+    if (isRepairable) {
+      pdf.text(`MTBM: ${fmtNum(fromHours(results.MTBM, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
+      yPos += 5;
+    }
+    yPos += 8;
+    
+    // Formules
+    pdf.setFontSize(13);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Gebruikte Formules', leftMargin, yPos);
+    pdf.setFont(undefined, 'normal');
+    yPos += 7;
+    
+    pdf.setFontSize(9);
+    pdf.text('MTTF = [Totale bedrijfstijd items] / [Aantal falende items]', leftMargin + 3, yPos);
+    yPos += 5;
+    
+    if (isRepairable) {
+      pdf.text('MTBF = [Totale bedrijfstijd] / [Aantal storingen]', leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text('MTTR = [Totale hersteltijd] / [Aantal storingen]', leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text('Beschikbaarheid [A] = MTBF / (MTBF + MTTR)', leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text('Failure Rate [λ] = 1 / MTBF', leftMargin + 3, yPos);
+      yPos += 5;
+    } else {
+      pdf.text('Failure Rate [λ] = 1 / MTTF', leftMargin + 3, yPos);
+      yPos += 5;
+    }
+    
+    pdf.text('FIT = [λ] × 10^9', leftMargin + 3, yPos);
+    yPos += 5;
+    
+    if (isRepairable) {
+      pdf.text('MTBM = [Totale bedrijfstijd] / ([Geplande] + [Ongeplande])', leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text('MCMT = [Totale hersteltijd] / [Ongeplande acties]', leftMargin + 3, yPos);
+    }
+    
+    // Opslaan
+    const fileName = `Veerenstael_KPI_Rapport_${dateStr.replace(/\s/g, '_')}.pdf`;
+    pdf.save(fileName);
+  });
 })();
