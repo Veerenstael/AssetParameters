@@ -49,43 +49,73 @@
           <!-- Invoer -->
           <div class="input-section">
             <h2 class="section-title">Invoervelden</h2>
+            
+            <!-- Type analyse toggle -->
+            <div class="analysis-type-toggle">
+              <label class="toggle-label">Type analyse:</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="analysisType" value="repairable" checked>
+                  <span class="radio-text">Repareerbaar (systemen/machines)</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="analysisType" value="non-repairable">
+                  <span class="radio-text">Niet-repareerbaar (componenten)</span>
+                </label>
+              </div>
+            </div>
+            
             <form id="kpi-form" autocomplete="off">
-              <label for="totItemsValue">Totale bedrijfstijd van alle items</label>
-              <div class="input-subtitle">Opgetelde draaiuren van alle geteste componenten</div>
-              <div class="unit-row">
-                <input type="number" id="totItemsValue" value="200000" step="1" min="0"/>
-                <select id="totItemsUnit" aria-label="Eenheid totale bedrijfstijd van alle items">
-                  <option value="hours" selected>uren</option>
-                  <option value="days">dagen</option>
-                  <option value="years">jaren</option>
-                </select>
+              <!-- MTTF Sectie (altijd zichtbaar) -->
+              <div class="input-group mttf-group">
+                <h3 class="group-title">MTTF Gegevens (tijd tot eerste storing)</h3>
+                
+                <label for="totItemsValue">Totale bedrijfstijd van alle items</label>
+                <div class="input-subtitle">Opgetelde draaiuren van alle geteste componenten</div>
+                <div class="unit-row">
+                  <input type="number" id="totItemsValue" value="200000" step="1" min="0"/>
+                  <select id="totItemsUnit" aria-label="Eenheid totale bedrijfstijd van alle items">
+                    <option value="hours" selected>uren</option>
+                    <option value="days">dagen</option>
+                    <option value="years">jaren</option>
+                  </select>
+                </div>
+
+                <label for="failedItems">Aantal falende items</label>
+                <input type="number" id="failedItems" value="10" step="1" min="0"/>
               </div>
+              
+              <!-- MTBF Sectie (alleen bij repareerbaar) -->
+              <div class="input-group mtbf-group">
+                <h3 class="group-title">MTBF Gegevens (cyclus tussen storingen)</h3>
 
-              <label for="failedItems">Aantal falende items</label>
-              <input type="number" id="failedItems" value="10" step="1" min="0"/>
+              <!-- MTBF Sectie (alleen bij repareerbaar) -->
+              <div class="input-group mtbf-group">
+                <h3 class="group-title">MTBF Gegevens (cyclus tussen storingen)</h3>
 
-              <label for="totHoursValue">Totale bedrijfstijd</label>
-              <div class="input-subtitle">Totale draaiuren van de machine/installatie</div>
-              <div class="unit-row">
-                <input type="number" id="totHoursValue" value="35000" step="1" min="0"/>
-                <select id="totHoursUnit" aria-label="Eenheid totale bedrijfstijd">
-                  <option value="hours" selected>uren</option>
-                  <option value="days">dagen</option>
-                  <option value="years">jaren</option>
-                </select>
+                <label for="totHoursValue">Totale bedrijfstijd</label>
+                <div class="input-subtitle">Totale draaiuren van de machine/installatie</div>
+                <div class="unit-row">
+                  <input type="number" id="totHoursValue" value="35000" step="1" min="0"/>
+                  <select id="totHoursUnit" aria-label="Eenheid totale bedrijfstijd">
+                    <option value="hours" selected>uren</option>
+                    <option value="days">dagen</option>
+                    <option value="years">jaren</option>
+                  </select>
+                </div>
+
+                <label for="failures">Aantal storingen</label>
+                <input type="number" id="failures" value="7" step="1" min="0"/>
+
+                <label for="totRepairHours">Totale hersteltijd (uren)</label>
+                <input type="number" id="totRepairHours" value="56" step="0.1" min="0"/>
+
+                <label for="pmCount">Aantal geplande onderhoudsacties</label>
+                <input type="number" id="pmCount" value="22" step="1" min="0"/>
+
+                <label for="cmCount">Aantal ongeplande onderhoudsacties</label>
+                <input type="number" id="cmCount" value="9" step="1" min="0"/>
               </div>
-
-              <label for="failures">Aantal storingen</label>
-              <input type="number" id="failures" value="7" step="1" min="0"/>
-
-              <label for="totRepairHours">Totale hersteltijd (uren)</label>
-              <input type="number" id="totRepairHours" value="56" step="0.1" min="0"/>
-
-              <label for="pmCount">Aantal geplande onderhoudsacties</label>
-              <input type="number" id="pmCount" value="22" step="1" min="0"/>
-
-              <label for="cmCount">Aantal ongeplande onderhoudsacties</label>
-              <input type="number" id="cmCount" value="9" step="1" min="0"/>
 
               <div class="button-row">
                 <button type="submit" class="green">Bereken</button>
