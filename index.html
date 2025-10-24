@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Veerenstael KPI Tool</title>
+  <title>Veerenstael Tooling</title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="icon" href="favicon.png" type="image/png"/>
 </head>
@@ -16,12 +16,12 @@
 
     <div class="main-card">
       <div class="header center-header">
-        <p>Bereken betrouwbaarheids- en onderhoudsparameters voor uw installaties en machines.</p>
+        <p>Bereken hieronder verschillende betrouwbaarheids- en onderhoudsparameters voor uw installaties, machines en componenten.</p>
       </div>
 
       <!-- KPI Definities -->
       <div class="definitions-section">
-        <h3 class="definitions-title">📚 KPI Definities - Klik voor uitleg</h3>
+        <h3 class="definitions-title">📚 Definities - Klik voor uitleg</h3>
         <div class="definitions-grid">
           <button type="button" class="def-btn" data-kpi="mttf">MTTF</button>
           <button type="button" class="def-btn" data-kpi="mtbf">MTBF</button>
@@ -141,7 +141,7 @@
                 <div class="fraction">
                   <span class="frac-num">MTBF</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den">(MTBF + MTTR)</span>
+                  <span class="frac-den">MTBF + MTTR</span>
                 </div>
               </div>
               
@@ -164,7 +164,7 @@
                 <div class="fraction">
                   <span class="frac-num">[Totale bedrijfstijd]</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den">([Geplande] + [Ongeplande])</span>
+                  <span class="frac-den">[Geplande OH-acties] + [Ongeplande OH-acties]</span>
                 </div>
               </div>
               
@@ -239,3 +239,4 @@
   <script src="main.js"></script>
 </body>
 </html>
+
