@@ -175,6 +175,88 @@ form label {
   margin-top: -4px;
 }
 
+/* Analysis type toggle */
+.analysis-type-toggle {
+  background: #1a2230;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 2px solid #2a3442;
+}
+
+.toggle-label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e0e6f0;
+  margin-bottom: 12px;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.radio-option:hover {
+  background: #232b3a;
+}
+
+.radio-option input[type="radio"] {
+  width: auto;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.radio-text {
+  color: #d0dae8;
+  font-size: 0.95rem;
+}
+
+.radio-option input[type="radio"]:checked + .radio-text {
+  color: #13d17c;
+  font-weight: 600;
+}
+
+/* Input groups */
+.input-group {
+  background: #1a2230;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-left: 4px solid #3e70ff;
+}
+
+.input-group.mttf-group {
+  border-left-color: #ffaa33;
+}
+
+.input-group.mtbf-group {
+  border-left-color: #13d17c;
+}
+
+.group-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e0e6f0;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2a3442;
+}
+
+.input-group label:first-of-type {
+  margin-top: 0;
+}
+
 form input, form select {
   width: 100%;
   background: #1a2230;
