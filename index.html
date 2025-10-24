@@ -89,10 +89,6 @@
               <div class="input-group mtbf-group">
                 <h3 class="group-title">MTBF Gegevens (cyclus tussen storingen)</h3>
 
-              <!-- MTBF Sectie (alleen bij repareerbaar) -->
-              <div class="input-group mtbf-group">
-                <h3 class="group-title">MTBF Gegevens (cyclus tussen storingen)</h3>
-
                 <label for="totHoursValue">Totale bedrijfstijd</label>
                 <div class="input-subtitle">Totale draaiuren van de machine/installatie</div>
                 <div class="unit-row">
@@ -152,15 +148,15 @@
                 <span class="result-label">MTTR:</span>
                 <span class="result-value"><span id="outMTTR">—</span> <span id="unitMTTR">uur</span></span>
               </div>
-              <div class="result-row mtbf-related">
+              <div class="result-row availability-related">
                 <span class="result-label">Beschikbaarheid [A]:</span>
                 <span class="result-value" id="outA">—</span>
               </div>
-              <div class="result-row mtbf-related">
+              <div class="result-row lambda-related">
                 <span class="result-label">Failure Rate [λ]:</span>
                 <span class="result-value"><span id="outLambda">—</span> per uur</span>
               </div>
-              <div class="result-row mtbf-related">
+              <div class="result-row lambda-related">
                 <span class="result-label">FIT:</span>
                 <span class="result-value"><span id="outFIT">—</span> per 10<sup>9</sup> uur</span>
               </div>
@@ -192,7 +188,7 @@
                 </div>
               </div>
               
-              <div class="formula-item">
+              <div class="formula-item mtbf-related">
                 <span class="formula-label">MTBF =</span>
                 <div class="fraction">
                   <span class="frac-num">[Totale bedrijfstijd]</span>
@@ -201,7 +197,7 @@
                 </div>
               </div>
               
-              <div class="formula-item">
+              <div class="formula-item mtbf-related">
                 <span class="formula-label">MTTR =</span>
                 <div class="fraction">
                   <span class="frac-num">[Totale hersteltijd]</span>
@@ -210,30 +206,30 @@
                 </div>
               </div>
               
-              <div class="formula-item">
+              <div class="formula-item availability-related">
                 <span class="formula-label">Beschikbaarheid [A] =</span>
                 <div class="fraction">
-                  <span class="frac-num">MTBF</span>
+                  <span class="frac-num" id="availFormulaNumerator">MTBF</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den">(MTBF + MTTR)</span>
+                  <span class="frac-den" id="availFormulaDenominator">(MTBF + MTTR)</span>
                 </div>
               </div>
               
-              <div class="formula-item">
+              <div class="formula-item lambda-related">
                 <span class="formula-label">Failure rate [λ] =</span>
                 <div class="fraction">
-                  <span class="frac-num">[Aantal storingen]</span>
+                  <span class="frac-num" id="lambdaFormulaNumerator">1</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den">[Totale bedrijfstijd]</span>
+                  <span class="frac-den" id="lambdaFormulaDenominator">MTBF</span>
                 </div>
               </div>
               
-              <div class="formula-item">
+              <div class="formula-item lambda-related">
                 <span class="formula-label">FIT =</span>
                 <span class="formula-simple">[λ] × 10<sup>9</sup></span>
               </div>
               
-              <div class="formula-item">
+              <div class="formula-item mtbf-related">
                 <span class="formula-label">MTBM =</span>
                 <div class="fraction">
                   <span class="frac-num">[Totale bedrijfstijd]</span>
@@ -242,7 +238,7 @@
                 </div>
               </div>
               
-              <div class="formula-item">
+              <div class="formula-item mtbf-related">
                 <span class="formula-label">MCMT =</span>
                 <div class="fraction">
                   <span class="frac-num">[Totale hersteltijd]</span>
@@ -267,7 +263,7 @@
             </svg>
             
             <!-- Info boxes voor MTBM en MCMT -->
-            <div class="info-boxes">
+            <div class="info-boxes mtbf-related">
               <div class="info-box mtbm-box">
                 <span class="info-icon">📅</span>
                 <div class="info-content">
@@ -286,7 +282,7 @@
           </div>
           
           <!-- Rechter kolom: Beschikbaarheid gauge -->
-          <div class="gauge-section">
+          <div class="gauge-section availability-related">
             <h3 class="gauge-title">Beschikbaarheid</h3>
             <svg id="availabilityGauge" width="100%" height="200" viewBox="0 0 240 160">
               <!-- Gauge wordt door JavaScript gevuld -->
@@ -296,7 +292,7 @@
         </div>
         
         <!-- Failure Rate onderaan -->
-        <div class="failure-rate-section">
+        <div class="failure-rate-section lambda-related">
           <span class="failure-icon">⚠️</span>
           <span class="failure-text">
             Failure Rate [λ]: <strong id="visLambda">—</strong> per uur
