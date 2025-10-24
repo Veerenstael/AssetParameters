@@ -188,49 +188,354 @@
     document.getElementById('unitMCMT').textContent = unitLabel;
   }
 
-  // Grafiek: alleen MTTF, MTTR, MTBM, MTBF (bars, één as in uren)
-  let chart;
-  function updateChart(r) {
-    const ctx = document.getElementById('kpiChart').getContext('2d');
-    const labels = ['MTTF', 'MTTR', 'MTBM', 'MTBF'];
-    const data = [r.MTTF, r.MTTR, r.MTBM, r.MTBF];
-
-    const config = {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Uren',
-          data,
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'top' },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => ` ${ctx.dataset.label}: ${nf(2).format(ctx.parsed.y)} uur`,
-            }
-          }
-        },
-        scales: {
-          y: {
-            title: { display: true, text: 'Uren' },
-            beginAtZero: true
-          }
-        }
+  // SVG Timeline Diagram
+  function drawTimeline(results) {
+    const svg = document.getElementById('timelineSvg');
+    const resultUnit = document.getElementById('resultUnit').value;
+    const unitLabel = getUnitLabel(resultUnit);
+    
+    // Convert values
+    const mttf = fromHours(results.MTTF, resultUnit);
+    const mttr = fromHours(results.MTTR, resultUnit);
+    const mtbf = fromHours(results.MTBF, resultUnit);
+    
+    // Clear existing content
+    svg.innerHTML = '';
+    
+    // Timeline parameters
+    const startX = 50;
+    const y = 140;
+    const totalWidth = 700;
+    
+    // Calculate proportions (simplified for visualization)
+    const mttfWidth = 200;
+    const mttrWidth = 100;
+    const mttf2Width = 200;
+    
+    // Create timeline
+    let currentX = startX;
+    
+    // Helper function to create icon circle
+    function createIcon(x, y, type, label) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', x);
+      circle.setAttribute('cy', y);
+      circle.setAttribute('r', 25);
+      
+      if (type === 'success') {
+        circle.setAttribute('fill', '#13d17c');
+        circle.setAttribute('stroke', '#0ea863');
+      } else if (type === 'failure') {
+        circle.setAttribute('fill', '#ffaa33');
+        circle.setAttribute('stroke', '#e59420');
+      } else if (type === 'repair') {
+        circle.setAttribute('fill', '#3e70ff');
+        circle.setAttribute('stroke', '#2a5ad9');
+      } else if (type === 'failure-end') {
+        circle.setAttribute('fill', '#ff4444');
+        circle.setAttribute('stroke', '#cc0000');
       }
+      circle.setAttribute('stroke-width', '3');
+      
+      g.appendChild(circle);
+      
+      // Add symbol
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x);
+      text.setAttribute('y', y + 6);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('fill', '#fff');
+      text.setAttribute('font-size', '20');
+      text.setAttribute('font-weight', 'bold');
+      
+      if (type === 'success') text.textContent = '✓';
+      else if (type === 'failure' || type === 'failure-end') text.textContent = '✗';
+      else if (type === 'repair') text.textContent = '🔧';
+      
+      g.appendChild(text);
+      
+      // Add label below
+      if (label) {
+        const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        labelText.setAttribute('x', x);
+        labelText.setAttribute('y', y + 55);
+        labelText.setAttribute('text-anchor', 'middle');
+        labelText.setAttribute('fill', '#93a4c9');
+        labelText.setAttribute('font-size', '11');
+        labelText.textContent = label;
+        g.appendChild(labelText);
+      }
+      
+      return g;
+    }
+    
+    // Helper function to create arrow
+    function createArrow(x1, x2, y, label, value) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      
+      // Arrow line
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', '#ffaa33');
+      line.setAttribute('stroke-width', '3');
+      line.setAttribute('marker-end', 'url(#arrowhead)');
+      g.appendChild(line);
+      
+      // Label above arrow
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', (x1 + x2) / 2);
+      text.setAttribute('y', y - 15);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('fill', '#e0e6f0');
+      text.setAttribute('font-size', '14');
+      text.setAttribute('font-weight', '600');
+      text.textContent = label;
+      g.appendChild(text);
+      
+      // Value below label
+      const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      valueText.setAttribute('x', (x1 + x2) / 2);
+      valueText.setAttribute('y', y - 2);
+      valueText.setAttribute('text-anchor', 'middle');
+      valueText.setAttribute('fill', '#b8c7e0');
+      valueText.setAttribute('font-size', '12');
+      valueText.textContent = value;
+      g.appendChild(valueText);
+      
+      return g;
+    }
+    
+    // Define arrowhead marker
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    marker.setAttribute('id', 'arrowhead');
+    marker.setAttribute('markerWidth', '10');
+    marker.setAttribute('markerHeight', '10');
+    marker.setAttribute('refX', '9');
+    marker.setAttribute('refY', '3');
+    marker.setAttribute('orient', 'auto');
+    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    polygon.setAttribute('points', '0 0, 10 3, 0 6');
+    polygon.setAttribute('fill', '#ffaa33');
+    marker.appendChild(polygon);
+    defs.appendChild(marker);
+    svg.appendChild(defs);
+    
+    // Draw timeline
+    // Icon 1: Correct Behavior (start)
+    svg.appendChild(createIcon(currentX, y, 'success', 'Correct Behavior'));
+    
+    // MTTF arrow
+    const mttfStart = currentX + 25;
+    currentX += mttfWidth;
+    svg.appendChild(createArrow(mttfStart, currentX - 25, y - 50, 'MTTF', `${fmtNum(mttf, 1)} ${unitLabel}`));
+    
+    // Icon 2: First Failure
+    svg.appendChild(createIcon(currentX, y, 'failure', 'First Failure'));
+    
+    // Vertical line to repair
+    const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    vLine1.setAttribute('x1', currentX);
+    vLine1.setAttribute('y1', y + 25);
+    vLine1.setAttribute('x2', currentX + mttrWidth/2);
+    vLine1.setAttribute('y2', y + 60);
+    vLine1.setAttribute('stroke', '#3e70ff');
+    vLine1.setAttribute('stroke-width', '2');
+    vLine1.setAttribute('stroke-dasharray', '5,5');
+    svg.appendChild(vLine1);
+    
+    // Icon 3: Repair
+    svg.appendChild(createIcon(currentX + mttrWidth/2, y + 60, 'repair', 'Begin Repair'));
+    
+    // MTTR arrow (at repair level)
+    const mttrStart = currentX + 25;
+    currentX += mttrWidth;
+    svg.appendChild(createArrow(mttrStart, currentX - 25, y, 'MTTR', `${fmtNum(mttr, 1)} ${unitLabel}`));
+    
+    // Vertical line from repair
+    const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    vLine2.setAttribute('x1', currentX - mttrWidth/2);
+    vLine2.setAttribute('y1', y + 60);
+    vLine2.setAttribute('x2', currentX);
+    vLine2.setAttribute('y2', y + 25);
+    vLine2.setAttribute('stroke', '#13d17c');
+    vLine2.setAttribute('stroke-width', '2');
+    vLine2.setAttribute('stroke-dasharray', '5,5');
+    svg.appendChild(vLine2);
+    
+    const repairLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    repairLabel.setAttribute('x', currentX - mttrWidth/2);
+    repairLabel.setAttribute('y', y + 95);
+    repairLabel.setAttribute('text-anchor', 'middle');
+    repairLabel.setAttribute('fill', '#93a4c9');
+    repairLabel.setAttribute('font-size', '11');
+    repairLabel.textContent = 'End Repair';
+    svg.appendChild(repairLabel);
+    
+    // Icon 4: Correct Behavior (after repair)
+    svg.appendChild(createIcon(currentX, y, 'success', 'Correct Behavior'));
+    
+    // MTTF arrow (second)
+    const mttf2Start = currentX + 25;
+    currentX += mttf2Width;
+    svg.appendChild(createArrow(mttf2Start, currentX - 25, y - 50, 'MTTF', `${fmtNum(mttf, 1)} ${unitLabel}`));
+    
+    // Icon 5: Second Failure
+    svg.appendChild(createIcon(currentX, y, 'failure-end', 'Second Failure'));
+    
+    // MTBF arrow (over entire cycle)
+    const mtbfStart = startX + 25;
+    const mtbfEnd = currentX - 25;
+    svg.appendChild(createArrow(mtbfStart, mtbfEnd, 30, 'MTBF', `${fmtNum(mtbf, 1)} ${unitLabel}`));
+  }
+  
+  // SVG Speedometer Gauge for Availability
+  function drawAvailabilityGauge(availability) {
+    const svg = document.getElementById('availabilityGauge');
+    svg.innerHTML = '';
+    
+    const centerX = 120;
+    const centerY = 120;
+    const radius = 80;
+    const percentage = isFinite(availability) ? availability * 100 : 0;
+    
+    // Background arc (semi-circle)
+    const bgArc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const startAngle = Math.PI; // Start at left (180 degrees)
+    const endAngle = 2 * Math.PI; // End at right (360/0 degrees)
+    
+    // Create gradient for gauge
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+    gradient.setAttribute('id', 'gaugeGradient');
+    gradient.setAttribute('x1', '0%');
+    gradient.setAttribute('x2', '100%');
+    
+    const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('stop-color', '#ff4444');
+    gradient.appendChild(stop1);
+    
+    const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop2.setAttribute('offset', '50%');
+    stop2.setAttribute('stop-color', '#ffaa33');
+    gradient.appendChild(stop2);
+    
+    const stop3 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop3.setAttribute('offset', '100%');
+    stop3.setAttribute('stop-color', '#13d17c');
+    gradient.appendChild(stop3);
+    
+    defs.appendChild(gradient);
+    svg.appendChild(defs);
+    
+    // Background arc path
+    const bgPath = describeArc(centerX, centerY, radius, startAngle, endAngle);
+    bgArc.setAttribute('d', bgPath);
+    bgArc.setAttribute('fill', 'none');
+    bgArc.setAttribute('stroke', '#2a3442');
+    bgArc.setAttribute('stroke-width', '16');
+    bgArc.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(bgArc);
+    
+    // Colored arc based on percentage
+    const coloredArc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const valueAngle = startAngle + (endAngle - startAngle) * (percentage / 100);
+    const colorPath = describeArc(centerX, centerY, radius, startAngle, valueAngle);
+    coloredArc.setAttribute('d', colorPath);
+    coloredArc.setAttribute('fill', 'none');
+    coloredArc.setAttribute('stroke', 'url(#gaugeGradient)');
+    coloredArc.setAttribute('stroke-width', '16');
+    coloredArc.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(coloredArc);
+    
+    // Needle/pointer
+    const needleAngle = startAngle + (endAngle - startAngle) * (percentage / 100);
+    const needleLength = radius - 20;
+    const needleX = centerX + needleLength * Math.cos(needleAngle);
+    const needleY = centerY + needleLength * Math.sin(needleAngle);
+    
+    const needle = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    needle.setAttribute('x1', centerX);
+    needle.setAttribute('y1', centerY);
+    needle.setAttribute('x2', needleX);
+    needle.setAttribute('y2', needleY);
+    needle.setAttribute('stroke', '#e5ecff');
+    needle.setAttribute('stroke-width', '3');
+    needle.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(needle);
+    
+    // Center circle
+    const centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    centerCircle.setAttribute('cx', centerX);
+    centerCircle.setAttribute('cy', centerY);
+    centerCircle.setAttribute('r', '8');
+    centerCircle.setAttribute('fill', '#e5ecff');
+    svg.appendChild(centerCircle);
+    
+    // Labels (0%, 50%, 100%)
+    addGaugeLabel(svg, centerX - radius - 10, centerY + 5, '0%');
+    addGaugeLabel(svg, centerX, centerY - radius - 10, '50%');
+    addGaugeLabel(svg, centerX + radius + 10, centerY + 5, '100%');
+    
+    // Update gauge value display
+    document.getElementById('gaugeValue').textContent = fmtPct(availability, 2);
+  }
+  
+  // Helper function to describe an arc path
+  function describeArc(x, y, radius, startAngle, endAngle) {
+    const start = polarToCartesian(x, y, radius, endAngle);
+    const end = polarToCartesian(x, y, radius, startAngle);
+    const largeArcFlag = endAngle - startAngle <= Math.PI ? '0' : '1';
+    return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`;
+  }
+  
+  function polarToCartesian(centerX, centerY, radius, angleInRadians) {
+    return {
+      x: centerX + radius * Math.cos(angleInRadians),
+      y: centerY + radius * Math.sin(angleInRadians)
     };
-
-    if (chart) {
-      chart.data = config.data;
-      chart.options = config.options;
-      chart.update();
+  }
+  
+  function addGaugeLabel(svg, x, y, text) {
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', x);
+    label.setAttribute('y', y);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('fill', '#93a4c9');
+    label.setAttribute('font-size', '11');
+    label.textContent = text;
+    svg.appendChild(label);
+  }
+  
+  // Update visualization
+  function updateVisualization(r) {
+    const resultUnit = document.getElementById('resultUnit').value;
+    const unitLabel = getUnitLabel(resultUnit);
+    
+    // Draw timeline and gauge
+    drawTimeline(r);
+    drawAvailabilityGauge(r.availability);
+    
+    // Update info boxes
+    document.getElementById('visMTBM').textContent = `${fmtNum(fromHours(r.MTBM, resultUnit), 1)} ${unitLabel}`;
+    document.getElementById('visMCMT').textContent = `${fmtNum(fromHours(r.MCMT, resultUnit), 1)} ${unitLabel}`;
+    
+    // Update failure rate
+    document.getElementById('visLambda').textContent = fmtNum(r.lambda, 6);
+    
+    // Add interpretation
+    if (isFinite(r.lambda) && r.lambda > 0) {
+      const hoursPerFailure = 1 / r.lambda;
+      const interpretation = ` | Verwachting: 1 storing per ${fmtNum(hoursPerFailure, 0)} uur`;
+      document.getElementById('visLambdaInterpretation').textContent = interpretation;
     } else {
-      chart = new Chart(ctx, config);
+      document.getElementById('visLambdaInterpretation').textContent = '';
     }
   }
 
@@ -410,9 +715,19 @@
     pdf.text(`      = ${fmtNum(inputs.totRepairHours, 2)} / ${fmtNum(inputs.cmCount, 0)} = ${fmtNum(results.MCMT, 2)} uur`, leftMargin + 5, yPos);
     yPos += 15;
     
-    // Grafiek toevoegen
-    const canvas = document.getElementById('kpiChart');
-    const chartImage = canvas.toDataURL('image/png');
+    // Visualisatie toevoegen
+    // Converteer timeline SVG naar image
+    const timelineSvg = document.getElementById('timelineSvg');
+    const gaugeSvg = document.getElementById('availabilityGauge');
+    
+    // Serialize SVG to data URL
+    const serializer = new XMLSerializer();
+    const timelineSvgStr = serializer.serializeToString(timelineSvg);
+    const gaugeSvgStr = serializer.serializeToString(gaugeSvg);
+    
+    const timelineDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(timelineSvgStr)));
+    const gaugeDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(gaugeSvgStr)));
+    
     pdf.addPage();
     
     // Blauwe header ook op pagina 2
@@ -441,11 +756,37 @@
     
     pdf.setFontSize(14);
     pdf.setTextColor(34, 44, 56);
-    pdf.text('Grafische Weergave', leftMargin, yPos);
+    pdf.text('Betrouwbaarheidsvisualisatie', leftMargin, yPos);
     yPos += 10;
     
-    pdf.addImage(chartImage, 'PNG', leftMargin, yPos, 170, 100);
-    yPos += 110;
+    // Timeline diagram
+    pdf.addImage(timelineDataUrl, 'PNG', leftMargin, yPos, 140, 50);
+    yPos += 55;
+    
+    // Beschikbaarheid gauge
+    pdf.setFontSize(12);
+    pdf.text('Beschikbaarheid:', leftMargin, yPos);
+    pdf.addImage(gaugeDataUrl, 'PNG', leftMargin, yPos + 5, 60, 40);
+    pdf.text(fmtPct(results.availability, 2), leftMargin + 70, yPos + 25);
+    yPos += 50;
+    
+    // MTBM & MCMT info
+    pdf.setFontSize(11);
+    pdf.text(`MTBM: ${fmtNum(fromHours(results.MTBM, resultUnit), 2)} ${unitLabel}`, leftMargin, yPos);
+    yPos += 6;
+    pdf.text(`MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, leftMargin, yPos);
+    yPos += 10;
+    
+    // Failure rate
+    pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin, yPos);
+    if (isFinite(results.lambda) && results.lambda > 0) {
+      const hoursPerFailure = 1 / results.lambda;
+      yPos += 5;
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Verwachting: 1 storing per ${fmtNum(hoursPerFailure, 0)} uur`, leftMargin + 5, yPos);
+    }
+    yPos += 15;
     
     // Footer met links onderaan
     pdf.setFontSize(9);
@@ -465,7 +806,7 @@
     validate(inputs);
     const results = compute(inputs);
     updateUI(results);
-    updateChart(results);
+    updateVisualization(results);
   });
   
   // Unit selector voor resultaten
@@ -473,6 +814,7 @@
     const inputs = readInputs();
     const results = compute(inputs);
     updateUI(results);
+    updateVisualization(results);
   });
   
   document.getElementById('exportPDF').addEventListener('click', exportToPDF);
@@ -482,5 +824,5 @@
   validate(initVals);
   const initResults = compute(initVals);
   updateUI(initResults);
-  updateChart(initResults);
+  updateVisualization(initResults);
 })();
