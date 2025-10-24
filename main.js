@@ -247,17 +247,11 @@
   }
   
   // Repareerbaar diagram (volledig)
-  function drawRepairableTimeline(svg, mttf, mttr, mtbf, unitLabel) {
-    
   // Repareerbaar diagram (volledig)
   function drawRepairableTimeline(svg, mttf, mttr, mtbf, unitLabel) {
-    // Clear existing content
-    svg.innerHTML = '';
-    
     // Timeline parameters
     const startX = 50;
     const y = 140;
-    const totalWidth = 700;
     
     // Calculate proportions
     const mttfWidth = 200;
@@ -270,6 +264,81 @@
     // Create timeline
     let currentX = startX;
     
+    // Icon 1: Nieuw systeem (start)
+    svg.appendChild(createIcon(currentX, y, 'success', 'Nieuw'));
+    
+    // MTTF arrow (eerste storing)
+    const mttfStart = currentX + 25;
+    currentX += mttfWidth;
+    svg.appendChild(createArrow(mttfStart, currentX - 25, y - 60, 'MTTF (1e storing)', `${fmtNum(mttf, 1)} ${unitLabel}`));
+    
+    // Icon 2: First Failure
+    svg.appendChild(createIcon(currentX, y, 'failure', 'Eerste Storing'));
+    
+    // Vertical line to repair
+    const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    vLine1.setAttribute('x1', currentX);
+    vLine1.setAttribute('y1', y + 25);
+    vLine1.setAttribute('x2', currentX + mttrWidth/2);
+    vLine1.setAttribute('y2', y + 60);
+    vLine1.setAttribute('stroke', '#3e70ff');
+    vLine1.setAttribute('stroke-width', '2');
+    vLine1.setAttribute('stroke-dasharray', '5,5');
+    svg.appendChild(vLine1);
+    
+    // Icon 3: Repair
+    svg.appendChild(createIcon(currentX + mttrWidth/2, y + 60, 'repair', 'Begin Repair'));
+    
+    // MTTR arrow (at repair level)
+    const mttrStart = currentX + 25;
+    currentX += mttrWidth;
+    svg.appendChild(createArrow(mttrStart, currentX - 25, y, 'MTTR', `${fmtNum(mttr, 1)} ${unitLabel}`));
+    
+    // Vertical line from repair
+    const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    vLine2.setAttribute('x1', currentX - mttrWidth/2);
+    vLine2.setAttribute('y1', y + 60);
+    vLine2.setAttribute('x2', currentX);
+    vLine2.setAttribute('y2', y + 25);
+    vLine2.setAttribute('stroke', '#13d17c');
+    vLine2.setAttribute('stroke-width', '2');
+    vLine2.setAttribute('stroke-dasharray', '5,5');
+    svg.appendChild(vLine2);
+    
+    const repairLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    repairLabel.setAttribute('x', currentX - mttrWidth/2);
+    repairLabel.setAttribute('y', y + 95);
+    repairLabel.setAttribute('text-anchor', 'middle');
+    repairLabel.setAttribute('fill', '#93a4c9');
+    repairLabel.setAttribute('font-size', '11');
+    repairLabel.textContent = 'End Repair';
+    svg.appendChild(repairLabel);
+    
+    // Icon 4: Hersteld
+    svg.appendChild(createIcon(currentX, y, 'success', 'Hersteld'));
+    
+    // Tijd tussen herstel en volgende storing
+    const timeStart = currentX + 25;
+    currentX += mttf2Width;
+    svg.appendChild(createArrow(timeStart, currentX - 25, y - 60, 'Tijd', `${fmtNum(mttf, 1)} ${unitLabel}`));
+    
+    // Icon 5: Second Failure
+    svg.appendChild(createIcon(currentX, y, 'failure-end', 'Tweede Storing'));
+    
+    // MTBF arrow (over volledige cyclus: herstel → volgende storing)
+    const mtbfStart = startX + mttfWidth + 25;
+    const mtbfEnd = currentX - 25;
+    svg.appendChild(createArrow(mtbfStart, mtbfEnd, 25, 'MTBF (tussen storingen)', `${fmtNum(mtbf, 1)} ${unitLabel}`));
+    
+    // Tekst onder diagram
+    const infoText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    infoText.setAttribute('x', 400);
+    infoText.setAttribute('y', y + 80);
+    infoText.setAttribute('text-anchor', 'middle');
+    infoText.setAttribute('fill', '#b8c7e0');
+    infoText.setAttribute('font-size', '13');
+    infoText.textContent = 'Repareerbaar systeem: MTTF (eerste) + MTBF cyclus (tussen storingen)';
+    svg.appendChild(infoText);
   }
   
   // Helper: Arrow marker voor SVG
@@ -603,12 +672,12 @@
   }
   
   // Update visualization
-  function updateVisualization(r) {
+  function updateVisualization(r, isRepairable) {
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
     
     // Draw timeline and gauge
-    drawTimeline(r);
+    drawTimeline(r, isRepairable);
     drawAvailabilityGauge(r.availability);
     
     // Update info boxes
@@ -625,6 +694,29 @@
       document.getElementById('visLambdaInterpretation').textContent = interpretation;
     } else {
       document.getElementById('visLambdaInterpretation').textContent = '';
+    }
+    
+    // Show/hide MTBF-related metrics
+    const mtbmBox = document.querySelector('.mtbm-box');
+    const mcmtBox = document.querySelector('.mcmt-box');
+    const failureRateSection = document.querySelector('.failure-rate-section');
+    const gaugeSection = document.querySelector('.gauge-section');
+    const mtbfRelatedResults = document.querySelectorAll('.result-row.mtbf-related');
+    
+    if (!isRepairable) {
+      // Bij niet-repareerbaar: verberg MTBF-gerelateerde items
+      if (mtbmBox) mtbmBox.style.display = 'none';
+      if (mcmtBox) mcmtBox.style.display = 'none';
+      if (failureRateSection) failureRateSection.style.display = 'none';
+      if (gaugeSection) gaugeSection.style.display = 'none';
+      mtbfRelatedResults.forEach(row => row.style.display = 'none');
+    } else {
+      // Bij repareerbaar: toon alles
+      if (mtbmBox) mtbmBox.style.display = 'flex';
+      if (mcmtBox) mcmtBox.style.display = 'flex';
+      if (failureRateSection) failureRateSection.style.display = 'flex';
+      if (gaugeSection) gaugeSection.style.display = 'flex';
+      mtbfRelatedResults.forEach(row => row.style.display = 'flex');
     }
   }
 
