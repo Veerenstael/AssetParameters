@@ -146,66 +146,27 @@
   }
 
   // Kernberekeningen
-  function compute(v, isRepairable) {
-    // MTTF: Altijd berekend op basis van totItemsHours en failedItems
-    const MTTF = safeDiv(v.totItemsHours, v.failedItems);
-    
-    let MTBF, MTTR, availability, lambda, FIT, MTBM, MCMT;
-    
-    if (isRepairable) {
-      // REPAREERBAAR SYSTEEM
-      // MTBF = Totale bedrijfstijd / Aantal storingen
-      MTBF = safeDiv(v.totHours, v.failures);
-      
-      // MTTR = Totale reparatietijd / Aantal reparaties
-      MTTR = safeDiv(v.totRepairHours, v.failures);
-      
-      // Beschikbaarheid [A] = MTBF / (MTBF + MTTR)
-      availability = (isFinite(MTBF) && isFinite(MTTR) && MTBF > 0 && MTTR >= 0)
-        ? MTBF / (MTBF + MTTR)
-        : NaN;
-      
-      // Failure Rate [λ] = 1 / MTBF
-      lambda = isFinite(MTBF) && MTBF > 0 ? 1 / MTBF : NaN;
-      
-      // FIT = λ × 10^9
-      FIT = isFinite(lambda) ? lambda * 1e9 : NaN;
-      
-      // MTBM = Totaal aantal bedrijfsuren / Aantal onderhoudsbeurten
-      const totalMaint = v.pmCount + v.cmCount;
-      MTBM = safeDiv(v.totHours, totalMaint);
-      
-      // MCMT = Totale tijd voor correctief onderhoud / Aantal correctieve onderhoudsbeurten
-      MCMT = safeDiv(v.totRepairHours, v.cmCount);
-      
-    } else {
-      // NIET-REPAREERBAAR COMPONENT
-      // MTBF = MTTF voor niet-repareerbare componenten
-      MTBF = MTTF;
-      
-      // MTTR is niet van toepassing (component wordt vervangen, niet gerepareerd)
-      MTTR = NaN;
-      
-      // Beschikbaarheid [A] = MTTF / (MTTF + MTTR)
-      // Voor niet-repareerbaar is dit vaak niet relevant
-      availability = NaN;
-      
-      // Failure Rate [λ] = 1 / MTTF
-      lambda = isFinite(MTTF) && MTTF > 0 ? 1 / MTTF : NaN;
-      
-      // FIT = λ × 10^9
-      FIT = isFinite(lambda) ? lambda * 1e9 : NaN;
-      
-      // MTBM en MCMT zijn niet van toepassing voor niet-repareerbare componenten
-      MTBM = NaN;
-      MCMT = NaN;
-    }
+  function compute(v) {
+    const MTTF = safeDiv(v.totItemsHours, v.failedItems); // niet-repareerbaar perspectief
+    const MTBF = safeDiv(v.totHours, v.failures);         // repareerbaar perspectief
+    const MTTR = safeDiv(v.totRepairHours, v.failures);   // herstel per storing
+
+    const availability = (isFinite(MTBF) && isFinite(MTTR) && MTBF > 0 && MTTR >= 0)
+      ? MTBF / (MTBF + MTTR)
+      : NaN;
+
+    const lambda = safeDiv(v.failures, v.totHours);       // storingen per uur
+    const FIT = isFinite(lambda) ? lambda * 1e9 : NaN;    // per 10^9 uur
+
+    const totalMaint = v.pmCount + v.cmCount;
+    const MTBM = safeDiv(v.totHours, totalMaint);         // tijd tussen onderhoud
+    const MCMT = safeDiv(v.totRepairHours, v.cmCount);    // gemiddelde duur correctief
 
     return { MTTF, MTBF, MTTR, availability, lambda, FIT, MTBM, MCMT };
   }
 
   // UI bijwerken
-  function updateUI(r, isRepairable) {
+  function updateUI(r) {
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
     
@@ -225,35 +186,6 @@
     document.getElementById('unitMTTR').textContent = unitLabel;
     document.getElementById('unitMTBM').textContent = unitLabel;
     document.getElementById('unitMCMT').textContent = unitLabel;
-    
-    // Toon/verberg elementen op basis van type analyse
-    const mtbfRelated = document.querySelectorAll('.mtbf-related');
-    const availabilityRelated = document.querySelectorAll('.availability-related');
-    const lambdaRelated = document.querySelectorAll('.lambda-related');
-    
-    if (isRepairable) {
-      // Toon alle velden voor repareerbare systemen
-      mtbfRelated.forEach(el => el.style.display = '');
-      availabilityRelated.forEach(el => el.style.display = '');
-      lambdaRelated.forEach(el => el.style.display = '');
-      
-      // Update formules voor repareerbaar
-      document.getElementById('availFormulaNumerator').textContent = 'MTBF';
-      document.getElementById('availFormulaDenominator').textContent = '(MTBF + MTTR)';
-      document.getElementById('lambdaFormulaNumerator').textContent = '1';
-      document.getElementById('lambdaFormulaDenominator').textContent = 'MTBF';
-    } else {
-      // Verberg MTBF-specifieke velden voor niet-repareerbare componenten
-      mtbfRelated.forEach(el => el.style.display = 'none');
-      availabilityRelated.forEach(el => el.style.display = 'none');
-      
-      // Toon wel lambda en FIT (deze zijn relevant voor niet-repareerbaar)
-      lambdaRelated.forEach(el => el.style.display = '');
-      
-      // Update formules voor niet-repareerbaar
-      document.getElementById('lambdaFormulaNumerator').textContent = '1';
-      document.getElementById('lambdaFormulaDenominator').textContent = 'MTTF';
-    }
   }
 
   // SVG Timeline Diagram
@@ -794,8 +726,7 @@
     const pdf = new jsPDF('p', 'mm', 'a4');
     
     const inputs = readInputs();
-    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
-    const results = compute(inputs, isRepairable);
+    const results = compute(inputs);
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
     
@@ -973,19 +904,19 @@
   document.getElementById('kpi-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const inputs = readInputs();
-    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
     validate(inputs);
-    const results = compute(inputs, isRepairable);
-    updateUI(results, isRepairable);
+    const results = compute(inputs);
+    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
+    updateUI(results);
     updateVisualization(results, isRepairable);
   });
   
   // Unit selector voor resultaten
   document.getElementById('resultUnit').addEventListener('change', () => {
     const inputs = readInputs();
+    const results = compute(inputs);
     const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
-    const results = compute(inputs, isRepairable);
-    updateUI(results, isRepairable);
+    updateUI(results);
     updateVisualization(results, isRepairable);
   });
   
@@ -1006,17 +937,16 @@
       // Herbereken en update visualisatie
       const inputs = readInputs();
       validate(inputs);
-      const results = compute(inputs, isRepairable);
-      updateUI(results, isRepairable);
+      const results = compute(inputs);
+      updateUI(results);
       updateVisualization(results, isRepairable);
     });
   });
 
   // Init met default waarden
   const initVals = readInputs();
-  const initIsRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
   validate(initVals);
-  const initResults = compute(initVals, initIsRepairable);
-  updateUI(initResults, initIsRepairable);
-  updateVisualization(initResults, initIsRepairable);
+  const initResults = compute(initVals);
+  updateUI(initResults);
+  updateVisualization(initResults, true); // Default: repairable
 })();
