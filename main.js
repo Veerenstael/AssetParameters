@@ -189,7 +189,7 @@
   }
 
   // SVG Timeline Diagram
-  function drawTimeline(results) {
+  function drawTimeline(results, isRepairable) {
     const svg = document.getElementById('timelineSvg');
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
@@ -202,21 +202,96 @@
     // Clear existing content
     svg.innerHTML = '';
     
+    if (!isRepairable) {
+      // Niet-repareerbaar: Simpel MTTF diagram
+      drawNonRepairableTimeline(svg, mttf, unitLabel);
+    } else {
+      // Repareerbaar: Volledig diagram met MTTF + MTBF
+      drawRepairableTimeline(svg, mttf, mttr, mtbf, unitLabel);
+    }
+  }
+  
+  // Niet-repareerbaar diagram (simpel)
+  function drawNonRepairableTimeline(svg, mttf, unitLabel) {
+    const startX = 100;
+    const y = 140;
+    const spacing = 150;
+    
+    // Define arrowhead marker
+    addArrowMarker(svg);
+    
+    // Icon 1: Start
+    svg.appendChild(createIcon(startX, y, 'success', 'Start'));
+    
+    // Icon 2: Werkt
+    svg.appendChild(createIcon(startX + spacing, y, 'success', 'Operationeel'));
+    
+    // Icon 3: Werkt
+    svg.appendChild(createIcon(startX + spacing * 2, y, 'success', 'Operationeel'));
+    
+    // Icon 4: Fout
+    svg.appendChild(createIcon(startX + spacing * 3, y, 'failure-end', 'Defect'));
+    
+    // MTTF arrow over alles
+    svg.appendChild(createArrow(startX + 25, startX + spacing * 3 - 25, y - 60, 'MTTF', `${fmtNum(mttf, 1)} ${unitLabel}`));
+    
+    // Tekst onder diagram
+    const infoText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    infoText.setAttribute('x', 400);
+    infoText.setAttribute('y', y + 80);
+    infoText.setAttribute('text-anchor', 'middle');
+    infoText.setAttribute('fill', '#b8c7e0');
+    infoText.setAttribute('font-size', '13');
+    infoText.textContent = 'Component levensduur tot defect (niet-repareerbaar)';
+    svg.appendChild(infoText);
+  }
+  
+  // Repareerbaar diagram (volledig)
+  function drawRepairableTimeline(svg, mttf, mttr, mtbf, unitLabel) {
+    
+  // Repareerbaar diagram (volledig)
+  function drawRepairableTimeline(svg, mttf, mttr, mtbf, unitLabel) {
+    // Clear existing content
+    svg.innerHTML = '';
+    
     // Timeline parameters
     const startX = 50;
     const y = 140;
     const totalWidth = 700;
     
-    // Calculate proportions (simplified for visualization)
+    // Calculate proportions
     const mttfWidth = 200;
     const mttrWidth = 100;
     const mttf2Width = 200;
     
+    // Define arrowhead marker
+    addArrowMarker(svg);
+    
     // Create timeline
     let currentX = startX;
     
-    // Helper function to create icon circle
-    function createIcon(x, y, type, label) {
+  }
+  
+  // Helper: Arrow marker voor SVG
+  function addArrowMarker(svg) {
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    marker.setAttribute('id', 'arrowhead');
+    marker.setAttribute('markerWidth', '10');
+    marker.setAttribute('markerHeight', '10');
+    marker.setAttribute('refX', '9');
+    marker.setAttribute('refY', '3');
+    marker.setAttribute('orient', 'auto');
+    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    polygon.setAttribute('points', '0 0, 10 3, 0 6');
+    polygon.setAttribute('fill', '#ffaa33');
+    marker.appendChild(polygon);
+    defs.appendChild(marker);
+    svg.appendChild(defs);
+  }
+  
+  // Helper function to create icon circle
+  function createIcon(x, y, type, label) {
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       
       const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -655,7 +730,7 @@
     yPos += 6;
     pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, leftMargin + 5, yPos);
     yPos += 6;
-    pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 5, yPos);
+    pdf.text(`Failure Rate: ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 5, yPos);
     yPos += 6;
     pdf.text(`FIT (Failures In Time): ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 5, yPos);
     yPos += 6;
@@ -729,14 +804,6 @@
     pdf.text(`      = ${fmtNum(inputs.totRepairHours, 2)} / ${fmtNum(inputs.cmCount, 0)} = ${fmtNum(results.MCMT, 2)} uur`, leftMargin + 5, yPos);
     yPos += 12;
     
-    // Footer met links onderaan (op pagina 1, vaste positie)
-    yPos = 270; // Fixed position onderaan pagina 1
-    pdf.setFontSize(9);
-    pdf.setTextColor(19, 209, 124);
-    pdf.textWithLink('www.veerenstael.nl', leftMargin, yPos, { url: 'https://www.veerenstael.nl' });
-    yPos += 5;
-    pdf.textWithLink('LinkedIn: Veerenstael', leftMargin, yPos, { url: 'https://www.linkedin.com/company/veerenstael' });
-    
     // PDF opslaan
     pdf.save(`Veerenstael_Tooling_Analyse_${dateStr.replace(/\s/g, '_')}.pdf`);
   }
@@ -747,24 +814,47 @@
     const inputs = readInputs();
     validate(inputs);
     const results = compute(inputs);
+    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
     updateUI(results);
-    updateVisualization(results);
+    updateVisualization(results, isRepairable);
   });
   
   // Unit selector voor resultaten
   document.getElementById('resultUnit').addEventListener('change', () => {
     const inputs = readInputs();
     const results = compute(inputs);
+    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
     updateUI(results);
-    updateVisualization(results);
+    updateVisualization(results, isRepairable);
   });
   
   document.getElementById('exportPDF').addEventListener('click', exportToPDF);
+  
+  // Analysis Type Toggle Handler
+  document.querySelectorAll('input[name="analysisType"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const isRepairable = this.value === 'repairable';
+      const mtbfGroup = document.querySelector('.mtbf-group');
+      
+      if (isRepairable) {
+        mtbfGroup.style.display = 'block';
+      } else {
+        mtbfGroup.style.display = 'none';
+      }
+      
+      // Herbereken en update visualisatie
+      const inputs = readInputs();
+      validate(inputs);
+      const results = compute(inputs);
+      updateUI(results);
+      updateVisualization(results, isRepairable);
+    });
+  });
 
   // Init met default waarden
   const initVals = readInputs();
   validate(initVals);
   const initResults = compute(initVals);
   updateUI(initResults);
-  updateVisualization(initResults);
+  updateVisualization(initResults, true); // Default: repairable
 })();
