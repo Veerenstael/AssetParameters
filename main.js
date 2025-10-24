@@ -178,9 +178,11 @@
   document.querySelectorAll('input[name="analysisType"]').forEach(radio => {
     radio.addEventListener('change', function() {
       const isRepairable = this.value === 'repairable';
-      const mtbfGroup = document.querySelector('.mtbf-group');
+      const mtbfRelated = document.querySelectorAll('.mtbf-related');
       
-      mtbfGroup.style.display = isRepairable ? 'block' : 'none';
+      mtbfRelated.forEach(el => {
+        el.style.display = isRepairable ? '' : 'none';
+      });
       
       const inputs = readInputs();
       const results = compute(inputs, isRepairable);
@@ -352,7 +354,7 @@
       yPos += 5;
       pdf.text('Beschikbaarheid [A] = MTBF / (MTBF + MTTR)', leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text('Failure Rate = 1 / MTBF', leftMargin + 3, yPos);
+      pdf.text('Failure Rate [λ] = 1 / MTBF', leftMargin + 3, yPos);
       yPos += 5;
     } else {
       pdf.text('Failure Rate [λ] = 1 / MTTF', leftMargin + 3, yPos);
@@ -373,4 +375,3 @@
     pdf.save(fileName);
   });
 })();
-
