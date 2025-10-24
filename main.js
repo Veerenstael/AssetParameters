@@ -554,7 +554,7 @@
   }
 
   // PDF Export functionaliteit
-  async function exportToPDF() {
+  function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     
@@ -727,90 +727,10 @@
     yPos += 5;
     pdf.setTextColor(100, 100, 100);
     pdf.text(`      = ${fmtNum(inputs.totRepairHours, 2)} / ${fmtNum(inputs.cmCount, 0)} = ${fmtNum(results.MCMT, 2)} uur`, leftMargin + 5, yPos);
-    yPos += 15;
+    yPos += 12;
     
-    // Visualisatie toevoegen met html2canvas voor betere SVG support
-    pdf.addPage();
-    
-    // Blauwe header ook op pagina 2
-    yPos = 0;
-    pdf.setFillColor(34, 48, 64);
-    pdf.rect(0, 0, 210, 25, 'F');
-    
-    // Logo op pagina 2
-    if (logoImg && logoImg.complete) {
-      const canvas2 = document.createElement('canvas');
-      const ctx2 = canvas2.getContext('2d');
-      canvas2.width = logoImg.naturalWidth;
-      canvas2.height = logoImg.naturalHeight;
-      ctx2.drawImage(logoImg, 0, 0);
-      const logoDataUrl2 = canvas2.toDataURL('image/png');
-      
-      const logoWidth = 60;
-      const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth;
-      const logoX = (210 - logoWidth) / 2;
-      const logoY = (25 - logoHeight) / 2 + 2;
-      
-      pdf.addImage(logoDataUrl2, 'PNG', logoX, logoY, logoWidth, logoHeight);
-    }
-    
-    yPos = 35;
-    
-    pdf.setFontSize(14);
-    pdf.setTextColor(34, 44, 56);
-    pdf.text('Betrouwbaarheidsvisualisatie', leftMargin, yPos);
-    yPos += 10;
-    
-    // Converteer visualisatie containers naar canvas met html2canvas
-    const timelineSection = document.querySelector('.timeline-section');
-    const gaugeSection = document.querySelector('.gauge-section');
-    
-    try {
-      // Timeline
-      const timelineCanvas = await html2canvas(timelineSection, {
-        backgroundColor: '#232b3a',
-        scale: 2
-      });
-      const timelineImg = timelineCanvas.toDataURL('image/png');
-      pdf.addImage(timelineImg, 'PNG', leftMargin, yPos, 140, 50);
-      
-      // Gauge (naast timeline info)
-      const gaugeCanvas = await html2canvas(gaugeSection, {
-        backgroundColor: '#1a2230',
-        scale: 2
-      });
-      const gaugeImg = gaugeCanvas.toDataURL('image/png');
-      pdf.addImage(gaugeImg, 'PNG', 140, yPos + 10, 50, 35);
-      
-    } catch (error) {
-      console.error('Error rendering visualization:', error);
-      // Fallback: text-only
-      pdf.setFontSize(10);
-      pdf.text('Visualisatie kon niet worden geladen', leftMargin, yPos);
-    }
-    
-    yPos += 60;
-    
-    // MTBM & MCMT info
-    pdf.setFontSize(11);
-    pdf.setTextColor(60, 60, 60);
-    pdf.text(`📅 MTBM: ${fmtNum(fromHours(results.MTBM, resultUnit), 2)} ${unitLabel}`, leftMargin, yPos);
-    yPos += 6;
-    pdf.text(`⚙️ MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, leftMargin, yPos);
-    yPos += 10;
-    
-    // Failure rate
-    pdf.text(`⚠️ Failure Rate [lambda]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin, yPos);
-    if (isFinite(results.lambda) && results.lambda > 0) {
-      const hoursPerFailure = 1 / results.lambda;
-      yPos += 5;
-      pdf.setFontSize(9);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text(`   Verwachting: 1 storing per ${fmtNum(hoursPerFailure, 0)} uur`, leftMargin, yPos);
-    }
-    yPos += 15;
-    
-    // Footer met links onderaan
+    // Footer met links onderaan (op pagina 1, vaste positie)
+    yPos = 270; // Fixed position onderaan pagina 1
     pdf.setFontSize(9);
     pdf.setTextColor(19, 209, 124);
     pdf.textWithLink('www.veerenstael.nl', leftMargin, yPos, { url: 'https://www.veerenstael.nl' });
