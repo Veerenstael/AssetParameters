@@ -588,3 +588,48 @@ button.export-btn:hover { background: #e55a28; }
     width: 100%;
   }
 }
+
+/* Results row layout */
+.results-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  align-items: flex-start;
+}
+
+.result-section {
+  flex: 1;
+}
+
+.pdf-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 48px;
+}
+
+.export-btn {
+  background: #ff6b35;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 14px 26px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.export-btn:hover {
+  background: #e55a28;
+}
+
+@media (max-width: 968px) {
+  .results-row {
+    flex-direction: column;
+  }
+  
+  .pdf-section {
+    padding-top: 0;
+  }
+}
