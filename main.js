@@ -352,7 +352,7 @@
       yPos += 5;
       pdf.text('Beschikbaarheid [A] = MTBF / (MTBF + MTTR)', leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text('Failure Rate [λ] = 1 / MTBF', leftMargin + 3, yPos);
+      pdf.text('Failure Rate = 1 / MTBF', leftMargin + 3, yPos);
       yPos += 5;
     } else {
       pdf.text('Failure Rate [λ] = 1 / MTTF', leftMargin + 3, yPos);
@@ -373,3 +373,4 @@
     pdf.save(fileName);
   });
 })();
+
