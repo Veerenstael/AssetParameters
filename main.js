@@ -248,12 +248,26 @@
     const leftMargin = 20;
     const pageWidth = 170;
     
-    // Logo en header
-    pdf.setFontSize(20);
-    pdf.setTextColor(34, 44, 56);
-    pdf.text('Veerenstael - Tooling', leftMargin, yPos);
-    yPos += 8;
+    // Logo bovenaan (van GitHub)
+    // We gebruiken het logo van de pagina zelf
+    const logoImg = document.querySelector('.veerenstael-logo');
+    if (logoImg && logoImg.complete) {
+      // Logo als base64
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = logoImg.naturalWidth;
+      canvas.height = logoImg.naturalHeight;
+      ctx.drawImage(logoImg, 0, 0);
+      const logoDataUrl = canvas.toDataURL('image/png');
+      
+      // Logo toevoegen aan PDF (120mm breed, proportioneel geschaald)
+      const logoWidth = 80;
+      const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth;
+      pdf.addImage(logoDataUrl, 'PNG', leftMargin, yPos, logoWidth, logoHeight);
+      yPos += logoHeight + 10;
+    }
     
+    // Subtitle
     pdf.setFontSize(10);
     pdf.setTextColor(100, 100, 100);
     pdf.text('Betrouwbaarheids- en Onderhoudsparameters Analyse', leftMargin, yPos);
@@ -402,12 +416,7 @@
     pdf.addImage(chartImage, 'PNG', leftMargin, yPos, 170, 100);
     yPos += 110;
     
-    // Footer met logo en links
-    pdf.setFontSize(10);
-    pdf.setTextColor(34, 44, 56);
-    pdf.text('Gegenereerd met Veerenstael - Tooling', leftMargin, yPos);
-    yPos += 6;
-    
+    // Footer met links onderaan
     pdf.setFontSize(9);
     pdf.setTextColor(19, 209, 124);
     pdf.textWithLink('www.veerenstael.nl', leftMargin, yPos, { url: 'https://www.veerenstael.nl' });
