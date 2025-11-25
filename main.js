@@ -107,7 +107,6 @@
 
     return {
       totItemsHours: toHours(totItemsValue, totItemsUnit),
-      failedItems: parseFloat(document.getElementById('failedItems').value),
       failures: parseFloat(document.getElementById('failures').value),
       totRepairHours: parseFloat(document.getElementById('totRepairHours').value),
       totDetectHours: parseFloat(document.getElementById('totDetectHours').value)
@@ -116,7 +115,7 @@
 
   // Compute - Repareerbaar
   function computeRepairable(v) {
-    const MTBF = safeDiv(v.totItemsHours, v.failedItems);
+    const MTBF = safeDiv(v.totItemsHours, v.failures);
     const MTTR = safeDiv(v.totRepairHours, v.failures);
     const MTTD = safeDiv(v.totDetectHours, v.failures);
     const MCMT = (isFinite(MTTR) && isFinite(MTTD)) ? MTTR + MTTD : NaN;
@@ -130,7 +129,7 @@
 
   // Compute - Niet-repareerbaar
   function computeNonRepairable(v) {
-    const MTTF = safeDiv(v.totItemsHours, v.failedItems);
+    const MTTF = safeDiv(v.totItemsHours, v.failures);
     const lambda = (isFinite(MTTF) && MTTF > 0) ? 1 / MTTF : NaN;
     const FIT = (isFinite(MTTF) && MTTF > 0) ? 1e9 / MTTF : NaN;
 
@@ -315,12 +314,10 @@
     pdf.setFontSize(10);
     pdf.text(`• Totale bedrijfstijd items: ${fmtNum(inputs.totItemsHours, 0)} uur`, leftMargin + 3, yPos);
     yPos += 5;
-    pdf.text(`• Aantal falende items: ${fmtNum(inputs.failedItems, 0)}`, leftMargin + 3, yPos);
+    pdf.text(`• Aantal failures: ${fmtNum(inputs.failures, 0)}`, leftMargin + 3, yPos);
     yPos += 5;
     
     if (isRepairable) {
-      pdf.text(`• Aantal storingen: ${fmtNum(inputs.failures, 0)}`, leftMargin + 3, yPos);
-      yPos += 5;
       pdf.text(`• Totale reparatietijd: ${fmtNum(inputs.totRepairHours, 2)} uur`, leftMargin + 3, yPos);
       yPos += 5;
       pdf.text(`• Totale detectietijd: ${fmtNum(inputs.totDetectHours, 2)} uur`, leftMargin + 3, yPos);
@@ -374,11 +371,11 @@
     pdf.setFontSize(9);
     
     if (isRepairable) {
-      pdf.text('MTBF = [Totale bedrijfstijd items] / [Aantal falende items]', leftMargin + 3, yPos);
+      pdf.text('MTBF = [Totale bedrijfstijd items] / [Aantal failures]', leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text('MTTR = [Totale reparatietijd] / [Aantal storingen]', leftMargin + 3, yPos);
+      pdf.text('MTTR = [Totale reparatietijd] / [Aantal failures]', leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text('MTTD = [Totale detectietijd] / [Aantal storingen]', leftMargin + 3, yPos);
+      pdf.text('MTTD = [Totale detectietijd] / [Aantal failures]', leftMargin + 3, yPos);
       yPos += 5;
       pdf.text('MCMT = MTTR + MTTD', leftMargin + 3, yPos);
       yPos += 5;
@@ -390,7 +387,7 @@
       yPos += 5;
       pdf.text('FIT = 1.000.000.000 / MTBF', leftMargin + 3, yPos);
     } else {
-      pdf.text('MTTF = [Totale bedrijfstijd items] / [Aantal falende items]', leftMargin + 3, yPos);
+      pdf.text('MTTF = [Totale bedrijfstijd items] / [Aantal failures]', leftMargin + 3, yPos);
       yPos += 5;
       pdf.text('Failure Rate [lambda] = 1 / MTTF', leftMargin + 3, yPos);
       yPos += 5;
