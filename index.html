@@ -26,18 +26,29 @@
           <button type="button" class="def-btn" data-kpi="mttf">MTTF</button>
           <button type="button" class="def-btn" data-kpi="mtbf">MTBF</button>
           <button type="button" class="def-btn" data-kpi="mttr">MTTR</button>
+          <button type="button" class="def-btn" data-kpi="mttd">MTTD</button>
+          <button type="button" class="def-btn" data-kpi="mcmt">MCMT</button>
+          <button type="button" class="def-btn" data-kpi="uptime">Uptime</button>
           <button type="button" class="def-btn" data-kpi="availability">Beschikbaarheid [A]</button>
           <button type="button" class="def-btn" data-kpi="lambda">Failure Rate [λ]</button>
           <button type="button" class="def-btn" data-kpi="fit">FIT</button>
-          <button type="button" class="def-btn" data-kpi="mtbm">MTBM</button>
-          <button type="button" class="def-btn" data-kpi="mcmt">MCMT</button>
         </div>
         <div id="def-explanation" class="def-explanation" hidden>
           <div class="def-content"></div>
         </div>
       </div>
 
-      <!-- Type Analyse - Bovenaan -->
+      <!-- Diagram plaatjes -->
+      <div class="diagram-section">
+        <div class="diagram-container" id="diagramRepairable">
+          <img src="repareerbaar.jpg" alt="Schema repareerbaar systeem" class="diagram-img"/>
+        </div>
+        <div class="diagram-container" id="diagramNonRepairable" style="display: none;">
+          <img src="nietrepareerbaar.jpg" alt="Schema niet-repareerbaar systeem" class="diagram-img"/>
+        </div>
+      </div>
+
+      <!-- Type Analyse -->
       <div class="input-section">
         <h2 class="section-title">Type Analyse</h2>
         <div class="analysis-type-toggle">
@@ -73,27 +84,14 @@
                 <label for="failedItems">Aantal falende items</label>
                 <input type="number" id="failedItems" value="10" step="1" min="0"/>
 
-                <label for="totHoursValue" class="mtbf-related">Totale bedrijfstijd</label>
-                <div class="unit-row mtbf-related">
-                  <input type="number" id="totHoursValue" value="35000" step="1" min="0"/>
-                  <select id="totHoursUnit">
-                    <option value="hours" selected>uren</option>
-                    <option value="days">dagen</option>
-                    <option value="years">jaren</option>
-                  </select>
-                </div>
+                <label for="failures" class="repairable-only">Aantal storingen</label>
+                <input type="number" id="failures" value="7" step="1" min="0" class="repairable-only"/>
 
-                <label for="failures" class="mtbf-related">Aantal storingen</label>
-                <input type="number" id="failures" value="7" step="1" min="0" class="mtbf-related"/>
+                <label for="totRepairHours" class="repairable-only">Totale reparatietijd (uren)</label>
+                <input type="number" id="totRepairHours" value="56" step="0.1" min="0" class="repairable-only"/>
 
-                <label for="totRepairHours" class="mtbf-related">Totale hersteltijd (uren)</label>
-                <input type="number" id="totRepairHours" value="56" step="0.1" min="0" class="mtbf-related"/>
-
-                <label for="pmCount" class="mtbf-related">Aantal geplande onderhoudsacties</label>
-                <input type="number" id="pmCount" value="22" step="1" min="0" class="mtbf-related"/>
-
-                <label for="cmCount" class="mtbf-related">Aantal ongeplande onderhoudsacties</label>
-                <input type="number" id="cmCount" value="9" step="1" min="0" class="mtbf-related"/>
+                <label for="totDetectHours" class="repairable-only">Totale detectietijd (uren)</label>
+                <input type="number" id="totDetectHours" value="14" step="0.1" min="0" class="repairable-only"/>
               </div>
 
               <div class="button-row">
@@ -108,7 +106,76 @@
         <section class="right-column">
           <div class="formulas-section">
             <h2 class="section-title">Berekeningsformules</h2>
-            <div class="formulas">
+            
+            <!-- Repareerbaar formules -->
+            <div class="formulas" id="formulasRepairable">
+              <div class="formula-item">
+                <span class="formula-label">MTBF =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale bedrijfstijd items]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal falende items]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MTTR =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale reparatietijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal storingen]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MTTD =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale detectietijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal storingen]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MCMT =</span>
+                <span class="formula-simple">MTTR + MTTD</span>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">Uptime =</span>
+                <span class="formula-simple">MTBF − MCMT</span>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">Beschikbaarheid [A] =</span>
+                <div class="fraction">
+                  <span class="frac-num">Uptime</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">MTBF</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">Failure rate [λ] =</span>
+                <div class="fraction">
+                  <span class="frac-num">1</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">MTBF</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">FIT =</span>
+                <div class="fraction">
+                  <span class="frac-num">1.000.000.000</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">MTBF</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Niet-repareerbaar formules -->
+            <div class="formulas" id="formulasNonRepairable" style="display: none;">
               <div class="formula-item">
                 <span class="formula-label">MTTF =</span>
                 <div class="fraction">
@@ -118,62 +185,21 @@
                 </div>
               </div>
               
-              <div class="formula-item mtbf-related">
-                <span class="formula-label">MTBF =</span>
-                <div class="fraction">
-                  <span class="frac-num">[Totale bedrijfstijd]</span>
-                  <span class="frac-line"></span>
-                  <span class="frac-den">[Aantal storingen]</span>
-                </div>
-              </div>
-              
-              <div class="formula-item mtbf-related">
-                <span class="formula-label">MTTR =</span>
-                <div class="fraction">
-                  <span class="frac-num">[Totale hersteltijd]</span>
-                  <span class="frac-line"></span>
-                  <span class="frac-den">[Aantal storingen]</span>
-                </div>
-              </div>
-              
-              <div class="formula-item mtbf-related">
-                <span class="formula-label">Beschikbaarheid [A] =</span>
-                <div class="fraction">
-                  <span class="frac-num">MTBF</span>
-                  <span class="frac-line"></span>
-                  <span class="frac-den">MTBF + MTTR</span>
-                </div>
-              </div>
-              
               <div class="formula-item">
                 <span class="formula-label">Failure rate [λ] =</span>
                 <div class="fraction">
                   <span class="frac-num">1</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den" id="lambdaFormula">MTBF</span>
+                  <span class="frac-den">MTTF</span>
                 </div>
               </div>
               
               <div class="formula-item">
                 <span class="formula-label">FIT =</span>
-                <span class="formula-simple">[λ] × 10<sup>9</sup></span>
-              </div>
-              
-              <div class="formula-item mtbf-related">
-                <span class="formula-label">MTBM =</span>
                 <div class="fraction">
-                  <span class="frac-num">[Totale bedrijfstijd]</span>
+                  <span class="frac-num">1.000.000.000</span>
                   <span class="frac-line"></span>
-                  <span class="frac-den">[Geplande OH-acties] + [Ongeplande OH-acties]</span>
-                </div>
-              </div>
-              
-              <div class="formula-item mtbf-related">
-                <span class="formula-label">MCMT =</span>
-                <div class="fraction">
-                  <span class="frac-num">[Totale hersteltijd]</span>
-                  <span class="frac-line"></span>
-                  <span class="frac-den">[Ongeplande acties]</span>
+                  <span class="frac-den">MTTF</span>
                 </div>
               </div>
             </div>
@@ -181,7 +207,7 @@
         </section>
       </div>
 
-      <!-- Resultaten - Onder de grid -->
+      <!-- Resultaten -->
       <div class="result-section">
         <h2 class="section-title">Resultaten</h2>
         
@@ -195,22 +221,39 @@
         </div>
         
         <div class="result-grid">
-          <div class="result-row">
-            <span class="result-label">MTTF:</span>
-            <span class="result-value"><span id="outMTTF">—</span> <span id="unitMTTF">uur</span></span>
-          </div>
-          <div class="result-row mtbf-related">
+          <!-- Repareerbaar resultaten -->
+          <div class="result-row repairable-only">
             <span class="result-label">MTBF:</span>
             <span class="result-value"><span id="outMTBF">—</span> <span id="unitMTBF">uur</span></span>
           </div>
-          <div class="result-row mtbf-related">
+          <div class="result-row repairable-only">
             <span class="result-label">MTTR:</span>
             <span class="result-value"><span id="outMTTR">—</span> <span id="unitMTTR">uur</span></span>
           </div>
-          <div class="result-row mtbf-related">
+          <div class="result-row repairable-only">
+            <span class="result-label">MTTD:</span>
+            <span class="result-value"><span id="outMTTD">—</span> <span id="unitMTTD">uur</span></span>
+          </div>
+          <div class="result-row repairable-only">
+            <span class="result-label">MCMT:</span>
+            <span class="result-value"><span id="outMCMT">—</span> <span id="unitMCMT">uur</span></span>
+          </div>
+          <div class="result-row repairable-only">
+            <span class="result-label">Uptime:</span>
+            <span class="result-value"><span id="outUptime">—</span> <span id="unitUptime">uur</span></span>
+          </div>
+          <div class="result-row repairable-only">
             <span class="result-label">Beschikbaarheid [A]:</span>
             <span class="result-value" id="outA">—</span>
           </div>
+          
+          <!-- Niet-repareerbaar resultaten -->
+          <div class="result-row non-repairable-only" style="display: none;">
+            <span class="result-label">MTTF:</span>
+            <span class="result-value"><span id="outMTTF">—</span> <span id="unitMTTF">uur</span></span>
+          </div>
+          
+          <!-- Gemeenschappelijke resultaten -->
           <div class="result-row">
             <span class="result-label">Failure Rate [λ]:</span>
             <span class="result-value"><span id="outLambda">—</span> per uur</span>
@@ -218,14 +261,6 @@
           <div class="result-row">
             <span class="result-label">FIT:</span>
             <span class="result-value"><span id="outFIT">—</span> per 10<sup>9</sup> uur</span>
-          </div>
-          <div class="result-row mtbf-related">
-            <span class="result-label">MTBM:</span>
-            <span class="result-value"><span id="outMTBM">—</span> <span id="unitMTBM">uur</span></span>
-          </div>
-          <div class="result-row mtbf-related">
-            <span class="result-label">MCMT:</span>
-            <span class="result-value"><span id="outMCMT">—</span> <span id="unitMCMT">uur</span></span>
           </div>
         </div>
         
@@ -239,4 +274,3 @@
   <script src="main.js"></script>
 </body>
 </html>
-
