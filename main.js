@@ -16,27 +16,31 @@
     },
     mttr: {
       title: 'MTTR - Mean Time To Repair',
-      text: '<strong>Wat het is:</strong> MTTR meet de gemiddelde tijd die nodig is om een storing te herstellen. <strong>Waarom belangrijk:</strong> MTTR is direct gekoppeld aan de productiviteit. <strong>Interpretatie:</strong> Een MTTR van 8 uur betekent dat storingen gemiddeld binnen 8 uur zijn opgelost.'
+      text: '<strong>Wat het is:</strong> MTTR meet de gemiddelde tijd die nodig is om een storing te herstellen (reparatietijd). <strong>Waarom belangrijk:</strong> MTTR is direct gekoppeld aan de productiviteit. <strong>Interpretatie:</strong> Een MTTR van 8 uur betekent dat reparaties gemiddeld 8 uur duren.'
     },
-    availability: {
-      title: 'Beschikbaarheid [A] - Availability',
-      text: '<strong>Wat het is:</strong> Beschikbaarheid geeft aan welk percentage van de tijd een systeem operationeel is. <strong>Waarom belangrijk:</strong> Beschikbaarheid is een directe maatstaf voor productiecapaciteit. <strong>Interpretatie:</strong> Een beschikbaarheid van 95% betekent dat de installatie 95% van de tijd productieklaar is.'
-    },
-    lambda: {
-      title: 'Failure Rate [λ] - Storingsfrequentie',
-      text: '<strong>Wat het is:</strong> De failure rate geeft het aantal storingen per tijdseenheid weer. <strong>Waarom belangrijk:</strong> Lambda wordt gebruikt in betrouwbaarheidsberekeningen. <strong>Interpretatie:</strong> Een λ van 0,0002 per uur betekent 0,02% kans op storing per uur.'
-    },
-    fit: {
-      title: 'FIT - Failures In Time',
-      text: '<strong>Wat het is:</strong> FIT is een gestandaardiseerde maat voor betrouwbaarheid die het aantal storingen per miljard bedrijfsuren weergeeft. <strong>Waarom belangrijk:</strong> FIT is vooral nuttig bij elektronische componenten. <strong>Interpretatie:</strong> Een FIT van 200 betekent 200 storingen per miljard uur.'
-    },
-    mtbm: {
-      title: 'MTBM - Mean Time Between Maintenance',
-      text: '<strong>Wat het is:</strong> MTBM meet de gemiddelde tijd tussen alle onderhoudsacties. <strong>Waarom belangrijk:</strong> MTBM helpt bij het plannen van onderhoudsresources. <strong>Interpretatie:</strong> Een MTBM van 1.000 uur betekent dat er gemiddeld elke 1.000 uur een onderhoudsactie plaatsvindt.'
+    mttd: {
+      title: 'MTTD - Mean Time To Detect',
+      text: '<strong>Wat het is:</strong> MTTD meet de gemiddelde tijd die nodig is om een storing te detecteren. <strong>Waarom belangrijk:</strong> Snelle detectie vermindert de totale downtime. <strong>Interpretatie:</strong> Een MTTD van 2 uur betekent dat storingen gemiddeld binnen 2 uur worden opgemerkt.'
     },
     mcmt: {
       title: 'MCMT - Mean Corrective Maintenance Time',
-      text: '<strong>Wat het is:</strong> MCMT meet de gemiddelde tijd die nodig is voor correctief onderhoud. <strong>Waarom belangrijk:</strong> MCMT geeft inzicht in de complexiteit van ongeplande storingen. <strong>Interpretatie:</strong> Een MCMT van 6 uur betekent dat ongeplande reparaties gemiddeld 6 uur duren.'
+      text: '<strong>Wat het is:</strong> MCMT is de totale gemiddelde tijd voor correctief onderhoud (detectie + reparatie). <strong>Formule:</strong> MCMT = MTTR + MTTD. <strong>Interpretatie:</strong> Een MCMT van 10 uur betekent dat de totale tijd van storing tot herstel gemiddeld 10 uur duurt.'
+    },
+    uptime: {
+      title: 'Uptime - Beschikbare bedrijfstijd',
+      text: '<strong>Wat het is:</strong> Uptime is de tijd dat het systeem daadwerkelijk operationeel is tussen storingen. <strong>Formule:</strong> Uptime = MTBF − MCMT. <strong>Interpretatie:</strong> Dit geeft de netto productieve tijd weer binnen elke storingscyclus.'
+    },
+    availability: {
+      title: 'Beschikbaarheid [A] - Availability',
+      text: '<strong>Wat het is:</strong> Beschikbaarheid geeft aan welk percentage van de tijd een systeem operationeel is. <strong>Formule:</strong> A = Uptime / MTBF. <strong>Interpretatie:</strong> Een beschikbaarheid van 95% betekent dat de installatie 95% van de tijd productieklaar is.'
+    },
+    lambda: {
+      title: 'Failure Rate [λ] - Storingsfrequentie',
+      text: '<strong>Wat het is:</strong> De failure rate geeft het aantal storingen per tijdseenheid weer. <strong>Formule:</strong> λ = 1 / MTBF (of MTTF). <strong>Interpretatie:</strong> Een λ van 0,0002 per uur betekent 0,02% kans op storing per uur.'
+    },
+    fit: {
+      title: 'FIT - Failures In Time',
+      text: '<strong>Wat het is:</strong> FIT is een gestandaardiseerde maat voor betrouwbaarheid die het aantal storingen per miljard bedrijfsuren weergeeft. <strong>Formule:</strong> FIT = 1.000.000.000 / MTBF (of MTTF). <strong>Interpretatie:</strong> Een FIT van 200 betekent 200 storingen per miljard uur.'
     }
   };
 
@@ -100,118 +104,144 @@
   function readInputs() {
     const totItemsValue = parseFloat(document.getElementById('totItemsValue').value);
     const totItemsUnit = document.getElementById('totItemsUnit').value;
-    const totHoursValue = parseFloat(document.getElementById('totHoursValue').value);
-    const totHoursUnit = document.getElementById('totHoursUnit').value;
 
     return {
       totItemsHours: toHours(totItemsValue, totItemsUnit),
       failedItems: parseFloat(document.getElementById('failedItems').value),
-      totHours: toHours(totHoursValue, totHoursUnit),
       failures: parseFloat(document.getElementById('failures').value),
       totRepairHours: parseFloat(document.getElementById('totRepairHours').value),
-      pmCount: parseFloat(document.getElementById('pmCount').value),
-      cmCount: parseFloat(document.getElementById('cmCount').value)
+      totDetectHours: parseFloat(document.getElementById('totDetectHours').value)
     };
   }
 
-  // Compute
-  function compute(v, isRepairable) {
-    const MTTF = safeDiv(v.totItemsHours, v.failedItems);
-    
-    let MTBF, MTTR, availability, lambda, FIT, MTBM, MCMT;
-    
-    if (isRepairable) {
-      MTBF = safeDiv(v.totHours, v.failures);
-      MTTR = safeDiv(v.totRepairHours, v.failures);
-      availability = (isFinite(MTBF) && isFinite(MTTR) && MTBF > 0 && MTTR >= 0) 
-        ? MTBF / (MTBF + MTTR) 
-        : NaN;
-      lambda = isFinite(MTBF) && MTBF > 0 ? 1 / MTBF : NaN;
-      FIT = isFinite(lambda) ? lambda * 1e9 : NaN;
-      const totalMaint = v.pmCount + v.cmCount;
-      MTBM = safeDiv(v.totHours, totalMaint);
-      MCMT = safeDiv(v.totRepairHours, v.cmCount);
-    } else {
-      MTBF = MTTF;
-      MTTR = NaN;
-      availability = NaN;
-      lambda = isFinite(MTTF) && MTTF > 0 ? 1 / MTTF : NaN;
-      FIT = isFinite(lambda) ? lambda * 1e9 : NaN;
-      MTBM = NaN;
-      MCMT = NaN;
-    }
+  // Compute - Repareerbaar
+  function computeRepairable(v) {
+    const MTBF = safeDiv(v.totItemsHours, v.failedItems);
+    const MTTR = safeDiv(v.totRepairHours, v.failures);
+    const MTTD = safeDiv(v.totDetectHours, v.failures);
+    const MCMT = (isFinite(MTTR) && isFinite(MTTD)) ? MTTR + MTTD : NaN;
+    const uptime = (isFinite(MTBF) && isFinite(MCMT)) ? MTBF - MCMT : NaN;
+    const availability = (isFinite(uptime) && isFinite(MTBF) && MTBF > 0) ? uptime / MTBF : NaN;
+    const lambda = (isFinite(MTBF) && MTBF > 0) ? 1 / MTBF : NaN;
+    const FIT = (isFinite(MTBF) && MTBF > 0) ? 1e9 / MTBF : NaN;
 
-    return { MTTF, MTBF, MTTR, availability, lambda, FIT, MTBM, MCMT };
+    return { MTBF, MTTR, MTTD, MCMT, uptime, availability, lambda, FIT };
   }
 
-  // Update UI
-  function updateUI(r, isRepairable) {
+  // Compute - Niet-repareerbaar
+  function computeNonRepairable(v) {
+    const MTTF = safeDiv(v.totItemsHours, v.failedItems);
+    const lambda = (isFinite(MTTF) && MTTF > 0) ? 1 / MTTF : NaN;
+    const FIT = (isFinite(MTTF) && MTTF > 0) ? 1e9 / MTTF : NaN;
+
+    return { MTTF, lambda, FIT };
+  }
+
+  // Update UI - Repareerbaar
+  function updateUIRepairable(r) {
+    const resultUnit = document.getElementById('resultUnit').value;
+    const unitLabel = getUnitLabel(resultUnit);
+    
+    document.getElementById('outMTBF').textContent = fmtNum(fromHours(r.MTBF, resultUnit), 2);
+    document.getElementById('outMTTR').textContent = fmtNum(fromHours(r.MTTR, resultUnit), 2);
+    document.getElementById('outMTTD').textContent = fmtNum(fromHours(r.MTTD, resultUnit), 2);
+    document.getElementById('outMCMT').textContent = fmtNum(fromHours(r.MCMT, resultUnit), 2);
+    document.getElementById('outUptime').textContent = fmtNum(fromHours(r.uptime, resultUnit), 2);
+    document.getElementById('outA').textContent = fmtPct(r.availability, 4);
+    document.getElementById('outLambda').textContent = fmtNum(r.lambda, 8);
+    document.getElementById('outFIT').textContent = fmtNum(r.FIT, 2);
+    
+    document.getElementById('unitMTBF').textContent = unitLabel;
+    document.getElementById('unitMTTR').textContent = unitLabel;
+    document.getElementById('unitMTTD').textContent = unitLabel;
+    document.getElementById('unitMCMT').textContent = unitLabel;
+    document.getElementById('unitUptime').textContent = unitLabel;
+  }
+
+  // Update UI - Niet-repareerbaar
+  function updateUINonRepairable(r) {
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
     
     document.getElementById('outMTTF').textContent = fmtNum(fromHours(r.MTTF, resultUnit), 2);
-    document.getElementById('outMTBF').textContent = fmtNum(fromHours(r.MTBF, resultUnit), 2);
-    document.getElementById('outMTTR').textContent = fmtNum(fromHours(r.MTTR, resultUnit), 2);
-    document.getElementById('outA').textContent = fmtPct(r.availability, 4);
-    document.getElementById('outLambda').textContent = fmtNum(r.lambda, 6);
+    document.getElementById('outLambda').textContent = fmtNum(r.lambda, 8);
     document.getElementById('outFIT').textContent = fmtNum(r.FIT, 2);
-    document.getElementById('outMTBM').textContent = fmtNum(fromHours(r.MTBM, resultUnit), 2);
-    document.getElementById('outMCMT').textContent = fmtNum(fromHours(r.MCMT, resultUnit), 2);
     
     document.getElementById('unitMTTF').textContent = unitLabel;
-    document.getElementById('unitMTBF').textContent = unitLabel;
-    document.getElementById('unitMTTR').textContent = unitLabel;
-    document.getElementById('unitMTBM').textContent = unitLabel;
-    document.getElementById('unitMCMT').textContent = unitLabel;
-    
-    // Show/hide MTBF-related fields
-    const mtbfRelated = document.querySelectorAll('.mtbf-related');
-    mtbfRelated.forEach(el => {
+  }
+
+  // Toggle visibility based on analysis type
+  function toggleAnalysisType(isRepairable) {
+    // Input fields
+    document.querySelectorAll('.repairable-only').forEach(el => {
       el.style.display = isRepairable ? '' : 'none';
     });
     
-    // Update formula
-    document.getElementById('lambdaFormula').textContent = isRepairable ? 'MTBF' : 'MTTF';
+    // Result fields
+    document.querySelectorAll('.result-row.repairable-only').forEach(el => {
+      el.style.display = isRepairable ? '' : 'none';
+    });
+    document.querySelectorAll('.result-row.non-repairable-only').forEach(el => {
+      el.style.display = isRepairable ? 'none' : '';
+    });
+    
+    // Formulas
+    document.getElementById('formulasRepairable').style.display = isRepairable ? '' : 'none';
+    document.getElementById('formulasNonRepairable').style.display = isRepairable ? 'none' : '';
+    
+    // Diagrams
+    document.getElementById('diagramRepairable').style.display = isRepairable ? '' : 'none';
+    document.getElementById('diagramNonRepairable').style.display = isRepairable ? 'none' : '';
   }
+
+  // Form submit
+  document.getElementById('kpi-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
+    const inputs = readInputs();
+    
+    if (isRepairable) {
+      const results = computeRepairable(inputs);
+      updateUIRepairable(results);
+    } else {
+      const results = computeNonRepairable(inputs);
+      updateUINonRepairable(results);
+    }
+  });
 
   // Toggle analysis type
   document.querySelectorAll('input[name="analysisType"]').forEach(radio => {
     radio.addEventListener('change', function() {
       const isRepairable = this.value === 'repairable';
-      const mtbfRelated = document.querySelectorAll('.mtbf-related');
-      
-      mtbfRelated.forEach(el => {
-        el.style.display = isRepairable ? '' : 'none';
-      });
-      
-      const inputs = readInputs();
-      const results = compute(inputs, isRepairable);
-      updateUI(results, isRepairable);
+      toggleAnalysisType(isRepairable);
     });
-  });
-
-  // Form submit
-  document.getElementById('kpi-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
-    const inputs = readInputs();
-    const results = compute(inputs, isRepairable);
-    updateUI(results, isRepairable);
   });
 
   // Unit selector
   document.getElementById('resultUnit').addEventListener('change', () => {
     const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
     const inputs = readInputs();
-    const results = compute(inputs, isRepairable);
-    updateUI(results, isRepairable);
+    
+    if (isRepairable) {
+      const results = computeRepairable(inputs);
+      updateUIRepairable(results);
+    } else {
+      const results = computeNonRepairable(inputs);
+      updateUINonRepairable(results);
+    }
   });
 
   // Init
   const initIsRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
+  toggleAnalysisType(initIsRepairable);
   const initInputs = readInputs();
-  const initResults = compute(initInputs, initIsRepairable);
-  updateUI(initResults, initIsRepairable);
+  if (initIsRepairable) {
+    const initResults = computeRepairable(initInputs);
+    updateUIRepairable(initResults);
+  } else {
+    const initResults = computeNonRepairable(initInputs);
+    updateUINonRepairable(initResults);
+  }
 
   // PDF Export
   document.getElementById('exportPDF').addEventListener('click', function() {
@@ -220,18 +250,17 @@
     
     const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
     const inputs = readInputs();
-    const results = compute(inputs, isRepairable);
     const resultUnit = document.getElementById('resultUnit').value;
     const unitLabel = getUnitLabel(resultUnit);
     
     let yPos = 0;
     const leftMargin = 20;
     
-    // Blauwe header met logo
+    // Blauwe header
     pdf.setFillColor(34, 48, 64);
     pdf.rect(0, 0, 210, 25, 'F');
     
-    // Logo (als beschikbaar)
+    // Logo
     const logoImg = document.querySelector('.veerenstael-logo');
     if (logoImg && logoImg.complete) {
       try {
@@ -290,15 +319,11 @@
     yPos += 5;
     
     if (isRepairable) {
-      pdf.text(`• Totale bedrijfstijd: ${fmtNum(inputs.totHours, 0)} uur`, leftMargin + 3, yPos);
-      yPos += 5;
       pdf.text(`• Aantal storingen: ${fmtNum(inputs.failures, 0)}`, leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text(`• Totale hersteltijd: ${fmtNum(inputs.totRepairHours, 2)} uur`, leftMargin + 3, yPos);
+      pdf.text(`• Totale reparatietijd: ${fmtNum(inputs.totRepairHours, 2)} uur`, leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text(`• Geplande onderhoudsacties: ${fmtNum(inputs.pmCount, 0)}`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`• Ongeplande onderhoudsacties: ${fmtNum(inputs.cmCount, 0)}`, leftMargin + 3, yPos);
+      pdf.text(`• Totale detectietijd: ${fmtNum(inputs.totDetectHours, 2)} uur`, leftMargin + 3, yPos);
       yPos += 5;
     }
     yPos += 8;
@@ -311,30 +336,33 @@
     yPos += 7;
     
     pdf.setFontSize(10);
-    pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
-    yPos += 5;
     
     if (isRepairable) {
+      const results = computeRepairable(inputs);
       pdf.text(`MTBF: ${fmtNum(fromHours(results.MTBF, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
       yPos += 5;
       pdf.text(`MTTR: ${fmtNum(fromHours(results.MTTR, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, leftMargin + 3, yPos);
-      yPos += 5;
-    }
-    
-    pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 6)} per uur`, leftMargin + 3, yPos);
-    yPos += 5;
-    pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 3, yPos);
-    yPos += 5;
-    
-    if (isRepairable) {
-      pdf.text(`MTBM: ${fmtNum(fromHours(results.MTBM, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
+      pdf.text(`MTTD: ${fmtNum(fromHours(results.MTTD, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
       yPos += 5;
       pdf.text(`MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
       yPos += 5;
+      pdf.text(`Uptime: ${fmtNum(fromHours(results.uptime, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 8)} per uur`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 3, yPos);
+    } else {
+      const results = computeNonRepairable(inputs);
+      pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 8)} per uur`, leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 3, yPos);
     }
-    yPos += 8;
+    yPos += 13;
     
     // Formules
     pdf.setFontSize(13);
@@ -344,30 +372,29 @@
     yPos += 7;
     
     pdf.setFontSize(9);
-    pdf.text('MTTF = [Totale bedrijfstijd items] / [Aantal falende items]', leftMargin + 3, yPos);
-    yPos += 5;
     
     if (isRepairable) {
-      pdf.text('MTBF = [Totale bedrijfstijd] / [Aantal storingen]', leftMargin + 3, yPos);
+      pdf.text('MTBF = [Totale bedrijfstijd items] / [Aantal falende items]', leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text('MTTR = [Totale hersteltijd] / [Aantal storingen]', leftMargin + 3, yPos);
+      pdf.text('MTTR = [Totale reparatietijd] / [Aantal storingen]', leftMargin + 3, yPos);
       yPos += 5;
-      pdf.text('Beschikbaarheid [A] = MTBF / (MTBF + MTTR)', leftMargin + 3, yPos);
+      pdf.text('MTTD = [Totale detectietijd] / [Aantal storingen]', leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text('MCMT = MTTR + MTTD', leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text('Uptime = MTBF - MCMT', leftMargin + 3, yPos);
+      yPos += 5;
+      pdf.text('Beschikbaarheid [A] = Uptime / MTBF', leftMargin + 3, yPos);
       yPos += 5;
       pdf.text('Failure Rate [lambda] = 1 / MTBF', leftMargin + 3, yPos);
       yPos += 5;
+      pdf.text('FIT = 1.000.000.000 / MTBF', leftMargin + 3, yPos);
     } else {
+      pdf.text('MTTF = [Totale bedrijfstijd items] / [Aantal falende items]', leftMargin + 3, yPos);
+      yPos += 5;
       pdf.text('Failure Rate [lambda] = 1 / MTTF', leftMargin + 3, yPos);
       yPos += 5;
-    }
-    
-    pdf.text('FIT = [lambda] × 10^9', leftMargin + 3, yPos);
-    yPos += 5;
-    
-    if (isRepairable) {
-      pdf.text('MTBM = [Totale bedrijfstijd] / ([Geplande] + [Ongeplande])', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('MCMT = [Totale hersteltijd] / [Ongeplande acties]', leftMargin + 3, yPos);
+      pdf.text('FIT = 1.000.000.000 / MTTF', leftMargin + 3, yPos);
     }
     
     // Opslaan
@@ -375,5 +402,3 @@
     pdf.save(fileName);
   });
 })();
-
-
