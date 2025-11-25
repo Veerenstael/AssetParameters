@@ -253,11 +253,11 @@
     const unitLabel = getUnitLabel(resultUnit);
     
     let yPos = 0;
-    const leftMargin = 20;
+    const leftMargin = 15;
     
     // Blauwe header
     pdf.setFillColor(34, 48, 64);
-    pdf.rect(0, 0, 210, 25, 'F');
+    pdf.rect(0, 0, 210, 22, 'F');
     
     // Logo
     const logoImg = document.querySelector('.veerenstael-logo');
@@ -270,10 +270,10 @@
         ctx.drawImage(logoImg, 0, 0);
         const logoDataUrl = canvas.toDataURL('image/png');
         
-        const logoWidth = 60;
+        const logoWidth = 50;
         const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth;
         const logoX = (210 - logoWidth) / 2;
-        const logoY = (25 - logoHeight) / 2 + 2;
+        const logoY = (22 - logoHeight) / 2 + 1;
         
         pdf.addImage(logoDataUrl, 'PNG', logoX, logoY, logoWidth, logoHeight);
       } catch(e) {
@@ -281,121 +281,157 @@
       }
     }
     
-    yPos = 35;
+    yPos = 28;
     
     // Titel
-    pdf.setFontSize(12);
+    pdf.setFontSize(11);
     pdf.setTextColor(34, 44, 56);
     pdf.setFont(undefined, 'bold');
     pdf.text('Rapport - Onderhoudsparameters', leftMargin, yPos);
     pdf.setFont(undefined, 'normal');
-    yPos += 7;
+    yPos += 5;
     
-    // Type analyse
-    pdf.setFontSize(10);
-    pdf.text(`Type: ${isRepairable ? 'Repareerbaar (systemen/machines)' : 'Niet-repareerbaar (componenten)'}`, leftMargin, yPos);
-    yPos += 7;
-    
-    // Datum
+    // Type analyse + datum op één regel
+    pdf.setFontSize(9);
     const dateStr = new Date().toLocaleDateString('nl-NL', { 
       year: 'numeric', month: 'long', day: 'numeric' 
     });
-    pdf.setFontSize(9);
-    pdf.text(`Gegenereerd op: ${dateStr}`, leftMargin, yPos);
-    yPos += 12;
-    
-    // Invoergegevens
-    pdf.setFontSize(13);
-    pdf.setFont(undefined, 'bold');
-    pdf.text('Invoergegevens', leftMargin, yPos);
-    pdf.setFont(undefined, 'normal');
-    yPos += 7;
-    
-    pdf.setFontSize(10);
-    pdf.text(`• Totale bedrijfstijd items: ${fmtNum(inputs.totItemsHours, 0)} uur`, leftMargin + 3, yPos);
-    yPos += 5;
-    pdf.text(`• Aantal failures: ${fmtNum(inputs.failures, 0)}`, leftMargin + 3, yPos);
-    yPos += 5;
-    
-    if (isRepairable) {
-      pdf.text(`• Totale reparatietijd: ${fmtNum(inputs.totRepairHours, 2)} uur`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`• Totale detectietijd: ${fmtNum(inputs.totDetectHours, 2)} uur`, leftMargin + 3, yPos);
-      yPos += 5;
-    }
+    pdf.text(`Type: ${isRepairable ? 'Repareerbaar (systemen/machines)' : 'Niet-repareerbaar (componenten)'}  |  ${dateStr}`, leftMargin, yPos);
     yPos += 8;
     
-    // Resultaten
-    pdf.setFontSize(13);
-    pdf.setFont(undefined, 'bold');
-    pdf.text('Berekende Resultaten', leftMargin, yPos);
-    pdf.setFont(undefined, 'normal');
-    yPos += 7;
+    // Twee kolommen layout
+    const colWidth = 88;
+    const col1X = leftMargin;
+    const col2X = leftMargin + colWidth + 5;
+    let col1Y = yPos;
+    let col2Y = yPos;
     
-    pdf.setFontSize(10);
+    // KOLOM 1: Invoergegevens
+    pdf.setFontSize(11);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Invoergegevens', col1X, col1Y);
+    pdf.setFont(undefined, 'normal');
+    col1Y += 6;
+    
+    pdf.setFontSize(9);
+    pdf.text(`• Totale bedrijfstijd: ${fmtNum(inputs.totItemsHours, 0)} uur`, col1X + 2, col1Y);
+    col1Y += 4;
+    pdf.text(`• Aantal failures: ${fmtNum(inputs.failures, 0)}`, col1X + 2, col1Y);
+    col1Y += 4;
+    
+    if (isRepairable) {
+      pdf.text(`• Totale reparatietijd: ${fmtNum(inputs.totRepairHours, 2)} uur`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`• Totale detectietijd: ${fmtNum(inputs.totDetectHours, 2)} uur`, col1X + 2, col1Y);
+      col1Y += 4;
+    }
+    col1Y += 4;
+    
+    // KOLOM 1: Resultaten
+    pdf.setFontSize(11);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Berekende Resultaten', col1X, col1Y);
+    pdf.setFont(undefined, 'normal');
+    col1Y += 6;
+    
+    pdf.setFontSize(9);
     
     if (isRepairable) {
       const results = computeRepairable(inputs);
-      pdf.text(`MTBF: ${fmtNum(fromHours(results.MTBF, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`MTTR: ${fmtNum(fromHours(results.MTTR, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`MTTD: ${fmtNum(fromHours(results.MTTD, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`Uptime: ${fmtNum(fromHours(results.uptime, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 8)} per uur`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 3, yPos);
+      pdf.text(`MTBF: ${fmtNum(fromHours(results.MTBF, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`MTTR: ${fmtNum(fromHours(results.MTTR, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`MTTD: ${fmtNum(fromHours(results.MTTD, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`Uptime: ${fmtNum(fromHours(results.uptime, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`Failure Rate [λ]: ${fmtNum(results.lambda, 8)} per uur`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, col1X + 2, col1Y);
     } else {
       const results = computeNonRepairable(inputs);
-      pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`Failure Rate [lambda]: ${fmtNum(results.lambda, 8)} per uur`, leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, leftMargin + 3, yPos);
+      pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`Failure Rate [λ]: ${fmtNum(results.lambda, 8)} per uur`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, col1X + 2, col1Y);
     }
-    yPos += 13;
     
-    // Formules
-    pdf.setFontSize(13);
+    // KOLOM 2: Formules
+    pdf.setFontSize(11);
     pdf.setFont(undefined, 'bold');
-    pdf.text('Gebruikte Formules', leftMargin, yPos);
+    pdf.text('Gebruikte Formules', col2X, col2Y);
     pdf.setFont(undefined, 'normal');
-    yPos += 7;
+    col2Y += 6;
     
-    pdf.setFontSize(9);
+    pdf.setFontSize(8);
     
     if (isRepairable) {
-      pdf.text('MTBF = [Totale bedrijfstijd items] / [Aantal failures]', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('MTTR = [Totale reparatietijd] / [Aantal failures]', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('MTTD = [Totale detectietijd] / [Aantal failures]', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('MCMT = MTTR + MTTD', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('Uptime = MTBF - MCMT', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('Beschikbaarheid [A] = Uptime / MTBF', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('Failure Rate [lambda] = 1 / MTBF', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('FIT = 1.000.000.000 / MTBF', leftMargin + 3, yPos);
+      pdf.text('MTBF = [Totale bedrijfstijd] / [Aantal failures]', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('MTTR = [Totale reparatietijd] / [Aantal failures]', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('MTTD = [Totale detectietijd] / [Aantal failures]', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('MCMT = MTTR + MTTD', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('Uptime = MTBF - MCMT', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('Beschikbaarheid [A] = Uptime / MTBF', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('Failure Rate [λ] = 1 / MTBF', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('FIT = 1.000.000.000 / MTBF', col2X + 2, col2Y);
     } else {
-      pdf.text('MTTF = [Totale bedrijfstijd items] / [Aantal failures]', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('Failure Rate [lambda] = 1 / MTTF', leftMargin + 3, yPos);
-      yPos += 5;
-      pdf.text('FIT = 1.000.000.000 / MTTF', leftMargin + 3, yPos);
+      pdf.text('MTTF = [Totale bedrijfstijd] / [Aantal failures]', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('Failure Rate [λ] = 1 / MTTF', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('FIT = 1.000.000.000 / MTTF', col2X + 2, col2Y);
+    }
+    
+    // Plaatje onderaan
+    const diagramId = isRepairable ? 'diagramRepairable' : 'diagramNonRepairable';
+    const diagramImg = document.querySelector(`#${diagramId} img`);
+    
+    if (diagramImg && diagramImg.complete && diagramImg.naturalWidth > 0) {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = diagramImg.naturalWidth;
+        canvas.height = diagramImg.naturalHeight;
+        ctx.drawImage(diagramImg, 0, 0);
+        const imgDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        
+        const maxImgWidth = 180;
+        const maxImgHeight = 160;
+        const aspectRatio = diagramImg.naturalWidth / diagramImg.naturalHeight;
+        
+        let imgWidth = maxImgWidth;
+        let imgHeight = imgWidth / aspectRatio;
+        
+        if (imgHeight > maxImgHeight) {
+          imgHeight = maxImgHeight;
+          imgWidth = imgHeight * aspectRatio;
+        }
+        
+        const imgX = (210 - imgWidth) / 2;
+        const imgY = 297 - imgHeight - 10;
+        
+        pdf.addImage(imgDataUrl, 'JPEG', imgX, imgY, imgWidth, imgHeight);
+      } catch(e) {
+        console.log('Diagram niet beschikbaar voor PDF:', e);
+      }
     }
     
     // Opslaan
     const fileName = `Veerenstael_Rapport_${dateStr.replace(/\s/g, '_')}.pdf`;
     pdf.save(fileName);
+  });
   });
 })();
