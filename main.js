@@ -171,12 +171,10 @@
 
   // Toggle visibility based on analysis type
   function toggleAnalysisType(isRepairable) {
-    // Input fields
     document.querySelectorAll('.repairable-only').forEach(el => {
       el.style.display = isRepairable ? '' : 'none';
     });
     
-    // Result fields
     document.querySelectorAll('.result-row.repairable-only').forEach(el => {
       el.style.display = isRepairable ? '' : 'none';
     });
@@ -184,11 +182,9 @@
       el.style.display = isRepairable ? 'none' : '';
     });
     
-    // Formulas
     document.getElementById('formulasRepairable').style.display = isRepairable ? '' : 'none';
     document.getElementById('formulasNonRepairable').style.display = isRepairable ? 'none' : '';
     
-    // Diagrams
     document.getElementById('diagramRepairable').style.display = isRepairable ? '' : 'none';
     document.getElementById('diagramNonRepairable').style.display = isRepairable ? 'none' : '';
   }
@@ -217,7 +213,7 @@
   });
 
   // Unit selector
-  document.getElementById('resultUnit').addEventListener('change', () => {
+  document.getElementById('resultUnit').addEventListener('change', function() {
     const isRepairable = document.querySelector('input[name="analysisType"]:checked').value === 'repairable';
     const inputs = readInputs();
     
@@ -432,6 +428,5 @@
     // Opslaan
     const fileName = `Veerenstael_Rapport_${dateStr.replace(/\s/g, '_')}.pdf`;
     pdf.save(fileName);
-  });
   });
 })();
