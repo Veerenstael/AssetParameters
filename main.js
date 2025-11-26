@@ -312,7 +312,7 @@
     pdf.setFontSize(9);
     pdf.text(`• Totale bedrijfstijd: ${fmtNum(inputs.totItemsHours, 0)} uur`, col1X + 2, col1Y);
     col1Y += 4;
-    pdf.text(`• Aantal failures: ${fmtNum(inputs.failures, 0)}`, col1X + 2, col1Y);
+    pdf.text(`• Aantal faalmomenten: ${fmtNum(inputs.failures, 0)}`, col1X + 2, col1Y);
     col1Y += 4;
     
     if (isRepairable) {
@@ -368,11 +368,11 @@
     pdf.setFontSize(8);
     
     if (isRepairable) {
-      pdf.text('MTBF = [Totale bedrijfstijd] / [Aantal failures]', col2X + 2, col2Y);
+      pdf.text('MTBF = [Totale bedrijfstijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('MTTR = [Totale reparatietijd] / [Aantal failures]', col2X + 2, col2Y);
+      pdf.text('MTTR = [Totale reparatietijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('MTTD = [Totale detectietijd] / [Aantal failures]', col2X + 2, col2Y);
+      pdf.text('MTTD = [Totale detectietijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('MCMT = MTTR + MTTD', col2X + 2, col2Y);
       col2Y += 4;
@@ -384,7 +384,7 @@
       col2Y += 4;
       pdf.text('FIT = 1.000.000.000 / MTBF', col2X + 2, col2Y);
     } else {
-      pdf.text('MTTF = [Totale bedrijfstijd] / [Aantal failures]', col2X + 2, col2Y);
+      pdf.text('MTTF = [Totale bedrijfstijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Failure Rate [λ] = 1 / MTTF', col2X + 2, col2Y);
       col2Y += 4;
@@ -430,3 +430,4 @@
     pdf.save(fileName);
   });
 })();
+
