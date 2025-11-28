@@ -38,9 +38,45 @@
         </div>
       </div>
 
-      <!-- Diagram plaatjes -->
+      <!-- Interactief Diagram -->
       <div class="diagram-section">
-        <div class="diagram-container" id="diagramRepairable">
+        <div class="diagram-container" id="interactiveDiagram">
+          <svg id="mtbfDiagram" width="100%" height="320" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet">
+            <!-- Gradients en filters -->
+            <defs>
+              <linearGradient id="gradMTTD" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#ffbb33;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#ff9500;stop-opacity:0.95" />
+              </linearGradient>
+              <linearGradient id="gradMTTR" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#ff5555;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#cc0000;stop-opacity:0.95" />
+              </linearGradient>
+              <linearGradient id="gradUptime" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#13d17c;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#0fa566;stop-opacity:0.95" />
+              </linearGradient>
+              <linearGradient id="gradMTTF" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#13d17c;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#0fa566;stop-opacity:0.95" />
+              </linearGradient>
+              <filter id="shadow">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+              </filter>
+            </defs>
+            
+            <!-- Dynamische content groepen -->
+            <g id="mtbfTopLine"></g>
+            <g id="mtbfSegments"></g>
+            <g id="mcmtBracket"></g>
+            <g id="verticalMarkers"></g>
+            <g id="bottomLabels"></g>
+            <g id="kpiInfoBox"></g>
+          </svg>
+        </div>
+        
+        <!-- Statische diagrams (verborgen, voor PDF export) -->
+        <div class="diagram-container" id="diagramRepairable" style="display: none;">
           <img src="repareerbaar.jpg" alt="Schema repareerbaar systeem" class="diagram-img"/>
         </div>
         <div class="diagram-container" id="diagramNonRepairable" style="display: none;">
@@ -271,4 +307,3 @@
   <script src="main.js"></script>
 </body>
 </html>
-
