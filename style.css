@@ -151,6 +151,30 @@ body {
   border-radius: 8px;
 }
 
+/* SVG Diagram styling */
+#mtbfDiagram {
+  background: #1a2230;
+  border-radius: 8px;
+  max-height: 320px;
+}
+
+#mtbfDiagram text {
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+#mtbfDiagram rect {
+  transition: all 0.3s ease;
+}
+
+#mtbfDiagram rect:hover {
+  opacity: 1 !important;
+  transform: translateY(-1px);
+}
+
+#mtbfDiagram line {
+  transition: all 0.2s ease;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
