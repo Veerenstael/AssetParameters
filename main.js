@@ -288,19 +288,23 @@
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
     `;
     
-    // KPI Info Box (RECHTS VAN MCMT, tussen MTBF en Uptime) - GRIJZE TEKST
-    const kpiBoxX = startX + mcmtWidth + 30;
+    // KPI Info Box (RECHTS, midden op hoogte MCMT lijn) - GRIJZE TEKST
+    const mcmtLineY = 95;
+    const kpiBoxHeight = 95;
+    const kpiBoxY = mcmtLineY - (kpiBoxHeight / 2); // Midden van box op hoogte MCMT
+    const kpiBoxX = 700; // Meer naar rechts
+    
     kpiBox.innerHTML = `
-      <rect x="${kpiBoxX}" y="95" width="200" height="95" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
+      <rect x="${kpiBoxX}" y="${kpiBoxY}" width="220" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
       
-      <text x="${kpiBoxX + 10}" y="125" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
-      <text x="${kpiBoxX + 190}" y="125" text-anchor="end" fill="#d0dae8" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 30}" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 30}" text-anchor="end" fill="#d0dae8" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
       
-      <text x="${kpiBoxX + 10}" y="150" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
-      <text x="${kpiBoxX + 190}" y="150" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 55}" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 55}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
       
-      <text x="${kpiBoxX + 10}" y="175" fill="#b8c7e0" font-size="13">FIT:</text>
-      <text x="${kpiBoxX + 190}" y="175" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 80}" fill="#b8c7e0" font-size="13">FIT:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
     `;
   }
 
@@ -364,15 +368,19 @@
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#ff6b35" font-size="14" font-weight="bold">Falen</text>
     `;
     
-    // KPI Info Box (linksboven, compacter voor niet-repareerbaar)
+    // KPI Info Box (RECHTS, compacter voor niet-repareerbaar) - GRIJZE TEKST
+    const kpiBoxHeight = 75;
+    const kpiBoxY = 85; // Ongeveer op hoogte van MTTF lijn
+    const kpiBoxX = 700;
+    
     kpiBox.innerHTML = `
-      <rect x="60" y="95" width="180" height="75" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
+      <rect x="${kpiBoxX}" y="${kpiBoxY}" width="200" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
       
-      <text x="70" y="125" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
-      <text x="230" y="125" text-anchor="end" fill="#ff6b35" font-weight="bold" font-size="13">${fmtNum(results.lambda, 6)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 35}" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
+      <text x="${kpiBoxX + 190}" y="${kpiBoxY + 35}" text-anchor="end" fill="#d0dae8" font-weight="bold" font-size="13">${fmtNum(results.lambda, 6)}</text>
       
-      <text x="70" y="155" fill="#b8c7e0" font-size="13">FIT:</text>
-      <text x="230" y="155" text-anchor="end" fill="#ffd700" font-weight="bold" font-size="13">${fmtNum(results.FIT, 0)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 60}" fill="#b8c7e0" font-size="13">FIT:</text>
+      <text x="${kpiBoxX + 190}" y="${kpiBoxY + 60}" text-anchor="end" fill="#d0dae8" font-weight="bold" font-size="13">${fmtNum(results.FIT, 0)}</text>
     `;
   }
 
