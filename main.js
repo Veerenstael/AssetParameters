@@ -244,15 +244,15 @@
             text-anchor="middle" fill="#1a1a1a" font-size="12">${uptimeValue} ${unitLabel}</text>
     `;
     
-    // MCMT bracket (boven segmenten) MET waarde
+    // MCMT bracket (boven segmenten) MET waarde - MEER RUIMTE
     const mcmtWidth = mttdWidth + mttrWidth;
     const mcmtValue = fmtNum(fromHours(results.MCMT, resultUnit), 2);
     mcmtGroup.innerHTML = `
-      <line x1="${startX}" y1="85" x2="${startX + mcmtWidth}" y2="85" stroke="#ff6b35" stroke-width="3"/>
-      <line x1="${startX}" y1="80" x2="${startX}" y2="90" stroke="#ff6b35" stroke-width="3"/>
-      <line x1="${startX + mcmtWidth}" y1="80" x2="${startX + mcmtWidth}" y2="90" stroke="#ff6b35" stroke-width="3"/>
-      <text x="${startX + mcmtWidth/2}" y="72" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
-      <text x="${startX + mcmtWidth/2}" y="87" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
+      <line x1="${startX}" y1="95" x2="${startX + mcmtWidth}" y2="95" stroke="#ff6b35" stroke-width="3"/>
+      <line x1="${startX}" y1="90" x2="${startX}" y2="100" stroke="#ff6b35" stroke-width="3"/>
+      <line x1="${startX + mcmtWidth}" y1="90" x2="${startX + mcmtWidth}" y2="100" stroke="#ff6b35" stroke-width="3"/>
+      <text x="${startX + mcmtWidth/2}" y="78" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
+      <text x="${startX + mcmtWidth/2}" y="93" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
     `;
     
     // Verticale markers
@@ -288,18 +288,19 @@
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
     `;
     
-    // KPI Info Box (linksboven, weg van Uptime segment)
+    // KPI Info Box (RECHTS VAN MCMT, tussen MTBF en Uptime) - GRIJZE TEKST
+    const kpiBoxX = startX + mcmtWidth + 30;
     kpiBox.innerHTML = `
-      <rect x="60" y="95" width="200" height="95" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
+      <rect x="${kpiBoxX}" y="95" width="200" height="95" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
       
-      <text x="70" y="125" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
-      <text x="250" y="125" text-anchor="end" fill="#13d17c" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
+      <text x="${kpiBoxX + 10}" y="125" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
+      <text x="${kpiBoxX + 190}" y="125" text-anchor="end" fill="#d0dae8" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
       
-      <text x="70" y="150" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
-      <text x="250" y="150" text-anchor="end" fill="#ff6b35" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
+      <text x="${kpiBoxX + 10}" y="150" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
+      <text x="${kpiBoxX + 190}" y="150" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
       
-      <text x="70" y="175" fill="#b8c7e0" font-size="13">FIT:</text>
-      <text x="250" y="175" text-anchor="end" fill="#ffd700" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
+      <text x="${kpiBoxX + 10}" y="175" fill="#b8c7e0" font-size="13">FIT:</text>
+      <text x="${kpiBoxX + 190}" y="175" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
     `;
   }
 
@@ -538,7 +539,7 @@
       year: 'numeric', month: 'long', day: 'numeric' 
     });
     pdf.text(`Type: ${isRepairable ? 'Repareerbaar (systemen/machines)' : 'Niet-repareerbaar (componenten)'}  |  ${dateStr}`, leftMargin, yPos);
-    yPos += 8;
+    yPos += 15;  // Meer ruimte voor teksten
     
     // Twee kolommen layout
     const colWidth = 88;
@@ -591,14 +592,14 @@
       col1Y += 4;
       pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, col1X + 2, col1Y);
       col1Y += 4;
-      pdf.text(`Failure Rate [λ]: ${fmtNum(results.lambda, 8)} per uur`, col1X + 2, col1Y);
+      pdf.text(`Failure Rate: ${fmtNum(results.lambda, 8)} per uur`, col1X + 2, col1Y);
       col1Y += 4;
       pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, col1X + 2, col1Y);
     } else {
       const results = computeNonRepairable(inputs);
       pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
-      pdf.text(`Failure Rate [λ]: ${fmtNum(results.lambda, 8)} per uur`, col1X + 2, col1Y);
+      pdf.text(`Failure Rate: ${fmtNum(results.lambda, 8)} per uur`, col1X + 2, col1Y);
       col1Y += 4;
       pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, col1X + 2, col1Y);
     }
@@ -625,13 +626,13 @@
       col2Y += 4;
       pdf.text('Beschikbaarheid [A] = Uptime / MTBF', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('Failure Rate [λ] = 1 / MTBF', col2X + 2, col2Y);
+      pdf.text('Failure Rate = 1 / MTBF', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('FIT = 1.000.000.000 / MTBF', col2X + 2, col2Y);
     } else {
       pdf.text('MTTF = [Totale bedrijfstijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('Failure Rate [λ] = 1 / MTTF', col2X + 2, col2Y);
+      pdf.text('Failure Rate = 1 / MTTF', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('FIT = 1.000.000.000 / MTTF', col2X + 2, col2Y);
     }
@@ -662,7 +663,8 @@
         }
         
         const imgX = (210 - imgWidth) / 2;
-        const imgY = 297 - imgHeight - 10;
+        // Plaatje hoger: plaats het 15mm onder de langste kolom tekst
+        const imgY = Math.max(col1Y, col2Y) + 15;
         
         pdf.addImage(imgDataUrl, 'JPEG', imgX, imgY, imgWidth, imgHeight);
       } catch(e) {
