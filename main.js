@@ -157,6 +157,10 @@
       return;
     }
     
+    // Get current result unit for display
+    const resultUnit = document.getElementById('resultUnit').value;
+    const unitLabel = getUnitLabel(resultUnit);
+    
     // SVG parameters
     const startX = 50;
     const endX = 950;
@@ -188,12 +192,14 @@
     const mttrWidth = totalWidth * scaledMTTR;
     const uptimeWidth = totalWidth * scaledUptime;
     
-    // MTBF top line met pijlen
+    // MTBF top line met pijlen EN waarde
+    const mtbfValue = fmtNum(fromHours(results.MTBF, resultUnit), 2);
     topLineGroup.innerHTML = `
       <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#6a9fef" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
       <line x1="${startX}" y1="45" x2="${startX}" y2="55" stroke="#6a9fef" stroke-width="2"/>
       <line x1="${endX}" y1="45" x2="${endX}" y2="55" stroke="#6a9fef" stroke-width="2"/>
-      <text x="${(startX + endX)/2}" y="35" text-anchor="middle" fill="#e0e6f0" font-size="18" font-weight="bold">MTBF</text>
+      <text x="${(startX + endX)/2}" y="32" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">MTBF</text>
+      <text x="${(startX + endX)/2}" y="47" text-anchor="middle" fill="#b8c7e0" font-size="13">${mtbfValue} ${unitLabel}</text>
     `;
     
     // Timeline basis
@@ -203,39 +209,50 @@
     
     let currentX = startX;
     
-    // 1. MTTD segment (detectie - oranje gradient)
+    // 1. MTTD segment (detectie - oranje gradient) MET waarde
+    const mttdValue = fmtNum(fromHours(results.MTTD, resultUnit), 2);
     segmentsGroup.innerHTML += `
       <rect x="${currentX}" y="${segmentY}" width="${mttdWidth}" height="${segmentHeight}" 
             fill="url(#gradMTTD)" rx="6" filter="url(#shadow)"/>
-      <text x="${currentX + mttdWidth/2}" y="${segmentY + segmentHeight/2 + 5}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="15" font-weight="bold">MTTD</text>
+      <text x="${currentX + mttdWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">MTTD</text>
+      <text x="${currentX + mttdWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="12">${mttdValue} ${unitLabel}</text>
     `;
     currentX += mttdWidth;
     
-    // 2. MTTR segment (reparatie - rood gradient)
+    // 2. MTTR segment (reparatie - rood gradient) MET waarde
+    const mttrValue = fmtNum(fromHours(results.MTTR, resultUnit), 2);
     segmentsGroup.innerHTML += `
       <rect x="${currentX}" y="${segmentY}" width="${mttrWidth}" height="${segmentHeight}" 
             fill="url(#gradMTTR)" rx="6" filter="url(#shadow)"/>
-      <text x="${currentX + mttrWidth/2}" y="${segmentY + segmentHeight/2 + 5}" 
-            text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">MTTR</text>
+      <text x="${currentX + mttrWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
+            text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">MTTR</text>
+      <text x="${currentX + mttrWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
+            text-anchor="middle" fill="#ffffff" font-size="12">${mttrValue} ${unitLabel}</text>
     `;
     currentX += mttrWidth;
     
-    // 3. Uptime segment (operationeel - groen gradient)
+    // 3. Uptime segment (operationeel - groen gradient) MET waarde
+    const uptimeValue = fmtNum(fromHours(results.uptime, resultUnit), 2);
     segmentsGroup.innerHTML += `
       <rect x="${currentX}" y="${segmentY}" width="${uptimeWidth}" height="${segmentHeight}" 
             fill="url(#gradUptime)" rx="6" filter="url(#shadow)"/>
-      <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 + 5}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="15" font-weight="bold">Uptime</text>
+      <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">Uptime</text>
+      <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="12">${uptimeValue} ${unitLabel}</text>
     `;
     
-    // MCMT bracket (boven segmenten)
+    // MCMT bracket (boven segmenten) MET waarde
     const mcmtWidth = mttdWidth + mttrWidth;
+    const mcmtValue = fmtNum(fromHours(results.MCMT, resultUnit), 2);
     mcmtGroup.innerHTML = `
       <line x1="${startX}" y1="85" x2="${startX + mcmtWidth}" y2="85" stroke="#ff6b35" stroke-width="3"/>
       <line x1="${startX}" y1="80" x2="${startX}" y2="90" stroke="#ff6b35" stroke-width="3"/>
       <line x1="${startX + mcmtWidth}" y1="80" x2="${startX + mcmtWidth}" y2="90" stroke="#ff6b35" stroke-width="3"/>
-      <text x="${startX + mcmtWidth/2}" y="75" text-anchor="middle" fill="#ff6b35" font-size="16" font-weight="bold">MCMT</text>
+      <text x="${startX + mcmtWidth/2}" y="72" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
+      <text x="${startX + mcmtWidth/2}" y="87" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
     `;
     
     // Verticale markers
@@ -271,19 +288,18 @@
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
     `;
     
-    // KPI Info Box (rechtsboven met verbeterde styling)
+    // KPI Info Box (linksboven, weg van Uptime segment)
     kpiBox.innerHTML = `
-      <rect x="730" y="80" width="240" height="120" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
-      <text x="850" y="110" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">📊 KPI Overzicht</text>
+      <rect x="60" y="95" width="200" height="95" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
       
-      <text x="745" y="135" fill="#b8c7e0" font-size="14">Beschikbaarheid:</text>
-      <text x="945" y="135" text-anchor="end" fill="#13d17c" font-size="15" font-weight="bold">${fmtPct(results.availability, 2)}</text>
+      <text x="70" y="125" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
+      <text x="250" y="125" text-anchor="end" fill="#13d17c" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
       
-      <text x="745" y="160" fill="#b8c7e0" font-size="14">Failure Rate λ:</text>
-      <text x="945" y="160" text-anchor="end" fill="#ff6b35" font-size="14" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
+      <text x="70" y="150" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
+      <text x="250" y="150" text-anchor="end" fill="#ff6b35" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
       
-      <text x="745" y="185" fill="#b8c7e0" font-size="14">FIT:</text>
-      <text x="945" y="185" text-anchor="end" fill="#ffd700" font-size="14" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
+      <text x="70" y="175" fill="#b8c7e0" font-size="13">FIT:</text>
+      <text x="250" y="175" text-anchor="end" fill="#ffd700" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
     `;
   }
 
@@ -307,16 +323,22 @@
       return;
     }
     
+    // Get current result unit for display
+    const resultUnit = document.getElementById('resultUnit').value;
+    const unitLabel = getUnitLabel(resultUnit);
+    
     const startX = 50;
     const endX = 950;
     const baseY = 160;
     const segmentY = 135;
     const segmentHeight = 50;
     
-    // MTTF top line
+    // MTTF top line MET waarde
+    const mttfValue = fmtNum(fromHours(results.MTTF, resultUnit), 2);
     topLineGroup.innerHTML = `
       <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#6a9fef" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
-      <text x="${(startX + endX)/2}" y="35" text-anchor="middle" fill="#e0e6f0" font-size="18" font-weight="bold">MTTF (Mean Time To Failure)</text>
+      <text x="${(startX + endX)/2}" y="32" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">MTTF (Mean Time To Failure)</text>
+      <text x="${(startX + endX)/2}" y="47" text-anchor="middle" fill="#b8c7e0" font-size="13">${mttfValue} ${unitLabel}</text>
     `;
     
     // Timeline basis
@@ -341,13 +363,15 @@
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#ff6b35" font-size="14" font-weight="bold">Falen</text>
     `;
     
-    // KPI Info Box (rechtsboven, compacter voor niet-repareerbaar)
+    // KPI Info Box (linksboven, compacter voor niet-repareerbaar)
     kpiBox.innerHTML = `
-      <rect x="730" y="200" width="240" height="80" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
-      <text x="850" y="230" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">📊 KPI Info</text>
+      <rect x="60" y="95" width="180" height="75" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
       
-      <text x="745" y="253" fill="#b8c7e0" font-size="14">λ: <tspan fill="#ff6b35" font-weight="bold">${fmtNum(results.lambda, 6)}</tspan></text>
-      <text x="745" y="273" fill="#b8c7e0" font-size="14">FIT: <tspan fill="#ffd700" font-weight="bold">${fmtNum(results.FIT, 0)}</tspan></text>
+      <text x="70" y="125" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
+      <text x="230" y="125" text-anchor="end" fill="#ff6b35" font-weight="bold" font-size="13">${fmtNum(results.lambda, 6)}</text>
+      
+      <text x="70" y="155" fill="#b8c7e0" font-size="13">FIT:</text>
+      <text x="230" y="155" text-anchor="end" fill="#ffd700" font-weight="bold" font-size="13">${fmtNum(results.FIT, 0)}</text>
     `;
   }
 
