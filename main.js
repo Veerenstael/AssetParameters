@@ -136,6 +136,221 @@
     return { MTTF, lambda, FIT };
   }
 
+  // Update interactief diagram (Repareerbaar) - VERBETERDE VERSIE
+  function updateInteractiveDiagram(results) {
+    const topLineGroup = document.getElementById('mtbfTopLine');
+    const segmentsGroup = document.getElementById('mtbfSegments');
+    const mcmtGroup = document.getElementById('mcmtBracket');
+    const markersGroup = document.getElementById('verticalMarkers');
+    const labelsGroup = document.getElementById('bottomLabels');
+    const kpiBox = document.getElementById('kpiInfoBox');
+    
+    // Clear previous content
+    topLineGroup.innerHTML = '';
+    segmentsGroup.innerHTML = '';
+    mcmtGroup.innerHTML = '';
+    markersGroup.innerHTML = '';
+    labelsGroup.innerHTML = '';
+    kpiBox.innerHTML = '';
+    
+    if (!isFinite(results.MTBF) || !isFinite(results.MCMT)) {
+      return;
+    }
+    
+    // SVG parameters
+    const startX = 50;
+    const endX = 950;
+    const totalWidth = endX - startX;
+    const baseY = 190;
+    const segmentY = 165;
+    const segmentHeight = 50;
+    
+    // Bereken verhoudingen
+    const mttdRatio = results.MTTD / results.MTBF;
+    const mttrRatio = results.MTTR / results.MTBF;
+    
+    // Intelligente schaling (MTTD en MTTR tussen 15-30%)
+    let scaledMTTD = Math.min(Math.max(mttdRatio * 40, 0.16), 0.28);
+    let scaledMTTR = Math.min(Math.max(mttrRatio * 40, 0.16), 0.28);
+    
+    // Zorg dat totale downtime max 55% is
+    const totalDowntime = scaledMTTD + scaledMTTR;
+    if (totalDowntime > 0.55) {
+      const scale = 0.55 / totalDowntime;
+      scaledMTTD *= scale;
+      scaledMTTR *= scale;
+    }
+    
+    const scaledUptime = 1 - (scaledMTTD + scaledMTTR);
+    
+    // Pixel breedtes
+    const mttdWidth = totalWidth * scaledMTTD;
+    const mttrWidth = totalWidth * scaledMTTR;
+    const uptimeWidth = totalWidth * scaledUptime;
+    
+    // MTBF top line met pijlen
+    topLineGroup.innerHTML = `
+      <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#6a9fef" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
+      <line x1="${startX}" y1="45" x2="${startX}" y2="55" stroke="#6a9fef" stroke-width="2"/>
+      <line x1="${endX}" y1="45" x2="${endX}" y2="55" stroke="#6a9fef" stroke-width="2"/>
+      <text x="${(startX + endX)/2}" y="35" text-anchor="middle" fill="#e0e6f0" font-size="18" font-weight="bold">MTBF</text>
+    `;
+    
+    // Timeline basis
+    segmentsGroup.innerHTML += `
+      <line x1="${startX}" y1="${baseY}" x2="${endX}" y2="${baseY}" stroke="#4a90e2" stroke-width="4" stroke-linecap="round"/>
+    `;
+    
+    let currentX = startX;
+    
+    // 1. MTTD segment (detectie - oranje gradient)
+    segmentsGroup.innerHTML += `
+      <rect x="${currentX}" y="${segmentY}" width="${mttdWidth}" height="${segmentHeight}" 
+            fill="url(#gradMTTD)" rx="6" filter="url(#shadow)"/>
+      <text x="${currentX + mttdWidth/2}" y="${segmentY + segmentHeight/2 + 5}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="15" font-weight="bold">MTTD</text>
+    `;
+    currentX += mttdWidth;
+    
+    // 2. MTTR segment (reparatie - rood gradient)
+    segmentsGroup.innerHTML += `
+      <rect x="${currentX}" y="${segmentY}" width="${mttrWidth}" height="${segmentHeight}" 
+            fill="url(#gradMTTR)" rx="6" filter="url(#shadow)"/>
+      <text x="${currentX + mttrWidth/2}" y="${segmentY + segmentHeight/2 + 5}" 
+            text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">MTTR</text>
+    `;
+    currentX += mttrWidth;
+    
+    // 3. Uptime segment (operationeel - groen gradient)
+    segmentsGroup.innerHTML += `
+      <rect x="${currentX}" y="${segmentY}" width="${uptimeWidth}" height="${segmentHeight}" 
+            fill="url(#gradUptime)" rx="6" filter="url(#shadow)"/>
+      <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 + 5}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="15" font-weight="bold">Uptime</text>
+    `;
+    
+    // MCMT bracket (boven segmenten)
+    const mcmtWidth = mttdWidth + mttrWidth;
+    mcmtGroup.innerHTML = `
+      <line x1="${startX}" y1="85" x2="${startX + mcmtWidth}" y2="85" stroke="#ff6b35" stroke-width="3"/>
+      <line x1="${startX}" y1="80" x2="${startX}" y2="90" stroke="#ff6b35" stroke-width="3"/>
+      <line x1="${startX + mcmtWidth}" y1="80" x2="${startX + mcmtWidth}" y2="90" stroke="#ff6b35" stroke-width="3"/>
+      <text x="${startX + mcmtWidth/2}" y="75" text-anchor="middle" fill="#ff6b35" font-size="16" font-weight="bold">MCMT</text>
+    `;
+    
+    // Verticale markers
+    currentX = startX;
+    
+    // Marker 1: Faalmoment (start)
+    markersGroup.innerHTML += `
+      <line x1="${currentX}" y1="${segmentY}" x2="${currentX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
+      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
+    `;
+    currentX += mttdWidth;
+    
+    // Marker 2: Start reparatie
+    markersGroup.innerHTML += `
+      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" 
+            stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#b8c7e0" font-size="11">Start reparatie</text>
+    `;
+    currentX += mttrWidth;
+    
+    // Marker 3: Systeem operationeel
+    markersGroup.innerHTML += `
+      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" 
+            stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <text x="${currentX}" y="${baseY + 55}" text-anchor="middle" fill="#b8c7e0" font-size="11">Systeem</text>
+      <text x="${currentX}" y="${baseY + 68}" text-anchor="middle" fill="#b8c7e0" font-size="11">operationeel</text>
+    `;
+    
+    // Marker 4: Volgende faalmoment (einde)
+    markersGroup.innerHTML += `
+      <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
+      <text x="${endX}" y="${baseY + 55}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Volgende</text>
+      <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
+    `;
+    
+    // KPI Info Box (rechtsboven met verbeterde styling)
+    kpiBox.innerHTML = `
+      <rect x="730" y="80" width="240" height="120" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
+      <text x="850" y="110" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">📊 KPI Overzicht</text>
+      
+      <text x="745" y="135" fill="#b8c7e0" font-size="14">Beschikbaarheid:</text>
+      <text x="945" y="135" text-anchor="end" fill="#13d17c" font-size="15" font-weight="bold">${fmtPct(results.availability, 2)}</text>
+      
+      <text x="745" y="160" fill="#b8c7e0" font-size="14">Failure Rate λ:</text>
+      <text x="945" y="160" text-anchor="end" fill="#ff6b35" font-size="14" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
+      
+      <text x="745" y="185" fill="#b8c7e0" font-size="14">FIT:</text>
+      <text x="945" y="185" text-anchor="end" fill="#ffd700" font-size="14" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
+    `;
+  }
+
+  // Update diagram voor niet-repareerbaar - VERBETERDE VERSIE
+  function updateNonRepairableDiagram(results) {
+    const topLineGroup = document.getElementById('mtbfTopLine');
+    const segmentsGroup = document.getElementById('mtbfSegments');
+    const mcmtGroup = document.getElementById('mcmtBracket');
+    const markersGroup = document.getElementById('verticalMarkers');
+    const labelsGroup = document.getElementById('bottomLabels');
+    const kpiBox = document.getElementById('kpiInfoBox');
+    
+    topLineGroup.innerHTML = '';
+    segmentsGroup.innerHTML = '';
+    mcmtGroup.innerHTML = '';
+    markersGroup.innerHTML = '';
+    labelsGroup.innerHTML = '';
+    kpiBox.innerHTML = '';
+    
+    if (!isFinite(results.MTTF)) {
+      return;
+    }
+    
+    const startX = 50;
+    const endX = 950;
+    const baseY = 160;
+    const segmentY = 135;
+    const segmentHeight = 50;
+    
+    // MTTF top line
+    topLineGroup.innerHTML = `
+      <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#6a9fef" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
+      <text x="${(startX + endX)/2}" y="35" text-anchor="middle" fill="#e0e6f0" font-size="18" font-weight="bold">MTTF (Mean Time To Failure)</text>
+    `;
+    
+    // Timeline basis
+    segmentsGroup.innerHTML += `
+      <line x1="${startX}" y1="${baseY}" x2="${endX}" y2="${baseY}" stroke="#4a90e2" stroke-width="4" stroke-linecap="round"/>
+    `;
+    
+    // MTTF segment (hele breedte - groen gradient)
+    segmentsGroup.innerHTML += `
+      <rect x="${startX}" y="${segmentY}" width="${endX - startX}" height="${segmentHeight}" 
+            fill="url(#gradMTTF)" rx="6" filter="url(#shadow)"/>
+      <text x="${(startX + endX)/2}" y="${segmentY + segmentHeight/2 + 5}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="16" font-weight="bold">Operationele Levensduur</text>
+    `;
+    
+    // Verticale markers
+    markersGroup.innerHTML = `
+      <line x1="${startX}" y1="${segmentY}" x2="${startX}" y2="${baseY + 50}" stroke="#e0e6f0" stroke-width="3"/>
+      <text x="${startX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="14" font-weight="bold">Start</text>
+      
+      <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 50}" stroke="#ff4444" stroke-width="3"/>
+      <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#ff6b35" font-size="14" font-weight="bold">Falen</text>
+    `;
+    
+    // KPI Info Box (rechtsboven, compacter voor niet-repareerbaar)
+    kpiBox.innerHTML = `
+      <rect x="730" y="200" width="240" height="80" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
+      <text x="850" y="230" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">📊 KPI Info</text>
+      
+      <text x="745" y="253" fill="#b8c7e0" font-size="14">λ: <tspan fill="#ff6b35" font-weight="bold">${fmtNum(results.lambda, 6)}</tspan></text>
+      <text x="745" y="273" fill="#b8c7e0" font-size="14">FIT: <tspan fill="#ffd700" font-weight="bold">${fmtNum(results.FIT, 0)}</tspan></text>
+    `;
+  }
+
   // Update UI - Repareerbaar
   function updateUIRepairable(r) {
     const resultUnit = document.getElementById('resultUnit').value;
@@ -155,6 +370,9 @@
     document.getElementById('unitMTTD').textContent = unitLabel;
     document.getElementById('unitMCMT').textContent = unitLabel;
     document.getElementById('unitUptime').textContent = unitLabel;
+    
+    // Update interactief diagram
+    updateInteractiveDiagram(r);
   }
 
   // Update UI - Niet-repareerbaar
@@ -167,6 +385,9 @@
     document.getElementById('outFIT').textContent = fmtNum(r.FIT, 2);
     
     document.getElementById('unitMTTF').textContent = unitLabel;
+    
+    // Update niet-repareerbaar diagram
+    updateNonRepairableDiagram(r);
   }
 
   // Toggle visibility based on analysis type
@@ -430,4 +651,3 @@
     pdf.save(fileName);
   });
 })();
-
