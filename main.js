@@ -244,15 +244,40 @@
             text-anchor="middle" fill="#1a1a1a" font-size="12">${uptimeValue} ${unitLabel}</text>
     `;
     
-    // MCMT bracket (boven segmenten) MET waarde - MEER RUIMTE
+    // KPI Info Box (RECHTS, tussen MTBF lijn en Uptime segment) - GRIJZE TEKST
+    const mtbfLineY = 50;
+    const segmentTopY = segmentY;
+    const availableSpace = segmentTopY - mtbfLineY; // Ruimte tussen MTBF lijn en segmenten
+    const kpiBoxHeight = 95;
+    const kpiBoxMargin = (availableSpace - kpiBoxHeight) / 2; // Centreer in beschikbare ruimte
+    const kpiBoxY = mtbfLineY + kpiBoxMargin;
+    const kpiBoxMiddleY = kpiBoxY + (kpiBoxHeight / 2); // Midden van de box
+    const kpiBoxX = 700;
+    
+    kpiBox.innerHTML = `
+      <rect x="${kpiBoxX}" y="${kpiBoxY}" width="220" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
+      
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 30}" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 30}" text-anchor="end" fill="#d0dae8" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
+      
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 55}" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 55}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
+      
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 80}" fill="#b8c7e0" font-size="13">FIT:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
+    `;
+    
+    // MCMT bracket (boven segmenten, IN MIDDEN VAN KPI BOX) MET waarde
     const mcmtWidth = mttdWidth + mttrWidth;
     const mcmtValue = fmtNum(fromHours(results.MCMT, resultUnit), 2);
+    const mcmtLineY = kpiBoxMiddleY; // Oranje lijn op midden van KPI box
+    
     mcmtGroup.innerHTML = `
-      <line x1="${startX}" y1="95" x2="${startX + mcmtWidth}" y2="95" stroke="#ff6b35" stroke-width="3"/>
-      <line x1="${startX}" y1="90" x2="${startX}" y2="100" stroke="#ff6b35" stroke-width="3"/>
-      <line x1="${startX + mcmtWidth}" y1="90" x2="${startX + mcmtWidth}" y2="100" stroke="#ff6b35" stroke-width="3"/>
-      <text x="${startX + mcmtWidth/2}" y="78" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
-      <text x="${startX + mcmtWidth/2}" y="93" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
+      <line x1="${startX}" y1="${mcmtLineY}" x2="${startX + mcmtWidth}" y2="${mcmtLineY}" stroke="#ff6b35" stroke-width="3"/>
+      <line x1="${startX}" y1="${mcmtLineY - 5}" x2="${startX}" y2="${mcmtLineY + 5}" stroke="#ff6b35" stroke-width="3"/>
+      <line x1="${startX + mcmtWidth}" y1="${mcmtLineY - 5}" x2="${startX + mcmtWidth}" y2="${mcmtLineY + 5}" stroke="#ff6b35" stroke-width="3"/>
+      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 13}" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
+      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 1}" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
     `;
     
     // Verticale markers
@@ -286,25 +311,6 @@
       <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
       <text x="${endX}" y="${baseY + 55}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Volgende</text>
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
-    `;
-    
-    // KPI Info Box (RECHTS, midden op hoogte MCMT lijn) - GRIJZE TEKST
-    const mcmtLineY = 95;
-    const kpiBoxHeight = 95;
-    const kpiBoxY = mcmtLineY - (kpiBoxHeight / 2); // Midden van box op hoogte MCMT
-    const kpiBoxX = 700; // Meer naar rechts
-    
-    kpiBox.innerHTML = `
-      <rect x="${kpiBoxX}" y="${kpiBoxY}" width="220" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
-      
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 30}" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
-      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 30}" text-anchor="end" fill="#d0dae8" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
-      
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 55}" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
-      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 55}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
-      
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 80}" fill="#b8c7e0" font-size="13">FIT:</text>
-      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
     `;
   }
 
