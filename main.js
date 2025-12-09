@@ -116,7 +116,8 @@
       failures: parseFloat(document.getElementById('failures').value),
       totRepairHours: parseFloat(document.getElementById('totRepairHours').value),
       totDetectHours: parseFloat(document.getElementById('totDetectHours').value),
-      totPMHours: toHours(totPMValue, totPMUnit)
+      totPMHours: toHours(totPMValue, totPMUnit),
+      numPM: parseFloat(document.getElementById('numPM').value)
     };
   }
 
@@ -125,7 +126,7 @@
     const MTBF = safeDiv(v.totItemsHours, v.failures);
     const MTTR = safeDiv(v.totRepairHours, v.failures);
     const MTTD = safeDiv(v.totDetectHours, v.failures);
-    const MPMT = safeDiv(v.totPMHours, v.failures);
+    const MPMT = safeDiv(v.totPMHours, v.numPM);
     const MCMT = (isFinite(MTTR) && isFinite(MTTD)) ? MTTR + MTTD : NaN;
     const uptime = (isFinite(MTBF) && isFinite(MCMT) && isFinite(MPMT)) ? MTBF - MCMT - MPMT : NaN;
     const availability = (isFinite(uptime) && isFinite(MTBF) && MTBF > 0) ? uptime / MTBF : NaN;
@@ -138,12 +139,13 @@
   // Compute - Niet-repareerbaar
   function computeNonRepairable(v) {
     const MTTF = safeDiv(v.totItemsHours, v.failures);
-    const MPMT = safeDiv(v.totPMHours, v.failures);
+    const MPMT = safeDiv(v.totPMHours, v.numPM);
     const uptime = (isFinite(MTTF) && isFinite(MPMT)) ? MTTF - MPMT : NaN;
+    const availability = (isFinite(uptime) && isFinite(MTTF) && MTTF > 0) ? uptime / MTTF : NaN;
     const lambda = (isFinite(MTTF) && MTTF > 0) ? 1 / MTTF : NaN;
     const FIT = (isFinite(MTTF) && MTTF > 0) ? 1e9 / MTTF : NaN;
 
-    return { MTTF, MPMT, uptime, lambda, FIT };
+    return { MTTF, MPMT, uptime, availability, lambda, FIT };
   }
 
   // Update interactief diagram (Repareerbaar) - MET MPMT
@@ -247,15 +249,15 @@
     `;
     currentX += mttrWidth;
     
-    // 3. MPMT segment (NIEUW!)
+    // 3. MPMT segment (Veerenstael BLAUW)
     const mpmtValue = fmtNum(fromHours(results.MPMT, resultUnit), 2);
     segmentsGroup.innerHTML += `
       <rect x="${currentX}" y="${segmentY}" width="${mpmtWidth}" height="${segmentHeight}" 
             fill="url(#gradMPMT)" rx="6" filter="url(#shadow)"/>
       <text x="${currentX + mpmtWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">MPMT</text>
+            text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">MPMT</text>
       <text x="${currentX + mpmtWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="12">${mpmtValue} ${unitLabel}</text>
+            text-anchor="middle" fill="#ffffff" font-size="12">${mpmtValue} ${unitLabel}</text>
     `;
     currentX += mpmtWidth;
     
@@ -265,9 +267,9 @@
       <rect x="${currentX}" y="${segmentY}" width="${uptimeWidth}" height="${segmentHeight}" 
             fill="url(#gradUptime)" rx="6" filter="url(#shadow)"/>
       <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
-            text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Uptime</text>
+            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">Uptime</text>
       <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
-            text-anchor="middle" fill="#ffffff" font-size="12">${uptimeValue} ${unitLabel}</text>
+            text-anchor="middle" fill="#1a1a1a" font-size="12">${uptimeValue} ${unitLabel}</text>
     `;
     
     // KPI Info Box
@@ -396,9 +398,9 @@
       <rect x="${currentX}" y="${segmentY}" width="${mpmtWidth}" height="${segmentHeight}" 
             fill="url(#gradMPMT)" rx="6" filter="url(#shadow)"/>
       <text x="${currentX + mpmtWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">MPMT</text>
+            text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">MPMT</text>
       <text x="${currentX + mpmtWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="12">${mpmtValue} ${unitLabel}</text>
+            text-anchor="middle" fill="#ffffff" font-size="12">${mpmtValue} ${unitLabel}</text>
     `;
     currentX += mpmtWidth;
     
@@ -406,11 +408,11 @@
     const uptimeValue = fmtNum(fromHours(results.uptime, resultUnit), 2);
     segmentsGroup.innerHTML += `
       <rect x="${currentX}" y="${segmentY}" width="${uptimeWidth}" height="${segmentHeight}" 
-            fill="url(#gradMTTF)" rx="6" filter="url(#shadow)"/>
+            fill="url(#gradUptime)" rx="6" filter="url(#shadow)"/>
       <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
-            text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Uptime</text>
+            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">Uptime</text>
       <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
-            text-anchor="middle" fill="#ffffff" font-size="12">${uptimeValue} ${unitLabel}</text>
+            text-anchor="middle" fill="#1a1a1a" font-size="12">${uptimeValue} ${unitLabel}</text>
     `;
     
     // Verticale markers
@@ -472,6 +474,7 @@
     document.getElementById('outMTTF').textContent = fmtNum(fromHours(r.MTTF, resultUnit), 2);
     document.getElementById('outMPMT').textContent = fmtNum(fromHours(r.MPMT, resultUnit), 2);
     document.getElementById('outUptime').textContent = fmtNum(fromHours(r.uptime, resultUnit), 2);
+    document.getElementById('outA').textContent = fmtPct(r.availability, 4);
     document.getElementById('outLambda').textContent = fmtNum(r.lambda, 8);
     document.getElementById('outFIT').textContent = fmtNum(r.FIT, 2);
     
@@ -636,6 +639,8 @@
     }
     pdf.text(`• Totale PM-tijd: ${fmtNum(inputs.totPMHours, 2)} uur`, col1X + 2, col1Y);
     col1Y += 4;
+    pdf.text(`• Aantal keer PM: ${fmtNum(inputs.numPM, 0)}`, col1X + 2, col1Y);
+    col1Y += 4;
     col1Y += 4;
     
     // KOLOM 1: Resultaten
@@ -674,6 +679,8 @@
       col1Y += 4;
       pdf.text(`Uptime: ${fmtNum(fromHours(results.uptime, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
+      pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, col1X + 2, col1Y);
+      col1Y += 4;
       pdf.text(`Failure Rate: ${fmtNum(results.lambda, 8)} per uur`, col1X + 2, col1Y);
       col1Y += 4;
       pdf.text(`FIT: ${fmtNum(results.FIT, 2)} per 10^9 uur`, col1X + 2, col1Y);
@@ -695,7 +702,7 @@
       col2Y += 4;
       pdf.text('MTTD = [Totale detectietijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('MPMT = [Totale PM-tijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
+      pdf.text('MPMT = [Totale PM-tijd] / [Aantal keer PM]', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('MCMT = MTTR + MTTD', col2X + 2, col2Y);
       col2Y += 4;
@@ -709,9 +716,11 @@
     } else {
       pdf.text('MTTF = [Totale bedrijfstijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('MPMT = [Totale PM-tijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
+      pdf.text('MPMT = [Totale PM-tijd] / [Aantal keer PM]', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Uptime = MTTF - MPMT', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('Beschikbaarheid [A] = Uptime / MTTF', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Failure Rate = 1 / MTTF', col2X + 2, col2Y);
       col2Y += 4;
