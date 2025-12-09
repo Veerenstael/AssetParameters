@@ -22,13 +22,17 @@
       title: 'MTTD - Mean Time To Detect',
       text: '<strong>Wat het is:</strong> MTTD meet de gemiddelde tijd die nodig is om een storing te detecteren. <strong>Waarom belangrijk:</strong> Snelle detectie vermindert de totale downtime. <strong>Interpretatie:</strong> Een MTTD van 2 uur betekent dat storingen gemiddeld binnen 2 uur worden opgemerkt.'
     },
+    mpmt: {
+      title: 'MPMT - Mean Preventive Maintenance Time',
+      text: '<strong>Wat het is:</strong> MPMT meet de gemiddelde tijd die nodig is voor gepland preventief onderhoud. <strong>Waarom belangrijk:</strong> Gepland onderhoud verlaagt de uptime maar voorkomt ongeplande storingen. <strong>Interpretatie:</strong> Een MPMT van 3 uur betekent dat geplande onderhoudsactiviteiten gemiddeld 3 uur per cyclus duren.'
+    },
     mcmt: {
       title: 'MCMT - Mean Corrective Maintenance Time',
       text: '<strong>Wat het is:</strong> MCMT is de totale gemiddelde tijd voor correctief onderhoud (detectie + reparatie). <strong>Formule:</strong> MCMT = MTTR + MTTD. <strong>Interpretatie:</strong> Een MCMT van 10 uur betekent dat de totale tijd van storing tot herstel gemiddeld 10 uur duurt.'
     },
     uptime: {
       title: 'Uptime - Beschikbare bedrijfstijd',
-      text: '<strong>Wat het is:</strong> Uptime is de tijd dat het systeem daadwerkelijk operationeel is tussen storingen. <strong>Formule:</strong> Uptime = MTBF − MCMT. <strong>Interpretatie:</strong> Dit geeft de netto productieve tijd weer binnen elke storingscyclus.'
+      text: '<strong>Wat het is:</strong> Uptime is de tijd dat het systeem daadwerkelijk operationeel is. <strong>Formule:</strong> Uptime = MTBF − MCMT − MPMT (repareerbaar) of MTTF − MPMT (niet-repareerbaar). <strong>Interpretatie:</strong> Dit geeft de netto productieve tijd weer.'
     },
     availability: {
       title: 'Beschikbaarheid [A] - Availability',
@@ -104,12 +108,15 @@
   function readInputs() {
     const totItemsValue = parseFloat(document.getElementById('totItemsValue').value);
     const totItemsUnit = document.getElementById('totItemsUnit').value;
+    const totPMValue = parseFloat(document.getElementById('totPMValue').value);
+    const totPMUnit = document.getElementById('totPMUnit').value;
 
     return {
       totItemsHours: toHours(totItemsValue, totItemsUnit),
       failures: parseFloat(document.getElementById('failures').value),
       totRepairHours: parseFloat(document.getElementById('totRepairHours').value),
-      totDetectHours: parseFloat(document.getElementById('totDetectHours').value)
+      totDetectHours: parseFloat(document.getElementById('totDetectHours').value),
+      totPMHours: toHours(totPMValue, totPMUnit)
     };
   }
 
@@ -118,25 +125,28 @@
     const MTBF = safeDiv(v.totItemsHours, v.failures);
     const MTTR = safeDiv(v.totRepairHours, v.failures);
     const MTTD = safeDiv(v.totDetectHours, v.failures);
+    const MPMT = safeDiv(v.totPMHours, v.failures);
     const MCMT = (isFinite(MTTR) && isFinite(MTTD)) ? MTTR + MTTD : NaN;
-    const uptime = (isFinite(MTBF) && isFinite(MCMT)) ? MTBF - MCMT : NaN;
+    const uptime = (isFinite(MTBF) && isFinite(MCMT) && isFinite(MPMT)) ? MTBF - MCMT - MPMT : NaN;
     const availability = (isFinite(uptime) && isFinite(MTBF) && MTBF > 0) ? uptime / MTBF : NaN;
     const lambda = (isFinite(MTBF) && MTBF > 0) ? 1 / MTBF : NaN;
     const FIT = (isFinite(MTBF) && MTBF > 0) ? 1e9 / MTBF : NaN;
 
-    return { MTBF, MTTR, MTTD, MCMT, uptime, availability, lambda, FIT };
+    return { MTBF, MTTR, MTTD, MPMT, MCMT, uptime, availability, lambda, FIT };
   }
 
   // Compute - Niet-repareerbaar
   function computeNonRepairable(v) {
     const MTTF = safeDiv(v.totItemsHours, v.failures);
+    const MPMT = safeDiv(v.totPMHours, v.failures);
+    const uptime = (isFinite(MTTF) && isFinite(MPMT)) ? MTTF - MPMT : NaN;
     const lambda = (isFinite(MTTF) && MTTF > 0) ? 1 / MTTF : NaN;
     const FIT = (isFinite(MTTF) && MTTF > 0) ? 1e9 / MTTF : NaN;
 
-    return { MTTF, lambda, FIT };
+    return { MTTF, MPMT, uptime, lambda, FIT };
   }
 
-  // Update interactief diagram (Repareerbaar) - VERBETERDE VERSIE
+  // Update interactief diagram (Repareerbaar) - MET MPMT
   function updateInteractiveDiagram(results) {
     const topLineGroup = document.getElementById('mtbfTopLine');
     const segmentsGroup = document.getElementById('mtbfSegments');
@@ -153,7 +163,7 @@
     labelsGroup.innerHTML = '';
     kpiBox.innerHTML = '';
     
-    if (!isFinite(results.MTBF) || !isFinite(results.MCMT)) {
+    if (!isFinite(results.MTBF) || !isFinite(results.MCMT) || !isFinite(results.MPMT)) {
       return;
     }
     
@@ -172,32 +182,36 @@
     // Bereken verhoudingen
     const mttdRatio = results.MTTD / results.MTBF;
     const mttrRatio = results.MTTR / results.MTBF;
+    const mpmtRatio = results.MPMT / results.MTBF;
     
-    // Intelligente schaling (MTTD en MTTR tussen 15-30%)
-    let scaledMTTD = Math.min(Math.max(mttdRatio * 40, 0.16), 0.28);
-    let scaledMTTR = Math.min(Math.max(mttrRatio * 40, 0.16), 0.28);
+    // Intelligente schaling
+    let scaledMTTD = Math.min(Math.max(mttdRatio * 35, 0.12), 0.22);
+    let scaledMTTR = Math.min(Math.max(mttrRatio * 35, 0.12), 0.22);
+    let scaledMPMT = Math.min(Math.max(mpmtRatio * 35, 0.12), 0.22);
     
-    // Zorg dat totale downtime max 55% is
-    const totalDowntime = scaledMTTD + scaledMTTR;
-    if (totalDowntime > 0.55) {
-      const scale = 0.55 / totalDowntime;
+    // Zorg dat totale downtime max 65% is
+    const totalDowntime = scaledMTTD + scaledMTTR + scaledMPMT;
+    if (totalDowntime > 0.65) {
+      const scale = 0.65 / totalDowntime;
       scaledMTTD *= scale;
       scaledMTTR *= scale;
+      scaledMPMT *= scale;
     }
     
-    const scaledUptime = 1 - (scaledMTTD + scaledMTTR);
+    const scaledUptime = 1 - (scaledMTTD + scaledMTTR + scaledMPMT);
     
     // Pixel breedtes
     const mttdWidth = totalWidth * scaledMTTD;
     const mttrWidth = totalWidth * scaledMTTR;
+    const mpmtWidth = totalWidth * scaledMPMT;
     const uptimeWidth = totalWidth * scaledUptime;
     
-    // MTBF top line met pijlen EN waarde
+    // MTBF top line met waarde
     const mtbfValue = fmtNum(fromHours(results.MTBF, resultUnit), 2);
     topLineGroup.innerHTML = `
-      <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#6a9fef" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
-      <line x1="${startX}" y1="45" x2="${startX}" y2="55" stroke="#6a9fef" stroke-width="2"/>
-      <line x1="${endX}" y1="45" x2="${endX}" y2="55" stroke="#6a9fef" stroke-width="2"/>
+      <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#2A6085" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
+      <line x1="${startX}" y1="45" x2="${startX}" y2="55" stroke="#2A6085" stroke-width="2"/>
+      <line x1="${endX}" y1="45" x2="${endX}" y2="55" stroke="#2A6085" stroke-width="2"/>
       <text x="${(startX + endX)/2}" y="32" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">MTBF</text>
       <text x="${(startX + endX)/2}" y="47" text-anchor="middle" fill="#b8c7e0" font-size="13">${mtbfValue} ${unitLabel}</text>
     `;
@@ -209,7 +223,7 @@
     
     let currentX = startX;
     
-    // 1. MTTD segment (detectie - oranje gradient) MET waarde
+    // 1. MTTD segment
     const mttdValue = fmtNum(fromHours(results.MTTD, resultUnit), 2);
     segmentsGroup.innerHTML += `
       <rect x="${currentX}" y="${segmentY}" width="${mttdWidth}" height="${segmentHeight}" 
@@ -221,7 +235,7 @@
     `;
     currentX += mttdWidth;
     
-    // 2. MTTR segment (reparatie - rood gradient) MET waarde
+    // 2. MTTR segment
     const mttrValue = fmtNum(fromHours(results.MTTR, resultUnit), 2);
     segmentsGroup.innerHTML += `
       <rect x="${currentX}" y="${segmentY}" width="${mttrWidth}" height="${segmentHeight}" 
@@ -233,44 +247,53 @@
     `;
     currentX += mttrWidth;
     
-    // 3. Uptime segment (operationeel - groen gradient) MET waarde
+    // 3. MPMT segment (NIEUW!)
+    const mpmtValue = fmtNum(fromHours(results.MPMT, resultUnit), 2);
+    segmentsGroup.innerHTML += `
+      <rect x="${currentX}" y="${segmentY}" width="${mpmtWidth}" height="${segmentHeight}" 
+            fill="url(#gradMPMT)" rx="6" filter="url(#shadow)"/>
+      <text x="${currentX + mpmtWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">MPMT</text>
+      <text x="${currentX + mpmtWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="12">${mpmtValue} ${unitLabel}</text>
+    `;
+    currentX += mpmtWidth;
+    
+    // 4. Uptime segment
     const uptimeValue = fmtNum(fromHours(results.uptime, resultUnit), 2);
     segmentsGroup.innerHTML += `
       <rect x="${currentX}" y="${segmentY}" width="${uptimeWidth}" height="${segmentHeight}" 
             fill="url(#gradUptime)" rx="6" filter="url(#shadow)"/>
       <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">Uptime</text>
+            text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Uptime</text>
       <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="12">${uptimeValue} ${unitLabel}</text>
+            text-anchor="middle" fill="#ffffff" font-size="12">${uptimeValue} ${unitLabel}</text>
     `;
     
-    // KPI Info Box (RECHTS, tussen MTBF lijn en Uptime segment) - GRIJZE TEKST
+    // KPI Info Box
     const mtbfLineY = 50;
     const segmentTopY = segmentY;
-    const availableSpace = segmentTopY - mtbfLineY; // Ruimte tussen MTBF lijn en segmenten
+    const availableSpace = segmentTopY - mtbfLineY;
     const kpiBoxHeight = 95;
-    const kpiBoxMargin = (availableSpace - kpiBoxHeight) / 2; // Centreer in beschikbare ruimte
+    const kpiBoxMargin = (availableSpace - kpiBoxHeight) / 2;
     const kpiBoxY = mtbfLineY + kpiBoxMargin;
-    const kpiBoxMiddleY = kpiBoxY + (kpiBoxHeight / 2); // Midden van de box
+    const kpiBoxMiddleY = kpiBoxY + (kpiBoxHeight / 2);
     const kpiBoxX = 700;
     
     kpiBox.innerHTML = `
       <rect x="${kpiBoxX}" y="${kpiBoxY}" width="220" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
-      
       <text x="${kpiBoxX + 10}" y="${kpiBoxY + 30}" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
       <text x="${kpiBoxX + 210}" y="${kpiBoxY + 30}" text-anchor="end" fill="#d0dae8" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
-      
       <text x="${kpiBoxX + 10}" y="${kpiBoxY + 55}" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
       <text x="${kpiBoxX + 210}" y="${kpiBoxY + 55}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
-      
       <text x="${kpiBoxX + 10}" y="${kpiBoxY + 80}" fill="#b8c7e0" font-size="13">FIT:</text>
       <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
     `;
     
-    // MCMT bracket (boven segmenten, IN MIDDEN VAN KPI BOX) MET waarde
+    // MCMT bracket
     const mcmtWidth = mttdWidth + mttrWidth;
     const mcmtValue = fmtNum(fromHours(results.MCMT, resultUnit), 2);
-    const mcmtLineY = kpiBoxMiddleY; // Oranje lijn op midden van KPI box
+    const mcmtLineY = kpiBoxMiddleY;
     
     mcmtGroup.innerHTML = `
       <line x1="${startX}" y1="${mcmtLineY}" x2="${startX + mcmtWidth}" y2="${mcmtLineY}" stroke="#ff6b35" stroke-width="3"/>
@@ -282,31 +305,30 @@
     
     // Verticale markers
     currentX = startX;
-    
-    // Marker 1: Faalmoment (start)
     markersGroup.innerHTML += `
       <line x1="${currentX}" y1="${segmentY}" x2="${currentX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
       <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
     `;
     currentX += mttdWidth;
     
-    // Marker 2: Start reparatie
     markersGroup.innerHTML += `
-      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" 
-            stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
       <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#b8c7e0" font-size="11">Start reparatie</text>
     `;
     currentX += mttrWidth;
     
-    // Marker 3: Systeem operationeel
     markersGroup.innerHTML += `
-      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" 
-            stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#b8c7e0" font-size="11">Start PM</text>
+    `;
+    currentX += mpmtWidth;
+    
+    markersGroup.innerHTML += `
+      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
       <text x="${currentX}" y="${baseY + 55}" text-anchor="middle" fill="#b8c7e0" font-size="11">Systeem</text>
       <text x="${currentX}" y="${baseY + 68}" text-anchor="middle" fill="#b8c7e0" font-size="11">operationeel</text>
     `;
     
-    // Marker 4: Volgende faalmoment (einde)
     markersGroup.innerHTML += `
       <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
       <text x="${endX}" y="${baseY + 55}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Volgende</text>
@@ -314,7 +336,7 @@
     `;
   }
 
-  // Update diagram voor niet-repareerbaar - VERBETERDE VERSIE
+  // Update diagram voor niet-repareerbaar - MET MPMT
   function updateNonRepairableDiagram(results) {
     const topLineGroup = document.getElementById('mtbfTopLine');
     const segmentsGroup = document.getElementById('mtbfSegments');
@@ -330,7 +352,7 @@
     labelsGroup.innerHTML = '';
     kpiBox.innerHTML = '';
     
-    if (!isFinite(results.MTTF)) {
+    if (!isFinite(results.MTTF) || !isFinite(results.MPMT)) {
       return;
     }
     
@@ -340,14 +362,23 @@
     
     const startX = 50;
     const endX = 950;
+    const totalWidth = endX - startX;
     const baseY = 160;
     const segmentY = 135;
     const segmentHeight = 50;
     
-    // MTTF top line MET waarde
+    // Bereken verhoudingen
+    const mpmtRatio = results.MPMT / results.MTTF;
+    let scaledMPMT = Math.min(Math.max(mpmtRatio * 40, 0.15), 0.35);
+    const scaledUptime = 1 - scaledMPMT;
+    
+    const mpmtWidth = totalWidth * scaledMPMT;
+    const uptimeWidth = totalWidth * scaledUptime;
+    
+    // MTTF top line met waarde
     const mttfValue = fmtNum(fromHours(results.MTTF, resultUnit), 2);
     topLineGroup.innerHTML = `
-      <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#6a9fef" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
+      <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#2A6085" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
       <text x="${(startX + endX)/2}" y="32" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">MTTF (Mean Time To Failure)</text>
       <text x="${(startX + endX)/2}" y="47" text-anchor="middle" fill="#b8c7e0" font-size="13">${mttfValue} ${unitLabel}</text>
     `;
@@ -357,12 +388,29 @@
       <line x1="${startX}" y1="${baseY}" x2="${endX}" y2="${baseY}" stroke="#4a90e2" stroke-width="4" stroke-linecap="round"/>
     `;
     
-    // MTTF segment (hele breedte - groen gradient)
+    let currentX = startX;
+    
+    // 1. MPMT segment
+    const mpmtValue = fmtNum(fromHours(results.MPMT, resultUnit), 2);
     segmentsGroup.innerHTML += `
-      <rect x="${startX}" y="${segmentY}" width="${endX - startX}" height="${segmentHeight}" 
+      <rect x="${currentX}" y="${segmentY}" width="${mpmtWidth}" height="${segmentHeight}" 
+            fill="url(#gradMPMT)" rx="6" filter="url(#shadow)"/>
+      <text x="${currentX + mpmtWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="bold">MPMT</text>
+      <text x="${currentX + mpmtWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
+            text-anchor="middle" fill="#1a1a1a" font-size="12">${mpmtValue} ${unitLabel}</text>
+    `;
+    currentX += mpmtWidth;
+    
+    // 2. Uptime segment (operationele levensduur)
+    const uptimeValue = fmtNum(fromHours(results.uptime, resultUnit), 2);
+    segmentsGroup.innerHTML += `
+      <rect x="${currentX}" y="${segmentY}" width="${uptimeWidth}" height="${segmentHeight}" 
             fill="url(#gradMTTF)" rx="6" filter="url(#shadow)"/>
-      <text x="${(startX + endX)/2}" y="${segmentY + segmentHeight/2 + 5}" 
-            text-anchor="middle" fill="#1a1a1a" font-size="16" font-weight="bold">Operationele Levensduur</text>
+      <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 - 2}" 
+            text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Uptime</text>
+      <text x="${currentX + uptimeWidth/2}" y="${segmentY + segmentHeight/2 + 13}" 
+            text-anchor="middle" fill="#ffffff" font-size="12">${uptimeValue} ${unitLabel}</text>
     `;
     
     // Verticale markers
@@ -370,21 +418,22 @@
       <line x1="${startX}" y1="${segmentY}" x2="${startX}" y2="${baseY + 50}" stroke="#e0e6f0" stroke-width="3"/>
       <text x="${startX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="14" font-weight="bold">Start</text>
       
+      <line x1="${startX + mpmtWidth}" y1="${segmentY + 5}" x2="${startX + mpmtWidth}" y2="${baseY + 50}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <text x="${startX + mpmtWidth}" y="${baseY + 70}" text-anchor="middle" fill="#b8c7e0" font-size="11">Einde PM</text>
+      
       <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 50}" stroke="#ff4444" stroke-width="3"/>
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#ff6b35" font-size="14" font-weight="bold">Falen</text>
     `;
     
-    // KPI Info Box (RECHTS, compacter voor niet-repareerbaar) - GRIJZE TEKST
+    // KPI Info Box
     const kpiBoxHeight = 75;
-    const kpiBoxY = 85; // Ongeveer op hoogte van MTTF lijn
+    const kpiBoxY = 85;
     const kpiBoxX = 700;
     
     kpiBox.innerHTML = `
       <rect x="${kpiBoxX}" y="${kpiBoxY}" width="200" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
-      
       <text x="${kpiBoxX + 10}" y="${kpiBoxY + 35}" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
       <text x="${kpiBoxX + 190}" y="${kpiBoxY + 35}" text-anchor="end" fill="#d0dae8" font-weight="bold" font-size="13">${fmtNum(results.lambda, 6)}</text>
-      
       <text x="${kpiBoxX + 10}" y="${kpiBoxY + 60}" fill="#b8c7e0" font-size="13">FIT:</text>
       <text x="${kpiBoxX + 190}" y="${kpiBoxY + 60}" text-anchor="end" fill="#d0dae8" font-weight="bold" font-size="13">${fmtNum(results.FIT, 0)}</text>
     `;
@@ -399,6 +448,7 @@
     document.getElementById('outMTTR').textContent = fmtNum(fromHours(r.MTTR, resultUnit), 2);
     document.getElementById('outMTTD').textContent = fmtNum(fromHours(r.MTTD, resultUnit), 2);
     document.getElementById('outMCMT').textContent = fmtNum(fromHours(r.MCMT, resultUnit), 2);
+    document.getElementById('outMPMT').textContent = fmtNum(fromHours(r.MPMT, resultUnit), 2);
     document.getElementById('outUptime').textContent = fmtNum(fromHours(r.uptime, resultUnit), 2);
     document.getElementById('outA').textContent = fmtPct(r.availability, 4);
     document.getElementById('outLambda').textContent = fmtNum(r.lambda, 8);
@@ -408,9 +458,9 @@
     document.getElementById('unitMTTR').textContent = unitLabel;
     document.getElementById('unitMTTD').textContent = unitLabel;
     document.getElementById('unitMCMT').textContent = unitLabel;
+    document.getElementById('unitMPMT').textContent = unitLabel;
     document.getElementById('unitUptime').textContent = unitLabel;
     
-    // Update interactief diagram
     updateInteractiveDiagram(r);
   }
 
@@ -420,12 +470,15 @@
     const unitLabel = getUnitLabel(resultUnit);
     
     document.getElementById('outMTTF').textContent = fmtNum(fromHours(r.MTTF, resultUnit), 2);
+    document.getElementById('outMPMT').textContent = fmtNum(fromHours(r.MPMT, resultUnit), 2);
+    document.getElementById('outUptime').textContent = fmtNum(fromHours(r.uptime, resultUnit), 2);
     document.getElementById('outLambda').textContent = fmtNum(r.lambda, 8);
     document.getElementById('outFIT').textContent = fmtNum(r.FIT, 2);
     
     document.getElementById('unitMTTF').textContent = unitLabel;
+    document.getElementById('unitMPMT').textContent = unitLabel;
+    document.getElementById('unitUptime').textContent = unitLabel;
     
-    // Update niet-repareerbaar diagram
     updateNonRepairableDiagram(r);
   }
 
@@ -512,7 +565,7 @@
     const leftMargin = 15;
     
     // Blauwe header
-    pdf.setFillColor(34, 48, 64);
+    pdf.setFillColor(42, 96, 133); // #2A6085
     pdf.rect(0, 0, 210, 22, 'F');
     
     // Logo
@@ -541,19 +594,19 @@
     
     // Titel
     pdf.setFontSize(11);
-    pdf.setTextColor(34, 44, 56);
+    pdf.setTextColor(29, 29, 27); // #1D1D1B
     pdf.setFont(undefined, 'bold');
     pdf.text('Rapport - Onderhoudsparameters', leftMargin, yPos);
     pdf.setFont(undefined, 'normal');
     yPos += 5;
     
-    // Type analyse + datum op één regel
+    // Type analyse + datum
     pdf.setFontSize(9);
     const dateStr = new Date().toLocaleDateString('nl-NL', { 
       year: 'numeric', month: 'long', day: 'numeric' 
     });
     pdf.text(`Type: ${isRepairable ? 'Repareerbaar (systemen/machines)' : 'Niet-repareerbaar (componenten)'}  |  ${dateStr}`, leftMargin, yPos);
-    yPos += 15;  // Meer ruimte voor teksten
+    yPos += 15;
     
     // Twee kolommen layout
     const colWidth = 88;
@@ -581,6 +634,8 @@
       pdf.text(`• Totale detectietijd: ${fmtNum(inputs.totDetectHours, 2)} uur`, col1X + 2, col1Y);
       col1Y += 4;
     }
+    pdf.text(`• Totale PM-tijd: ${fmtNum(inputs.totPMHours, 2)} uur`, col1X + 2, col1Y);
+    col1Y += 4;
     col1Y += 4;
     
     // KOLOM 1: Resultaten
@@ -602,6 +657,8 @@
       col1Y += 4;
       pdf.text(`MCMT: ${fmtNum(fromHours(results.MCMT, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
+      pdf.text(`MPMT: ${fmtNum(fromHours(results.MPMT, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
       pdf.text(`Uptime: ${fmtNum(fromHours(results.uptime, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
       pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, col1X + 2, col1Y);
@@ -612,6 +669,10 @@
     } else {
       const results = computeNonRepairable(inputs);
       pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`MPMT: ${fmtNum(fromHours(results.MPMT, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`Uptime: ${fmtNum(fromHours(results.uptime, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
       pdf.text(`Failure Rate: ${fmtNum(results.lambda, 8)} per uur`, col1X + 2, col1Y);
       col1Y += 4;
@@ -634,9 +695,11 @@
       col2Y += 4;
       pdf.text('MTTD = [Totale detectietijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
+      pdf.text('MPMT = [Totale PM-tijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
+      col2Y += 4;
       pdf.text('MCMT = MTTR + MTTD', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('Uptime = MTBF - MCMT', col2X + 2, col2Y);
+      pdf.text('Uptime = MTBF - MCMT - MPMT', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Beschikbaarheid [A] = Uptime / MTBF', col2X + 2, col2Y);
       col2Y += 4;
@@ -645,6 +708,10 @@
       pdf.text('FIT = 1.000.000.000 / MTBF', col2X + 2, col2Y);
     } else {
       pdf.text('MTTF = [Totale bedrijfstijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('MPMT = [Totale PM-tijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('Uptime = MTTF - MPMT', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Failure Rate = 1 / MTTF', col2X + 2, col2Y);
       col2Y += 4;
@@ -665,7 +732,7 @@
         const imgDataUrl = canvas.toDataURL('image/jpeg', 0.9);
         
         const maxImgWidth = 180;
-        const maxImgHeight = 160;
+        const maxImgHeight = 130;
         const aspectRatio = diagramImg.naturalWidth / diagramImg.naturalHeight;
         
         let imgWidth = maxImgWidth;
@@ -677,14 +744,33 @@
         }
         
         const imgX = (210 - imgWidth) / 2;
-        // Plaatje hoger: plaats het 15mm onder de langste kolom tekst
-        const imgY = Math.max(col1Y, col2Y) + 15;
+        const imgY = Math.max(col1Y, col2Y) + 10;
         
         pdf.addImage(imgDataUrl, 'JPEG', imgX, imgY, imgWidth, imgHeight);
       } catch(e) {
         console.log('Diagram niet beschikbaar voor PDF:', e);
       }
     }
+    
+    // Contactinfo onderaan (NIEUW!)
+    yPos = 265;
+    pdf.setFillColor(251, 245, 236); // #FBF5EC (OFF WHITE)
+    pdf.rect(0, yPos, 210, 32, 'F');
+    
+    yPos += 8;
+    pdf.setFontSize(9);
+    pdf.setTextColor(29, 29, 27); // #1D1D1B
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Over deze berekeningen', leftMargin, yPos);
+    pdf.setFont(undefined, 'normal');
+    yPos += 5;
+    
+    pdf.setFontSize(8);
+    pdf.text('Dit is slechts een eenvoudig enkelvoudig voorbeeld. Voor complexere berekeningen', leftMargin, yPos);
+    yPos += 4;
+    pdf.text('of analyses kun je ons inzetten. Neem contact op met Michel, Rik of vul het', leftMargin, yPos);
+    yPos += 4;
+    pdf.text('contactformulier in op: www.veerenstael.nl/contact/', leftMargin, yPos);
     
     // Opslaan
     const fileName = `Veerenstael_Rapport_${dateStr.replace(/\s/g, '_')}.pdf`;
