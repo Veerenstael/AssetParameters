@@ -271,7 +271,7 @@ form label:first-of-type {
 }
 
 .radio-option input[type="radio"]:checked + .radio-text {
-  color: #13d17c;
+  color: #B0543B;
   font-weight: 600;
 }
 
@@ -333,10 +333,10 @@ button {
   margin-bottom: 0;
 }
 button.green {
-  background: #13d17c;
+  background: #B0543B;
   color: #fff;
 }
-button.green:hover { background: #10b86a; }
+button.green:hover { background: #954537; }
 button.reset-btn {
   background: #23314a;
   color: #fff;
@@ -500,4 +500,90 @@ button.export-btn:hover { background: #e55a28; }
   button {
     width: 100%;
   }
+}
+
+/* Info tooltip styling */
+.info-tooltip {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  background: #2A6085;
+  color: #fff;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 11px;
+  line-height: 16px;
+  cursor: help;
+  font-weight: bold;
+}
+
+.info-tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 24px;
+  top: -8px;
+  background: #1a2230;
+  color: #e0e6f0;
+  padding: 12px;
+  border-radius: 6px;
+  width: 280px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: normal;
+  z-index: 1000;
+  border: 2px solid #2A6085;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.info-tooltip:hover::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 6px;
+  border: 6px solid transparent;
+  border-right-color: #2A6085;
+  z-index: 1001;
+}
+
+/* Info tooltips */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2A6085;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 8px;
+  cursor: help;
+  position: relative;
+}
+
+.info-icon:hover {
+  background: #3a7095;
+}
+
+.info-tooltip {
+  visibility: hidden;
+  position: absolute;
+  left: 30px;
+  top: 0;
+  background: #1a2230;
+  border: 2px solid #2A6085;
+  border-radius: 8px;
+  padding: 12px;
+  width: 280px;
+  font-size: 0.85rem;
+  color: #d0dae8;
+  z-index: 1000;
+  line-height: 1.5;
+}
+
+.info-icon:hover .info-tooltip {
+  visibility: visible;
 }
