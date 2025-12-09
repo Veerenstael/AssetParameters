@@ -10,7 +10,7 @@
 <body>
   <div class="dashboard-bg">
     <header class="logo-header">
-      <img src="logo-veerenstael-wit.png" alt="Veerenstael Logo" class="veerenstael-logo"/>
+      <img src="logoveerenstaelwit.png" alt="Veerenstael Logo" class="veerenstael-logo"/>
       <div class="subtitle-title">Inzicht in Betrouwbaarheids- en Onderhoudsparameters</div>
     </header>
 
@@ -27,6 +27,7 @@
           <button type="button" class="def-btn" data-kpi="mtbf">MTBF</button>
           <button type="button" class="def-btn" data-kpi="mttr">MTTR</button>
           <button type="button" class="def-btn" data-kpi="mttd">MTTD</button>
+          <button type="button" class="def-btn" data-kpi="mpmt">MPMT</button>
           <button type="button" class="def-btn" data-kpi="mcmt">MCMT</button>
           <button type="button" class="def-btn" data-kpi="uptime">Uptime</button>
           <button type="button" class="def-btn" data-kpi="availability">Beschikbaarheid [A]</button>
@@ -52,13 +53,17 @@
                 <stop offset="0%" style="stop-color:#ff5555;stop-opacity:0.95" />
                 <stop offset="100%" style="stop-color:#cc0000;stop-opacity:0.95" />
               </linearGradient>
+              <linearGradient id="gradMPMT" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#E0A943;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#d09630;stop-opacity:0.95" />
+              </linearGradient>
               <linearGradient id="gradUptime" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#13d17c;stop-opacity:0.95" />
-                <stop offset="100%" style="stop-color:#0fa566;stop-opacity:0.95" />
+                <stop offset="0%" style="stop-color:#2A6085;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#1a4865;stop-opacity:0.95" />
               </linearGradient>
               <linearGradient id="gradMTTF" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#13d17c;stop-opacity:0.95" />
-                <stop offset="100%" style="stop-color:#0fa566;stop-opacity:0.95" />
+                <stop offset="0%" style="stop-color:#2A6085;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#1a4865;stop-opacity:0.95" />
               </linearGradient>
               <filter id="shadow">
                 <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
@@ -91,10 +96,16 @@
           <label class="radio-option">
             <input type="radio" name="analysisType" value="repairable" checked>
             <span class="radio-text">🔧 Repareerbaar (systemen/machines)</span>
+            <span class="info-icon">i
+              <span class="info-tooltip">Voor systemen die na een storing gerepareerd kunnen worden en weer in gebruik genomen. Denk aan machines, installaties en apparatuur waarbij reparatie mogelijk is.</span>
+            </span>
           </label>
           <label class="radio-option">
             <input type="radio" name="analysisType" value="non-repairable">
             <span class="radio-text">💡 Niet-repareerbaar (componenten)</span>
+            <span class="info-icon">i
+              <span class="info-tooltip">Voor componenten die na falen vervangen moeten worden. Denk aan lampjes, zekeringen, batterijen en andere wegwerpcomponenten.</span>
+            </span>
           </label>
         </div>
       </div>
@@ -125,6 +136,16 @@
 
                 <label for="totDetectHours" class="repairable-only">Totale detectietijd (uren)</label>
                 <input type="number" id="totDetectHours" value="14" step="0.1" min="0" class="repairable-only"/>
+                
+                <label for="totPMValue">Totale geplande onderhoudstijd</label>
+                <div class="unit-row">
+                  <input type="number" id="totPMValue" value="30" step="0.1" min="0"/>
+                  <select id="totPMUnit">
+                    <option value="hours" selected>uren</option>
+                    <option value="days">dagen</option>
+                    <option value="years">jaren</option>
+                  </select>
+                </div>
               </div>
 
               <div class="button-row">
@@ -170,13 +191,22 @@
               </div>
               
               <div class="formula-item">
+                <span class="formula-label">MPMT =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale PM-tijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal faalmomenten]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
                 <span class="formula-label">MCMT =</span>
                 <span class="formula-simple">MTTR + MTTD</span>
               </div>
               
               <div class="formula-item">
                 <span class="formula-label">Uptime =</span>
-                <span class="formula-simple">MTBF − MCMT</span>
+                <span class="formula-simple">MTBF − MCMT − MPMT</span>
               </div>
               
               <div class="formula-item">
@@ -216,6 +246,20 @@
                   <span class="frac-line"></span>
                   <span class="frac-den">[Aantal faalmomenten]</span>
                 </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MPMT =</span>
+                <div class="fraction">
+                  <span class="frac-num">[Totale PM-tijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal faalmomenten]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">Uptime =</span>
+                <span class="formula-simple">MTTF − MPMT</span>
               </div>
               
               <div class="formula-item">
@@ -271,14 +315,6 @@
             <span class="result-label">MCMT:</span>
             <span class="result-value"><span id="outMCMT">—</span> <span id="unitMCMT">uur</span></span>
           </div>
-          <div class="result-row repairable-only">
-            <span class="result-label">Uptime:</span>
-            <span class="result-value"><span id="outUptime">—</span> <span id="unitUptime">uur</span></span>
-          </div>
-          <div class="result-row repairable-only">
-            <span class="result-label">Beschikbaarheid [A]:</span>
-            <span class="result-value" id="outA">—</span>
-          </div>
           
           <!-- Niet-repareerbaar resultaten -->
           <div class="result-row non-repairable-only" style="display: none;">
@@ -287,6 +323,18 @@
           </div>
           
           <!-- Gemeenschappelijke resultaten -->
+          <div class="result-row">
+            <span class="result-label">MPMT:</span>
+            <span class="result-value"><span id="outMPMT">—</span> <span id="unitMPMT">uur</span></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Uptime:</span>
+            <span class="result-value"><span id="outUptime">—</span> <span id="unitUptime">uur</span></span>
+          </div>
+          <div class="result-row repairable-only">
+            <span class="result-label">Beschikbaarheid [A]:</span>
+            <span class="result-value" id="outA">—</span>
+          </div>
           <div class="result-row">
             <span class="result-label">Failure Rate [λ]:</span>
             <span class="result-value"><span id="outLambda">—</span> per uur</span>
