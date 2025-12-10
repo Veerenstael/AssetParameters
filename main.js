@@ -771,7 +771,7 @@
       col2Y += 4;
       pdf.text('MCMT = MTTR + MTTD', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('MMT = (Totale tijd voor Onderhoud) / (Aantal keer PM + Faalmomenten)', col2X + 2, col2Y);
+      pdf.text('MMT = (Totale Onderhoudstijd) / ([Aantal keer PM] + [Aantal faalmomenten])', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Uptime = MTBF - MMT', col2X + 2, col2Y);
       col2Y += 4;
@@ -917,4 +917,5 @@
     pdf.save(fileName);
   });
 })();
+
 
