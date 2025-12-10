@@ -846,7 +846,7 @@
     pdf.setFontSize(8);
     pdf.text('Dit is slechts een eenvoudig en enkelvoudig voorbeeld. Voor complexere berekeningen', leftMargin, yPos);
     yPos += 4;
-    pdf.text('of analyses kunt u Veerenstael inzettenn. Neem contact op met onze Business Development', leftMargin, yPos);
+    pdf.text('of analyses kunt u Veerenstael inzetten. Neem contact op met onze Business Development', leftMargin, yPos);
     yPos += 4;
     pdf.text('Manager, of vul het contactformulier in op: https://www.veerenstael.nl/contact/ .', leftMargin, yPos);
     
@@ -917,6 +917,7 @@
     pdf.save(fileName);
   });
 })();
+
 
 
 
