@@ -94,20 +94,31 @@
       <div class="input-section">
         <h2 class="section-title">Type Analyse</h2>
         <div class="analysis-type-toggle">
-          <label class="radio-option">
-            <input type="radio" name="analysisType" value="repairable" checked>
-            <span class="radio-text">🔧 Repareerbaar (systemen/machines)</span>
-            <span class="info-icon">i
-              <span class="info-tooltip">Voor systemen die na een storing gerepareerd kunnen worden en weer in gebruik genomen. Denk aan machines, installaties en apparatuur waarbij reparatie mogelijk is.</span>
-            </span>
-          </label>
-          <label class="radio-option">
-            <input type="radio" name="analysisType" value="non-repairable">
-            <span class="radio-text">💡 Niet-repareerbaar (componenten)</span>
-            <span class="info-icon">i
-              <span class="info-tooltip">Voor componenten die na falen vervangen moeten worden. Denk aan lampjes, zekeringen, batterijen en andere wegwerpcomponenten.</span>
-            </span>
-          </label>
+          <div class="radio-option-wrapper">
+            <label class="radio-option">
+              <input type="radio" name="analysisType" value="repairable" checked>
+              <span class="radio-text">🔧 Repareerbaar (systemen/machines)</span>
+              <button type="button" class="info-icon" data-info="repairable">i</button>
+            </label>
+            <div class="info-panel" id="info-repairable">
+              <div class="info-panel-content">
+                Voor systemen die na een storing gerepareerd kunnen worden en weer in gebruik genomen. Denk aan machines, installaties en apparatuur waarbij reparatie mogelijk is.
+              </div>
+            </div>
+          </div>
+          
+          <div class="radio-option-wrapper">
+            <label class="radio-option">
+              <input type="radio" name="analysisType" value="non-repairable">
+              <span class="radio-text">💡 Niet-repareerbaar (componenten)</span>
+              <button type="button" class="info-icon" data-info="non-repairable">i</button>
+            </label>
+            <div class="info-panel" id="info-non-repairable">
+              <div class="info-panel-content">
+                Voor componenten die na falen vervangen moeten worden. Denk aan lampjes, zekeringen, batterijen en andere wegwerpcomponenten.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
