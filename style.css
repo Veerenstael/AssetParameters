@@ -343,12 +343,12 @@ button.reset-btn {
 }
 button.reset-btn:hover { background: #3b4970; }
 button.export-btn {
-  background: #ff6b35;
+  background: #B0543B;
   color: #fff;
   width: 100%;
   margin-top: 20px;
 }
-button.export-btn:hover { background: #e55a28; }
+button.export-btn:hover { background: #9a4532; }
 
 .result-section {
   display: flex;
