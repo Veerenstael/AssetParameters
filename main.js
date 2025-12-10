@@ -327,27 +327,27 @@
     // MMT bracket (tussen MTBF en MCMT - alle onderhoud) - HOGER GEPLAATST
     const mmtWidth = mttdWidth + mttrWidth + mpmtWidth;
     const mmtValue = fmtNum(fromHours(results.MMT, resultUnit), 2);
-    const mmtLineY = mtbfLineY + 16; // 16px onder MTBF lijn
+    const mmtLineY = mtbfLineY + 35; // 35px onder MTBF lijn (PERFECTE VERSIE!)
     
     mcmtGroup.innerHTML = `
       <line x1="${startX}" y1="${mmtLineY}" x2="${startX + mmtWidth}" y2="${mmtLineY}" stroke="#E0A943" stroke-width="2.5"/>
       <line x1="${startX}" y1="${mmtLineY - 4}" x2="${startX}" y2="${mmtLineY + 4}" stroke="#E0A943" stroke-width="2.5"/>
       <line x1="${startX + mmtWidth}" y1="${mmtLineY - 4}" x2="${startX + mmtWidth}" y2="${mmtLineY + 4}" stroke="#E0A943" stroke-width="2.5"/>
-      <text x="${startX + mmtWidth/2}" y="${mmtLineY - 9}" text-anchor="middle" fill="#E0A943" font-size="14" font-weight="bold">MMT</text>
-      <text x="${startX + mmtWidth/2}" y="${mmtLineY + 2}" text-anchor="middle" fill="#E0A943" font-size="11">${mmtValue} ${unitLabel}</text>
+      <text x="${startX + mmtWidth/2}" y="${mmtLineY - 16}" text-anchor="middle" fill="#E0A943" font-size="14" font-weight="bold">MMT</text>
+      <text x="${startX + mmtWidth/2}" y="${mmtLineY - 4}" text-anchor="middle" fill="#E0A943" font-size="11">${mmtValue} ${unitLabel}</text>
     `;
     
     // MCMT bracket (correctief onderhoud) - LAGER GEPLAATST
     const mcmtWidth = mttdWidth + mttrWidth;
     const mcmtValue = fmtNum(fromHours(results.MCMT, resultUnit), 2);
-    const mcmtLineY = kpiBoxMiddleY + 15; // 15px onder midden KPI box (was op midden)
+    const mcmtLineY = kpiBoxMiddleY + 20; // 20px onder midden KPI box (PERFECTE VERSIE!)
     
     mcmtGroup.innerHTML += `
       <line x1="${startX}" y1="${mcmtLineY}" x2="${startX + mcmtWidth}" y2="${mcmtLineY}" stroke="#ff6b35" stroke-width="3"/>
       <line x1="${startX}" y1="${mcmtLineY - 5}" x2="${startX}" y2="${mcmtLineY + 5}" stroke="#ff6b35" stroke-width="3"/>
       <line x1="${startX + mcmtWidth}" y1="${mcmtLineY - 5}" x2="${startX + mcmtWidth}" y2="${mcmtLineY + 5}" stroke="#ff6b35" stroke-width="3"/>
-      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 12}" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
-      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 0.5}" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
+      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 15}" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
+      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 3}" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
     `;
     
     // Verticale markers
