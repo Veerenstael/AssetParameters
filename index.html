@@ -10,7 +10,7 @@
 <body>
   <div class="dashboard-bg">
     <header class="logo-header">
-      <img src="logoveerenstaelwit.png" alt="Veerenstael Logo" class="veerenstael-logo"/>
+      <img src="logo-veerenstael-wit.png" alt="Veerenstael Logo" class="veerenstael-logo"/>
       <div class="subtitle-title">Inzicht in Betrouwbaarheids- en Onderhoudsparameters</div>
     </header>
 
@@ -28,6 +28,7 @@
           <button type="button" class="def-btn" data-kpi="mttr">MTTR</button>
           <button type="button" class="def-btn" data-kpi="mttd">MTTD</button>
           <button type="button" class="def-btn" data-kpi="mpmt">MPMT</button>
+          <button type="button" class="def-btn" data-kpi="mmt">MMT</button>
           <button type="button" class="def-btn" data-kpi="mcmt">MCMT</button>
           <button type="button" class="def-btn" data-kpi="uptime">Uptime</button>
           <button type="button" class="def-btn" data-kpi="availability">Beschikbaarheid [A]</button>
@@ -208,6 +209,15 @@
               </div>
               
               <div class="formula-item">
+                <span class="formula-label">MMT =</span>
+                <div class="fraction">
+                  <span class="frac-num">MCMT + MPMT</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal falen] + [Aantal keer PM]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
                 <span class="formula-label">Uptime =</span>
                 <span class="formula-simple">MTBF − MCMT − MPMT</span>
               </div>
@@ -255,6 +265,15 @@
                 <span class="formula-label">MPMT =</span>
                 <div class="fraction">
                   <span class="frac-num">[Totale PM-tijd]</span>
+                  <span class="frac-line"></span>
+                  <span class="frac-den">[Aantal keer PM]</span>
+                </div>
+              </div>
+              
+              <div class="formula-item">
+                <span class="formula-label">MMT =</span>
+                <div class="fraction">
+                  <span class="frac-num">MPMT</span>
                   <span class="frac-line"></span>
                   <span class="frac-den">[Aantal keer PM]</span>
                 </div>
@@ -338,6 +357,10 @@
           <div class="result-row">
             <span class="result-label">MPMT:</span>
             <span class="result-value"><span id="outMPMT">—</span> <span id="unitMPMT">uur</span></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">MMT:</span>
+            <span class="result-value"><span id="outMMT">—</span> <span id="unitMMT">uur</span></span>
           </div>
           <div class="result-row">
             <span class="result-label">Uptime:</span>
