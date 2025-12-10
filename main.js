@@ -32,7 +32,7 @@
     },
     mmt: {
       title: 'MMT - Mean Maintenance Time',
-      text: '<strong>Wat het is:</strong> MMT is de gemiddelde onderhoudstijd, zowel correctief als preventief. <strong>Formule:</strong> MMT = (MCMT + MPMT) / (Aantal falen + Aantal keer PM). <strong>Interpretatie:</strong> Dit geeft de gemiddelde tijd weer die besteed wordt aan alle onderhoudsactiviteiten (zowel ongepland als gepland).'
+      text: '<strong>Wat het is:</strong> MMT is de gemiddelde onderhoudstijd, zowel correctief als preventief. <strong>Formule:</strong> MMT = (PM-tijd + Detect-tijd + Repair-tijd) / (Aantal PM + Aantal falen). <strong>Interpretatie:</strong> Dit geeft de gemiddelde tijd weer die besteed wordt aan alle onderhoudsactiviteiten per moment.'
     },
     uptime: {
       title: 'Uptime - Beschikbare bedrijfstijd',
@@ -158,7 +158,7 @@
     const MTTD = safeDiv(v.totDetectHours, v.failures);
     const MPMT = safeDiv(v.totPMHours, v.numPM);
     const MCMT = (isFinite(MTTR) && isFinite(MTTD)) ? MTTR + MTTD : NaN;
-    const MMT = safeDiv((isFinite(MCMT) ? MCMT : 0) + (isFinite(MPMT) ? MPMT : 0), v.failures + v.numPM);
+    const MMT = safeDiv(v.totPMHours + v.totDetectHours + v.totRepairHours, v.numPM + v.failures);
     const uptime = (isFinite(MTBF) && isFinite(MCMT) && isFinite(MPMT)) ? MTBF - MCMT - MPMT : NaN;
     const availability = (isFinite(uptime) && isFinite(MTBF) && MTBF > 0) ? uptime / MTBF : NaN;
     const lambda = (isFinite(MTBF) && MTBF > 0) ? 1 / MTBF : NaN;
@@ -171,7 +171,7 @@
   function computeNonRepairable(v) {
     const MTTF = safeDiv(v.totItemsHours, v.failures);
     const MPMT = safeDiv(v.totPMHours, v.numPM);
-    const MMT = safeDiv(MPMT, v.numPM);
+    const MMT = safeDiv(v.totPMHours, v.numPM);
     const uptime = (isFinite(MTTF) && isFinite(MPMT)) ? MTTF - MPMT : NaN;
     const availability = (isFinite(uptime) && isFinite(MTTF) && MTTF > 0) ? uptime / MTTF : NaN;
     const lambda = (isFinite(MTTF) && MTTF > 0) ? 1 / MTTF : NaN;
@@ -767,7 +767,7 @@
       col2Y += 4;
       pdf.text('MCMT = MTTR + MTTD', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('MMT = (MCMT + MPMT) / (Falen + PM)', col2X + 2, col2Y);
+      pdf.text('MMT = (PM + Detect + Repair tijd) / (PM + Falen)', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Uptime = MTBF - MCMT - MPMT', col2X + 2, col2Y);
       col2Y += 4;
@@ -781,7 +781,7 @@
       col2Y += 4;
       pdf.text('MPMT = [Totale PM-tijd] / [Aantal keer PM]', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('MMT = MPMT / [Aantal keer PM]', col2X + 2, col2Y);
+      pdf.text('MMT = [Totale PM-tijd] / [Aantal keer PM]', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Uptime = MTTF - MPMT', col2X + 2, col2Y);
       col2Y += 4;
@@ -845,6 +845,56 @@
     pdf.text('of analyses kun je ons inzetten. Neem contact op met Michel, Rik of vul het', leftMargin, yPos);
     yPos += 4;
     pdf.text('contactformulier in op: www.veerenstael.nl/contact/', leftMargin, yPos);
+    
+    // Logo's rechtsonder met links
+    const logoSize = 10; // 10mm hoog
+    const logoMargin = 8; // 8mm van rechts
+    const logoSpacing = 3; // 3mm tussen logo's
+    const logoY = 268; // Verticaal in midden van OFF WHITE sectie
+    
+    // Website logo
+    const websiteLogo = document.querySelector('img[src*="logo-website"]');
+    if (websiteLogo && websiteLogo.complete) {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = websiteLogo.naturalWidth;
+        canvas.height = websiteLogo.naturalHeight;
+        ctx.drawImage(websiteLogo, 0, 0);
+        const websiteDataUrl = canvas.toDataURL('image/png');
+        
+        const websiteAspect = websiteLogo.naturalWidth / websiteLogo.naturalHeight;
+        const websiteWidth = logoSize * websiteAspect;
+        const websiteX = 210 - logoMargin - websiteWidth - logoSize - logoSpacing; // Ruimte voor beide logo's
+        
+        pdf.addImage(websiteDataUrl, 'PNG', websiteX, logoY, websiteWidth, logoSize);
+        pdf.link(websiteX, logoY, websiteWidth, logoSize, { url: 'https://www.veerenstael.nl' });
+      } catch(e) {
+        console.log('Website logo niet beschikbaar voor PDF');
+      }
+    }
+    
+    // LinkedIn logo
+    const linkedinLogo = document.querySelector('img[src*="logo-linkedin"]');
+    if (linkedinLogo && linkedinLogo.complete) {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = linkedinLogo.naturalWidth;
+        canvas.height = linkedinLogo.naturalHeight;
+        ctx.drawImage(linkedinLogo, 0, 0);
+        const linkedinDataUrl = canvas.toDataURL('image/png');
+        
+        const linkedinAspect = linkedinLogo.naturalWidth / linkedinLogo.naturalHeight;
+        const linkedinWidth = logoSize * linkedinAspect;
+        const linkedinX = 210 - logoMargin - linkedinWidth;
+        
+        pdf.addImage(linkedinDataUrl, 'PNG', linkedinX, logoY, linkedinWidth, logoSize);
+        pdf.link(linkedinX, logoY, linkedinWidth, logoSize, { url: 'https://www.linkedin.com/company/veerenstael/posts/?feedView=all' });
+      } catch(e) {
+        console.log('LinkedIn logo niet beschikbaar voor PDF');
+      }
+    }
     
     // Opslaan met timestamp
     const now = new Date();
