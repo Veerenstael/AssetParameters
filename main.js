@@ -32,7 +32,7 @@
     },
     mmt: {
       title: 'MMT - Mean Maintenance Time',
-      text: '<strong>Wat het is:</strong> MMT is de gemiddelde onderhoudstijd, zowel correctief als preventief. <strong>Formule:</strong> MMT = (PM-tijd + Detect-tijd + Repair-tijd) / (Aantal PM + Aantal falen). <strong>Interpretatie:</strong> Dit geeft de gemiddelde tijd weer die besteed wordt aan alle onderhoudsactiviteiten per moment.'
+      text: '<strong>Wat het is:</strong> MMT is de gemiddelde onderhoudstijd, zowel correctief als preventief. <strong>Formule:</strong> MMT = (Alle onderhoudstijd) / (Aantal keer PM + Faalmomenten). <strong>Interpretatie:</strong> Dit geeft de gemiddelde tijd weer die besteed wordt aan alle onderhoudsactiviteiten per moment.'
     },
     uptime: {
       title: 'Uptime - Beschikbare bedrijfstijd',
@@ -771,9 +771,9 @@
       col2Y += 4;
       pdf.text('MCMT = MTTR + MTTD', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('MMT = (PM + Detect + Repair tijd) / (PM + Falen)', col2X + 2, col2Y);
+      pdf.text('MMT = (Totale tijd voor Onderhoud) / (Aantal keer PM + Faalmomenten)', col2X + 2, col2Y);
       col2Y += 4;
-      pdf.text('Uptime = MTBF - MCMT - MPMT', col2X + 2, col2Y);
+      pdf.text('Uptime = MTBF - MMT', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Beschikbaarheid [A] = Uptime / MTBF', col2X + 2, col2Y);
       col2Y += 4;
@@ -844,11 +844,11 @@
     yPos += 5;
     
     pdf.setFontSize(8);
-    pdf.text('Dit is slechts een eenvoudig enkelvoudig voorbeeld. Voor complexere berekeningen', leftMargin, yPos);
+    pdf.text('Dit is slechts een eenvoudig en enkelvoudig voorbeeld. Voor complexere berekeningen', leftMargin, yPos);
     yPos += 4;
-    pdf.text('of analyses kun je ons inzetten. Neem contact op met Michel, Rik of vul het', leftMargin, yPos);
+    pdf.text('of analyses kunt u Veerenstael inzettenn. Neem contact op met onze Business Development', leftMargin, yPos);
     yPos += 4;
-    pdf.text('contactformulier in op: www.veerenstael.nl/contact/', leftMargin, yPos);
+    pdf.text('Manager, of vul het contactformulier in op: https://www.veerenstael.nl/contact/ .', leftMargin, yPos);
     
     // Logo's rechts gecentreerd in OFF WHITE vak, boven elkaar
     const logoSize = 5; // 5mm hoog (was 10mm)
@@ -917,3 +917,4 @@
     pdf.save(fileName);
   });
 })();
+
