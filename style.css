@@ -552,14 +552,14 @@ button.export-btn:hover { background: #e55a28; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #2A6085;
   color: #fff;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: bold;
-  margin-left: 10px;
+  margin-left: 8px;
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
@@ -568,7 +568,6 @@ button.export-btn:hover { background: #e55a28; }
 
 .info-icon:hover {
   background: #3a7095;
-  transform: scale(1.1);
 }
 
 .info-icon.active {
@@ -579,16 +578,19 @@ button.export-btn:hover { background: #e55a28; }
 .info-panel {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
   background: #1a2230;
   border-left: 3px solid #2A6085;
-  margin-top: 8px;
+  margin-top: 0;
   margin-left: 30px;
   border-radius: 0 8px 8px 0;
 }
 
 .info-panel.open {
   max-height: 300px;
+  opacity: 1;
+  margin-top: 8px;
   overflow-y: auto;
 }
 
