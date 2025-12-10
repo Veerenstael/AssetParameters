@@ -140,12 +140,16 @@
     const totItemsUnit = document.getElementById('totItemsUnit').value;
     const totPMValue = parseFloat(document.getElementById('totPMValue').value);
     const totPMUnit = document.getElementById('totPMUnit').value;
+    const totRepairValue = parseFloat(document.getElementById('totRepairValue').value);
+    const totRepairUnit = document.getElementById('totRepairUnit').value;
+    const totDetectValue = parseFloat(document.getElementById('totDetectValue').value);
+    const totDetectUnit = document.getElementById('totDetectUnit').value;
 
     return {
       totItemsHours: toHours(totItemsValue, totItemsUnit),
       failures: parseFloat(document.getElementById('failures').value),
-      totRepairHours: parseFloat(document.getElementById('totRepairHours').value),
-      totDetectHours: parseFloat(document.getElementById('totDetectHours').value),
+      totRepairHours: toHours(totRepairValue, totRepairUnit),
+      totDetectHours: toHours(totDetectValue, totDetectUnit),
       totPMHours: toHours(totPMValue, totPMUnit),
       numPM: parseFloat(document.getElementById('numPM').value)
     };
