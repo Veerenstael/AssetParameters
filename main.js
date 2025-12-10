@@ -850,13 +850,18 @@
     yPos += 4;
     pdf.text('contactformulier in op: www.veerenstael.nl/contact/', leftMargin, yPos);
     
-    // Logo's rechtsonder met links
-    const logoSize = 10; // 10mm hoog
-    const logoMargin = 8; // 8mm van rechts
-    const logoSpacing = 3; // 3mm tussen logo's
-    const logoY = 268; // Verticaal in midden van OFF WHITE sectie
+    // Logo's rechts gecentreerd in OFF WHITE vak, boven elkaar
+    const logoSize = 5; // 5mm hoog (was 10mm)
+    const logoSpacing = 2; // 2mm tussen logo's (verticaal)
+    const logoX = 210 - 25; // 25mm van rechts (gecentreerd in rechterhelft)
     
-    // Website logo
+    // Bereken totale hoogte van beide logo's + spacing
+    const totalLogoHeight = logoSize * 2 + logoSpacing;
+    const boxStartY = 265; // Start OFF WHITE box
+    const boxHeight = 32;
+    const logoStartY = boxStartY + (boxHeight - totalLogoHeight) / 2; // Verticaal gecentreerd
+    
+    // Website logo (bovenaan)
     const websiteLogo = document.querySelector('img[src*="logo-website"]');
     if (websiteLogo && websiteLogo.complete) {
       try {
@@ -869,16 +874,16 @@
         
         const websiteAspect = websiteLogo.naturalWidth / websiteLogo.naturalHeight;
         const websiteWidth = logoSize * websiteAspect;
-        const websiteX = 210 - logoMargin - websiteWidth - logoSize - logoSpacing; // Ruimte voor beide logo's
+        const websiteX = logoX - (websiteWidth / 2); // Horizontaal gecentreerd
         
-        pdf.addImage(websiteDataUrl, 'PNG', websiteX, logoY, websiteWidth, logoSize);
-        pdf.link(websiteX, logoY, websiteWidth, logoSize, { url: 'https://www.veerenstael.nl' });
+        pdf.addImage(websiteDataUrl, 'PNG', websiteX, logoStartY, websiteWidth, logoSize);
+        pdf.link(websiteX, logoStartY, websiteWidth, logoSize, { url: 'https://www.veerenstael.nl' });
       } catch(e) {
         console.log('Website logo niet beschikbaar voor PDF');
       }
     }
     
-    // LinkedIn logo
+    // LinkedIn logo (onderaan)
     const linkedinLogo = document.querySelector('img[src*="logo-linkedin"]');
     if (linkedinLogo && linkedinLogo.complete) {
       try {
@@ -891,10 +896,11 @@
         
         const linkedinAspect = linkedinLogo.naturalWidth / linkedinLogo.naturalHeight;
         const linkedinWidth = logoSize * linkedinAspect;
-        const linkedinX = 210 - logoMargin - linkedinWidth;
+        const linkedinX = logoX - (linkedinWidth / 2); // Horizontaal gecentreerd
+        const linkedinY = logoStartY + logoSize + logoSpacing; // Onder website logo
         
-        pdf.addImage(linkedinDataUrl, 'PNG', linkedinX, logoY, linkedinWidth, logoSize);
-        pdf.link(linkedinX, logoY, linkedinWidth, logoSize, { url: 'https://www.linkedin.com/company/veerenstael/posts/?feedView=all' });
+        pdf.addImage(linkedinDataUrl, 'PNG', linkedinX, linkedinY, linkedinWidth, logoSize);
+        pdf.link(linkedinX, linkedinY, linkedinWidth, logoSize, { url: 'https://www.linkedin.com/company/veerenstael/posts/?feedView=all' });
       } catch(e) {
         console.log('LinkedIn logo niet beschikbaar voor PDF');
       }
