@@ -572,18 +572,31 @@ button.export-btn:hover { background: #e55a28; }
   visibility: hidden;
   position: absolute;
   left: 30px;
-  top: 0;
+  top: 50%;
+  transform: translateY(-50%);
   background: #1a2230;
   border: 2px solid #2A6085;
   border-radius: 8px;
   padding: 12px;
-  width: 280px;
+  width: 300px;
+  max-width: 80vw;
   font-size: 0.85rem;
   color: #d0dae8;
   z-index: 1000;
-  line-height: 1.5;
+  line-height: 1.6;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .info-icon:hover .info-tooltip {
   visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .info-tooltip {
+    left: auto;
+    right: 0;
+    width: 250px;
+  }
 }
