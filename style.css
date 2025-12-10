@@ -577,16 +577,18 @@ button.export-btn:hover { background: #e55a28; }
   background: #1a2230;
   border: 2px solid #2A6085;
   border-radius: 8px;
-  padding: 12px;
-  width: 300px;
-  max-width: 80vw;
+  padding: 14px 16px;
+  min-width: 280px;
+  max-width: 400px;
+  width: max-content;
   font-size: 0.85rem;
   color: #d0dae8;
   z-index: 1000;
   line-height: 1.6;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   white-space: normal;
   word-wrap: break-word;
+  overflow: visible;
 }
 
 .info-icon:hover .info-tooltip {
