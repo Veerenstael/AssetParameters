@@ -147,11 +147,25 @@
                 <label for="failures">Aantal faalmomenten</label>
                 <input type="number" id="failures" value="10" step="1" min="0"/>
 
-                <label for="totRepairHours" class="repairable-only">Totale reparatietijd (uren)</label>
-                <input type="number" id="totRepairHours" value="56" step="0.1" min="0" class="repairable-only"/>
+                <label for="totRepairValue" class="repairable-only">Totale reparatietijd</label>
+                <div class="unit-row repairable-only">
+                  <input type="number" id="totRepairValue" value="56" step="0.1" min="0"/>
+                  <select id="totRepairUnit">
+                    <option value="hours" selected>uren</option>
+                    <option value="days">dagen</option>
+                    <option value="years">jaren</option>
+                  </select>
+                </div>
 
-                <label for="totDetectHours" class="repairable-only">Totale detectietijd (uren)</label>
-                <input type="number" id="totDetectHours" value="14" step="0.1" min="0" class="repairable-only"/>
+                <label for="totDetectValue" class="repairable-only">Totale detectietijd</label>
+                <div class="unit-row repairable-only">
+                  <input type="number" id="totDetectValue" value="14" step="0.1" min="0"/>
+                  <select id="totDetectUnit">
+                    <option value="hours" selected>uren</option>
+                    <option value="days">dagen</option>
+                    <option value="years">jaren</option>
+                  </select>
+                </div>
                 
                 <label for="totPMValue">Totale geplande onderhoudstijd</label>
                 <div class="unit-row">
