@@ -301,14 +301,14 @@
     // MMT bracket (tussen MTBF en MCMT - alle onderhoud) - HOGER GEPLAATST
     const mmtWidth = mttdWidth + mttrWidth + mpmtWidth;
     const mmtValue = fmtNum(fromHours(results.MMT, resultUnit), 2);
-    const mmtLineY = mtbfLineY + 25; // 16px onder MTBF lijn
+    const mmtLineY = mtbfLineY + 35; // 16px onder MTBF lijn
     
     mcmtGroup.innerHTML = `
       <line x1="${startX}" y1="${mmtLineY}" x2="${startX + mmtWidth}" y2="${mmtLineY}" stroke="#E0A943" stroke-width="2.5"/>
       <line x1="${startX}" y1="${mmtLineY - 4}" x2="${startX}" y2="${mmtLineY + 4}" stroke="#E0A943" stroke-width="2.5"/>
       <line x1="${startX + mmtWidth}" y1="${mmtLineY - 4}" x2="${startX + mmtWidth}" y2="${mmtLineY + 4}" stroke="#E0A943" stroke-width="2.5"/>
-      <text x="${startX + mmtWidth/2}" y="${mmtLineY - 9}" text-anchor="middle" fill="#E0A943" font-size="14" font-weight="bold">MMT</text>
-      <text x="${startX + mmtWidth/2}" y="${mmtLineY + 2}" text-anchor="middle" fill="#E0A943" font-size="11">${mmtValue} ${unitLabel}</text>
+      <text x="${startX + mmtWidth/2}" y="${mmtLineY - 12}" text-anchor="middle" fill="#E0A943" font-size="14" font-weight="bold">MMT</text>
+      <text x="${startX + mmtWidth/2}" y="${mmtLineY + 5}" text-anchor="middle" fill="#E0A943" font-size="11">${mmtValue} ${unitLabel}</text>
     `;
     
     // MCMT bracket (correctief onderhoud) - LAGER GEPLAATST
@@ -831,4 +831,5 @@
     pdf.save(fileName);
   });
 })();
+
 
