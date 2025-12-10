@@ -687,20 +687,20 @@
     col1Y += 6;
     
     pdf.setFontSize(9);
-    pdf.text(`• Totale bedrijfstijd: ${fmtNum(inputs.totItemsHours, 0)} uur`, col1X + 2, col1Y);
+    pdf.text(`Totale bedrijfstijd: ${fmtNum(inputs.totItemsHours, 0)} uur`, col1X + 2, col1Y);
     col1Y += 4;
-    pdf.text(`• Aantal faalmomenten: ${fmtNum(inputs.failures, 0)}`, col1X + 2, col1Y);
+    pdf.text(`Aantal faalmomenten: ${fmtNum(inputs.failures, 0)}`, col1X + 2, col1Y);
     col1Y += 4;
     
     if (isRepairable) {
-      pdf.text(`• Totale reparatietijd: ${fmtNum(inputs.totRepairHours, 2)} uur`, col1X + 2, col1Y);
+      pdf.text(`Totale reparatietijd: ${fmtNum(inputs.totRepairHours, 2)} uur`, col1X + 2, col1Y);
       col1Y += 4;
-      pdf.text(`• Totale detectietijd: ${fmtNum(inputs.totDetectHours, 2)} uur`, col1X + 2, col1Y);
+      pdf.text(`Totale detectietijd: ${fmtNum(inputs.totDetectHours, 2)} uur`, col1X + 2, col1Y);
       col1Y += 4;
     }
-    pdf.text(`• Totale PM-tijd: ${fmtNum(inputs.totPMHours, 2)} uur`, col1X + 2, col1Y);
+    pdf.text(`Totale PM-tijd: ${fmtNum(inputs.totPMHours, 2)} uur`, col1X + 2, col1Y);
     col1Y += 4;
-    pdf.text(`• Aantal keer PM: ${fmtNum(inputs.numPM, 0)}`, col1X + 2, col1Y);
+    pdf.text(`Aantal keer PM: ${fmtNum(inputs.numPM, 0)}`, col1X + 2, col1Y);
     col1Y += 4;
     col1Y += 4;
     
@@ -917,5 +917,6 @@
     pdf.save(fileName);
   });
 })();
+
 
 
