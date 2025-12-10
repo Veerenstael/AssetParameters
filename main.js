@@ -298,30 +298,30 @@
       <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
     `;
     
-    // MMT bracket (tussen MTBF en MCMT - alle onderhoud)
+    // MMT bracket (tussen MTBF en MCMT - alle onderhoud) - HOGER GEPLAATST
     const mmtWidth = mttdWidth + mttrWidth + mpmtWidth;
     const mmtValue = fmtNum(fromHours(results.MMT, resultUnit), 2);
-    const mmtLineY = mtbfLineY + 20; // 20px onder MTBF lijn
+    const mmtLineY = mtbfLineY + 16; // 16px onder MTBF lijn
     
     mcmtGroup.innerHTML = `
       <line x1="${startX}" y1="${mmtLineY}" x2="${startX + mmtWidth}" y2="${mmtLineY}" stroke="#E0A943" stroke-width="2.5"/>
       <line x1="${startX}" y1="${mmtLineY - 4}" x2="${startX}" y2="${mmtLineY + 4}" stroke="#E0A943" stroke-width="2.5"/>
       <line x1="${startX + mmtWidth}" y1="${mmtLineY - 4}" x2="${startX + mmtWidth}" y2="${mmtLineY + 4}" stroke="#E0A943" stroke-width="2.5"/>
-      <text x="${startX + mmtWidth/2}" y="${mmtLineY - 10}" text-anchor="middle" fill="#E0A943" font-size="14" font-weight="bold">MMT</text>
-      <text x="${startX + mmtWidth/2}" y="${mmtLineY + 1}" text-anchor="middle" fill="#E0A943" font-size="11">${mmtValue} ${unitLabel}</text>
+      <text x="${startX + mmtWidth/2}" y="${mmtLineY - 9}" text-anchor="middle" fill="#E0A943" font-size="14" font-weight="bold">MMT</text>
+      <text x="${startX + mmtWidth/2}" y="${mmtLineY + 2}" text-anchor="middle" fill="#E0A943" font-size="11">${mmtValue} ${unitLabel}</text>
     `;
     
-    // MCMT bracket (correctief onderhoud)
+    // MCMT bracket (correctief onderhoud) - LAGER GEPLAATST
     const mcmtWidth = mttdWidth + mttrWidth;
     const mcmtValue = fmtNum(fromHours(results.MCMT, resultUnit), 2);
-    const mcmtLineY = kpiBoxMiddleY;
+    const mcmtLineY = kpiBoxMiddleY + 15; // 15px onder midden KPI box (was op midden)
     
     mcmtGroup.innerHTML += `
       <line x1="${startX}" y1="${mcmtLineY}" x2="${startX + mcmtWidth}" y2="${mcmtLineY}" stroke="#ff6b35" stroke-width="3"/>
       <line x1="${startX}" y1="${mcmtLineY - 5}" x2="${startX}" y2="${mcmtLineY + 5}" stroke="#ff6b35" stroke-width="3"/>
       <line x1="${startX + mcmtWidth}" y1="${mcmtLineY - 5}" x2="${startX + mcmtWidth}" y2="${mcmtLineY + 5}" stroke="#ff6b35" stroke-width="3"/>
-      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 13}" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
-      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 1}" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
+      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 12}" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">MCMT</text>
+      <text x="${startX + mcmtWidth/2}" y="${mcmtLineY - 0.5}" text-anchor="middle" fill="#ff6b35" font-size="12">${mcmtValue} ${unitLabel}</text>
     `;
     
     // Verticale markers
@@ -541,6 +541,14 @@
       const results = computeNonRepairable(inputs);
       updateUINonRepairable(results);
     }
+    
+    // Auto-scroll naar resultaten sectie
+    setTimeout(() => {
+      const resultSection = document.querySelector('.result-section');
+      if (resultSection) {
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   });
 
   // Toggle analysis type
@@ -812,8 +820,14 @@
     yPos += 4;
     pdf.text('contactformulier in op: www.veerenstael.nl/contact/', leftMargin, yPos);
     
-    // Opslaan
-    const fileName = `Veerenstael_Rapport_${dateStr.replace(/\s/g, '_')}.pdf`;
+    // Opslaan met timestamp
+    const now = new Date();
+    const dateStamp = now.getFullYear().toString() + 
+                     (now.getMonth() + 1).toString().padStart(2, '0') + 
+                     now.getDate().toString().padStart(2, '0');
+    const timeStamp = now.getHours().toString().padStart(2, '0') + 
+                     now.getMinutes().toString().padStart(2, '0');
+    const fileName = `Veerenstael_Betrouwbaarheidsrapport_${dateStamp}_${timeStamp}.pdf`;
     pdf.save(fileName);
   });
 })();
