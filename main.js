@@ -301,7 +301,7 @@
     // MMT bracket (tussen MTBF en MCMT - alle onderhoud) - HOGER GEPLAATST
     const mmtWidth = mttdWidth + mttrWidth + mpmtWidth;
     const mmtValue = fmtNum(fromHours(results.MMT, resultUnit), 2);
-    const mmtLineY = mtbfLineY + 16; // 16px onder MTBF lijn
+    const mmtLineY = mtbfLineY + 25; // 16px onder MTBF lijn
     
     mcmtGroup.innerHTML = `
       <line x1="${startX}" y1="${mmtLineY}" x2="${startX + mmtWidth}" y2="${mmtLineY}" stroke="#E0A943" stroke-width="2.5"/>
@@ -831,3 +831,4 @@
     pdf.save(fileName);
   });
 })();
+
