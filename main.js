@@ -30,6 +30,10 @@
       title: 'MCMT - Mean Corrective Maintenance Time',
       text: '<strong>Wat het is:</strong> MCMT is de totale gemiddelde tijd voor correctief onderhoud (detectie + reparatie). <strong>Formule:</strong> MCMT = MTTR + MTTD. <strong>Interpretatie:</strong> Een MCMT van 10 uur betekent dat de totale tijd van storing tot herstel gemiddeld 10 uur duurt.'
     },
+    mmt: {
+      title: 'MMT - Mean Maintenance Time',
+      text: '<strong>Wat het is:</strong> MMT is de gemiddelde onderhoudstijd, zowel correctief als preventief. <strong>Formule:</strong> MMT = (MCMT + MPMT) / (Aantal falen + Aantal keer PM). <strong>Interpretatie:</strong> Dit geeft de gemiddelde tijd weer die besteed wordt aan alle onderhoudsactiviteiten (zowel ongepland als gepland).'
+    },
     uptime: {
       title: 'Uptime - Beschikbare bedrijfstijd',
       text: '<strong>Wat het is:</strong> Uptime is de tijd dat het systeem daadwerkelijk operationeel is. <strong>Formule:</strong> Uptime = MTBF − MCMT − MPMT (repareerbaar) of MTTF − MPMT (niet-repareerbaar). <strong>Interpretatie:</strong> Dit geeft de netto productieve tijd weer.'
@@ -128,24 +132,26 @@
     const MTTD = safeDiv(v.totDetectHours, v.failures);
     const MPMT = safeDiv(v.totPMHours, v.numPM);
     const MCMT = (isFinite(MTTR) && isFinite(MTTD)) ? MTTR + MTTD : NaN;
+    const MMT = safeDiv((isFinite(MCMT) ? MCMT : 0) + (isFinite(MPMT) ? MPMT : 0), v.failures + v.numPM);
     const uptime = (isFinite(MTBF) && isFinite(MCMT) && isFinite(MPMT)) ? MTBF - MCMT - MPMT : NaN;
     const availability = (isFinite(uptime) && isFinite(MTBF) && MTBF > 0) ? uptime / MTBF : NaN;
     const lambda = (isFinite(MTBF) && MTBF > 0) ? 1 / MTBF : NaN;
     const FIT = (isFinite(MTBF) && MTBF > 0) ? 1e9 / MTBF : NaN;
 
-    return { MTBF, MTTR, MTTD, MPMT, MCMT, uptime, availability, lambda, FIT };
+    return { MTBF, MTTR, MTTD, MPMT, MCMT, MMT, uptime, availability, lambda, FIT };
   }
 
   // Compute - Niet-repareerbaar
   function computeNonRepairable(v) {
     const MTTF = safeDiv(v.totItemsHours, v.failures);
     const MPMT = safeDiv(v.totPMHours, v.numPM);
+    const MMT = safeDiv(MPMT, v.numPM);
     const uptime = (isFinite(MTTF) && isFinite(MPMT)) ? MTTF - MPMT : NaN;
     const availability = (isFinite(uptime) && isFinite(MTTF) && MTTF > 0) ? uptime / MTTF : NaN;
     const lambda = (isFinite(MTTF) && MTTF > 0) ? 1 / MTTF : NaN;
     const FIT = (isFinite(MTTF) && MTTF > 0) ? 1e9 / MTTF : NaN;
 
-    return { MTTF, MPMT, uptime, availability, lambda, FIT };
+    return { MTTF, MPMT, MMT, uptime, availability, lambda, FIT };
   }
 
   // Update interactief diagram (Repareerbaar) - MET MPMT
@@ -292,12 +298,25 @@
       <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
     `;
     
-    // MCMT bracket
+    // MMT bracket (tussen MTBF en MCMT - alle onderhoud)
+    const mmtWidth = mttdWidth + mttrWidth + mpmtWidth;
+    const mmtValue = fmtNum(fromHours(results.MMT, resultUnit), 2);
+    const mmtLineY = mtbfLineY + 20; // 20px onder MTBF lijn
+    
+    mcmtGroup.innerHTML = `
+      <line x1="${startX}" y1="${mmtLineY}" x2="${startX + mmtWidth}" y2="${mmtLineY}" stroke="#E0A943" stroke-width="2.5"/>
+      <line x1="${startX}" y1="${mmtLineY - 4}" x2="${startX}" y2="${mmtLineY + 4}" stroke="#E0A943" stroke-width="2.5"/>
+      <line x1="${startX + mmtWidth}" y1="${mmtLineY - 4}" x2="${startX + mmtWidth}" y2="${mmtLineY + 4}" stroke="#E0A943" stroke-width="2.5"/>
+      <text x="${startX + mmtWidth/2}" y="${mmtLineY - 10}" text-anchor="middle" fill="#E0A943" font-size="14" font-weight="bold">MMT</text>
+      <text x="${startX + mmtWidth/2}" y="${mmtLineY + 1}" text-anchor="middle" fill="#E0A943" font-size="11">${mmtValue} ${unitLabel}</text>
+    `;
+    
+    // MCMT bracket (correctief onderhoud)
     const mcmtWidth = mttdWidth + mttrWidth;
     const mcmtValue = fmtNum(fromHours(results.MCMT, resultUnit), 2);
     const mcmtLineY = kpiBoxMiddleY;
     
-    mcmtGroup.innerHTML = `
+    mcmtGroup.innerHTML += `
       <line x1="${startX}" y1="${mcmtLineY}" x2="${startX + mcmtWidth}" y2="${mcmtLineY}" stroke="#ff6b35" stroke-width="3"/>
       <line x1="${startX}" y1="${mcmtLineY - 5}" x2="${startX}" y2="${mcmtLineY + 5}" stroke="#ff6b35" stroke-width="3"/>
       <line x1="${startX + mcmtWidth}" y1="${mcmtLineY - 5}" x2="${startX + mcmtWidth}" y2="${mcmtLineY + 5}" stroke="#ff6b35" stroke-width="3"/>
@@ -451,6 +470,7 @@
     document.getElementById('outMTTD').textContent = fmtNum(fromHours(r.MTTD, resultUnit), 2);
     document.getElementById('outMCMT').textContent = fmtNum(fromHours(r.MCMT, resultUnit), 2);
     document.getElementById('outMPMT').textContent = fmtNum(fromHours(r.MPMT, resultUnit), 2);
+    document.getElementById('outMMT').textContent = fmtNum(fromHours(r.MMT, resultUnit), 2);
     document.getElementById('outUptime').textContent = fmtNum(fromHours(r.uptime, resultUnit), 2);
     document.getElementById('outA').textContent = fmtPct(r.availability, 4);
     document.getElementById('outLambda').textContent = fmtNum(r.lambda, 8);
@@ -461,6 +481,7 @@
     document.getElementById('unitMTTD').textContent = unitLabel;
     document.getElementById('unitMCMT').textContent = unitLabel;
     document.getElementById('unitMPMT').textContent = unitLabel;
+    document.getElementById('unitMMT').textContent = unitLabel;
     document.getElementById('unitUptime').textContent = unitLabel;
     
     updateInteractiveDiagram(r);
@@ -473,6 +494,7 @@
     
     document.getElementById('outMTTF').textContent = fmtNum(fromHours(r.MTTF, resultUnit), 2);
     document.getElementById('outMPMT').textContent = fmtNum(fromHours(r.MPMT, resultUnit), 2);
+    document.getElementById('outMMT').textContent = fmtNum(fromHours(r.MMT, resultUnit), 2);
     document.getElementById('outUptime').textContent = fmtNum(fromHours(r.uptime, resultUnit), 2);
     document.getElementById('outA').textContent = fmtPct(r.availability, 4);
     document.getElementById('outLambda').textContent = fmtNum(r.lambda, 8);
@@ -480,6 +502,7 @@
     
     document.getElementById('unitMTTF').textContent = unitLabel;
     document.getElementById('unitMPMT').textContent = unitLabel;
+    document.getElementById('unitMMT').textContent = unitLabel;
     document.getElementById('unitUptime').textContent = unitLabel;
     
     updateNonRepairableDiagram(r);
@@ -664,6 +687,8 @@
       col1Y += 4;
       pdf.text(`MPMT: ${fmtNum(fromHours(results.MPMT, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
+      pdf.text(`MMT: ${fmtNum(fromHours(results.MMT, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
       pdf.text(`Uptime: ${fmtNum(fromHours(results.uptime, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
       pdf.text(`Beschikbaarheid [A]: ${fmtPct(results.availability, 2)}`, col1X + 2, col1Y);
@@ -676,6 +701,8 @@
       pdf.text(`MTTF: ${fmtNum(fromHours(results.MTTF, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
       pdf.text(`MPMT: ${fmtNum(fromHours(results.MPMT, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
+      col1Y += 4;
+      pdf.text(`MMT: ${fmtNum(fromHours(results.MMT, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
       pdf.text(`Uptime: ${fmtNum(fromHours(results.uptime, resultUnit), 2)} ${unitLabel}`, col1X + 2, col1Y);
       col1Y += 4;
@@ -706,6 +733,8 @@
       col2Y += 4;
       pdf.text('MCMT = MTTR + MTTD', col2X + 2, col2Y);
       col2Y += 4;
+      pdf.text('MMT = (MCMT + MPMT) / (Falen + PM)', col2X + 2, col2Y);
+      col2Y += 4;
       pdf.text('Uptime = MTBF - MCMT - MPMT', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Beschikbaarheid [A] = Uptime / MTBF', col2X + 2, col2Y);
@@ -717,6 +746,8 @@
       pdf.text('MTTF = [Totale bedrijfstijd] / [Aantal faalmomenten]', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('MPMT = [Totale PM-tijd] / [Aantal keer PM]', col2X + 2, col2Y);
+      col2Y += 4;
+      pdf.text('MMT = MPMT / [Aantal keer PM]', col2X + 2, col2Y);
       col2Y += 4;
       pdf.text('Uptime = MTTF - MPMT', col2X + 2, col2Y);
       col2Y += 4;
