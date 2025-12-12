@@ -1,109 +1,91 @@
 # Veerenstael KPI Tool - Wijzigingen Overzicht
 
-## Samenvatting
-De KPI Tool is aangepast om correct te werken met twee verschillende analysetypes:
-1. **Repareerbaar** (systemen/machines)
-2. **Niet-repareerbaar** (componenten)
+## Laatste Update (December 2024)
+
+### Samenvatting wijzigingen:
+1. ✓ Emojis verwijderd (📚, 🔧, 💡)
+2. ✓ Font aangepast naar Roboto
+3. ✓ Tekst kleuren aangepast naar gebroken wit (#FBF5EC)
+4. ✓ MMT formule tekst aangepast naar "Totale Onderhoudstijd"
+5. ✓ Volgorde PM invoervelden omgedraaid
+6. ✓ Standaard bedrijfstijd aangepast naar 20.000 uur
+
+---
 
 ## Belangrijkste Wijzigingen
 
 ### 1. HTML (index.html)
 **Wat is aangepast:**
-- Dubbele `<div class="input-group mtbf-group">` verwijderd (was een bug)
-- CSS klassen toegevoegd voor betere visibility control:
-  - `.mtbf-related` - voor MTBF, MTTR, MTBM, MCMT
-  - `.availability-related` - voor Beschikbaarheid velden
-  - `.lambda-related` - voor Failure Rate en FIT
-- Formule velden nu dynamisch met IDs:
-  - `id="availFormulaNumerator"` en `id="availFormulaDenominator"`
-  - `id="lambdaFormulaNumerator"` en `id="lambdaFormulaDenominator"`
+- Emojis verwijderd:
+  - "📚 Definities" → "Definities"
+  - "🔧 Repareerbaar" → "Repareerbaar"
+  - "💡 Niet-repareerbaar" → "Niet-repareerbaar"
+- Standaardwaarde aangepast:
+  - Totale bedrijfstijd: 200.000 → 20.000 uur
+- Volgorde invoervelden aangepast:
+  - "Aantal keer PM uitgevoerd" staat nu VOOR "Totale geplande onderhoudstijd"
+- MMT formule tekst:
+  - "[PM + Detect + Repair tijd]" → "[Totale Onderhoudstijd]"
+- Google Fonts link toegevoegd voor Roboto font
 
-### 2. JavaScript (main.js)
-**Kernfunctie `compute(v, isRepairable)` - Volledig herzien:**
+### 2. CSS (style.css)
+**Wat is aangepast:**
+- Font-family aangepast naar Roboto:
+  - `font-family: 'Roboto', 'Inter', Arial, sans-serif;`
+- Tekst kleuren aangepast naar gebroken wit (#FBF5EC):
+  - Alle #e0e6f0 → #FBF5EC
+  - Alle #d0dae8 → #FBF5EC
+  - Alle #b8c7e0 → #FBF5EC
 
-#### Voor REPAREERBARE systemen:
-```javascript
-- MTTF = Totale bedrijfstijd van alle items / Aantal falende items
-- MTBF = Totale bedrijfstijd / Aantal storingen
-- MTTR = Totale reparatietijd / Aantal reparaties
-- Beschikbaarheid [A] = MTBF / (MTBF + MTTR)
-- Failure Rate [λ] = 1 / MTBF
-- FIT = λ × 10⁹
-- MTBM = Totale bedrijfstijd / (Geplande + Ongeplande acties)
-- MCMT = Totale hersteltijd / Aantal ongeplande acties
-```
+### 3. JavaScript (main.js)
+**Wat is aangepast:**
+- SVG fill colors aangepast naar gebroken wit (#FBF5EC):
+  - In interactieve diagram voor MTBF/MTTF labels
+  - In KPI info box teksten
+  - In timeline markers en labels
 
-#### Voor NIET-REPAREERBARE componenten:
-```javascript
-- MTTF = Totale bedrijfstijd van alle items / Aantal falende items
-- MTBF = MTTF (identiek voor niet-repareerbaar)
-- MTTR = NaN (niet van toepassing)
-- Beschikbaarheid [A] = NaN (niet van toepassing)
-- Failure Rate [λ] = 1 / MTTF
-- FIT = λ × 10⁹
-- MTBM = NaN (niet van toepassing)
-- MCMT = NaN (niet van toepassing)
-```
+---
 
-**Functie `updateUI(r, isRepairable)` - Uitgebreid:**
-- Voegt nu visibility logica toe
-- Toont/verbergt velden op basis van `isRepairable`
-- Past formule-teksten dynamisch aan:
-  - Repareerbaar: "λ = 1 / MTBF"
-  - Niet-repareerbaar: "λ = 1 / MTTF"
+## Visuele Veranderingen
 
-**Alle compute() aanroepen aangepast:**
-- Submit handler: `compute(inputs, isRepairable)`
-- Unit selector: `compute(inputs, isRepairable)`
-- Toggle handler: `compute(inputs, isRepairable)`
-- PDF export: `compute(inputs, isRepairable)`
-- Initialisatie: `compute(initVals, initIsRepairable)`
+### Voor:
+- Emojis bij labels (📚, 🔧, 💡)
+- Inter font
+- Blauwachtige witte tekst kleuren
+- Totale bedrijfstijd standaard: 200.000 uur
 
-### 3. CSS (style.css)
-**Geen wijzigingen nodig** - Bestaande klassen werken correct met de nieuwe HTML structuur.
+### Na:
+- Geen emojis, alleen tekst
+- Roboto font (met Inter als fallback)
+- Gebroken wit (#FBF5EC) voor alle teksten
+- Totale bedrijfstijd standaard: 20.000 uur
+- PM velden logische volgorde (aantal eerst, dan tijd)
 
-## Gedrag van de Tool
+---
 
-### Bij opstarten:
-- Standaard geselecteerd: **Repareerbaar**
-- Alle velden zichtbaar
-- MTBF sectie zichtbaar in formulier
+## Veerenstael Huisstijl Kleuren
 
-### Bij selectie "Niet-repareerbaar":
-- MTBF invoervelden worden verborgen
-- In resultaten worden MTBF, MTTR, MTBM, MCMT en Beschikbaarheid verborgen
-- Alleen MTTF, Failure Rate en FIT blijven zichtbaar
-- Formules passen zich aan
-- Visualisatie toont vereenvoudigd diagram
+**Hoofdkleuren:**
+- ZWART: #1D1D1B
+- WIT: #FFFFFF
+- Veerenstael BLAUW: #2A6085
+- OFF WHITE: #FBF5EC ✓ (gebruikt voor alle teksten)
 
-### Bij selectie "Repareerbaar":
-- Alle velden worden getoond
-- Volledige berekeningen actief
-- Uitgebreide visualisatie
+**Secundaire kleuren:**
+- TERRACOTTA: #B0543B (knoppen)
+- OFF BLUE: #BFD4DA
+- OFF YELLOW: #E0A943 (MMT bracket)
+
+---
 
 ## Technische Details
 
-### Formule Correctheid
-De implementatie volgt exact de opgegeven wiskundige formules:
-
-**MTTF (beide types):**
+### Formulevereenvoudiging
+De MMT formule is nu duidelijker:
 ```
-MTTF = Totale gebruiksduur / Aantal falen
+Oud: MMT = [PM + Detect + Repair tijd] / ([Aantal keer PM] + [Aantal falen])
+Nieuw: MMT = [Totale Onderhoudstijd] / ([Aantal keer PM] + [Aantal falen])
 ```
-
-**MTBF (repareerbaar):**
-```
-MTBF = Totale gebruiksduur / Aantal falen (tijdens operationele tijd)
-```
-
-**MTBF (niet-repareerbaar):**
-```
-MTBF = MTTF
-```
-
-**Failure Rate:**
-- Repareerbaar: `λ = 1 / MTBF`
-- Niet-repareerbaar: `λ = 1 / MTTF`
 
 ### Deployment
 De tool werkt in:
@@ -114,32 +96,28 @@ De tool werkt in:
 
 Geen server-side dependencies, alles client-side JavaScript.
 
-## Testing Checklist
-
-- [x] Toggle tussen repareerbaar/niet-repareerbaar werkt
-- [x] MTBF velden worden correct getoond/verborgen
-- [x] Berekeningen zijn correct voor beide types
-- [x] Resultaten tonen juiste velden per type
-- [x] Formules passen zich aan
-- [x] Visualisatie past zich aan
-- [x] PDF export werkt voor beide types
-- [x] Unit conversie (uren/dagen/jaren) werkt
-- [x] Validatie werkt correct
-
-## Belangrijke Notities
-
-1. **Favicon en Logo:** Deze worden NIET nagemaakt door de tool, zoals gevraagd. Upload deze zelf naar GitHub.
-
-2. **Excel export:** Staat in het Engels met puntkomma (;) als separator.
-
-3. **Browser compatibility:** Werkt in moderne browsers (Chrome, Firefox, Safari, Edge).
-
-4. **Responsive:** Tool is volledig responsive en werkt op mobile devices.
+---
 
 ## Bestandsoverzicht
 
-- `index.html` - Hoofdbestand met formulier en resultaten
-- `main.js` - Alle berekeningslogica en event handlers
-- `style.css` - Styling (geen wijzigingen)
-- `logo-veerenstael-wit.png` - Te uploaden door gebruiker
-- `favicon.png` - Te uploaden door gebruiker
+- `index.html` - Hoofdbestand met formulier en resultaten (✓ aangepast)
+- `main.js` - Berekeningslogica en SVG diagram (✓ aangepast)
+- `style.css` - Styling met Roboto en gebroken wit (✓ aangepast)
+- `logo-veerenstael-wit.png` - Logo (niet aangepast, door gebruiker beheerd)
+- `favicon.png` - Favicon (niet aangepast, door gebruiker beheerd)
+- `repareerbaar.jpg` - Diagram repareerbaar (niet aangepast)
+- `nietrepareerbaar.jpg` - Diagram niet-repareerbaar (niet aangepast)
+- `logowebsite.png` - Website logo voor PDF (niet aangepast)
+- `logolinkedin.png` - LinkedIn logo voor PDF (niet aangepast)
+
+---
+
+## Aanpassingen voor GitHub
+
+Upload de volgende bestanden naar je GitHub repository:
+1. index.html (aangepast)
+2. style.css (aangepast)
+3. main.js (aangepast)
+4. README.md (nieuw)
+
+De logo's en afbeeldingen blijven ongewijzigd.
