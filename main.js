@@ -36,15 +36,15 @@
     },
     uptime: {
       title: 'Uptime - Beschikbare bedrijfstijd',
-      text: '<strong>Wat het is:</strong> Uptime is de tijd dat het systeem daadwerkelijk operationeel is. <strong>Formule:</strong> Uptime = MTBF − MCMT − MPMT (repareerbaar) of MTTF − MPMT (niet-repareerbaar). <strong>Interpretatie:</strong> Dit geeft de netto productieve tijd weer.'
+      text: '<strong>Wat het is:</strong> Uptime is de tijd dat het systeem daadwerkelijk operationeel is. <strong>Formule:</strong> Uptime = MTBF âˆ’ MCMT âˆ’ MPMT (repareerbaar) of MTTF âˆ’ MPMT (niet-repareerbaar). <strong>Interpretatie:</strong> Dit geeft de netto productieve tijd weer.'
     },
     availability: {
       title: 'Beschikbaarheid [A] - Availability',
       text: '<strong>Wat het is:</strong> Beschikbaarheid geeft aan welk percentage van de tijd een systeem operationeel is. <strong>Formule:</strong> A = Uptime / MTBF. <strong>Interpretatie:</strong> Een beschikbaarheid van 95% betekent dat de installatie 95% van de tijd productieklaar is.'
     },
     lambda: {
-      title: 'Failure Rate [λ] - Storingsfrequentie',
-      text: '<strong>Wat het is:</strong> De failure rate geeft het aantal storingen per tijdseenheid weer. <strong>Formule:</strong> λ = 1 / MTBF (of MTTF). <strong>Interpretatie:</strong> Een λ van 0,0002 per uur betekent 0,02% kans op storing per uur.'
+      title: 'Failure Rate [Î»] - Storingsfrequentie',
+      text: '<strong>Wat het is:</strong> De failure rate geeft het aantal storingen per tijdseenheid weer. <strong>Formule:</strong> Î» = 1 / MTBF (of MTTF). <strong>Interpretatie:</strong> Een Î» van 0,0002 per uur betekent 0,02% kans op storing per uur.'
     },
     fit: {
       title: 'FIT - Failures In Time',
@@ -55,8 +55,8 @@
   // Helpers
   const nf = (d = 2) => new Intl.NumberFormat('nl-NL', { minimumFractionDigits: d, maximumFractionDigits: d });
   const pf = (d = 4) => new Intl.NumberFormat('nl-NL', { style: 'percent', minimumFractionDigits: d, maximumFractionDigits: d });
-  const fmtNum = (x, d = 2) => (isFinite(x) ? nf(d).format(x) : '—');
-  const fmtPct = (x, d = 4) => (isFinite(x) ? pf(d).format(x) : '—');
+  const fmtNum = (x, d = 2) => (isFinite(x) ? nf(d).format(x) : 'â€”');
+  const fmtPct = (x, d = 4) => (isFinite(x) ? pf(d).format(x) : 'â€”');
   const safeDiv = (num, den) => (den > 0 ? num / den : NaN);
 
   function toHours(value, unit) {
@@ -250,8 +250,8 @@
       <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#2A6085" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
       <line x1="${startX}" y1="45" x2="${startX}" y2="55" stroke="#2A6085" stroke-width="2"/>
       <line x1="${endX}" y1="45" x2="${endX}" y2="55" stroke="#2A6085" stroke-width="2"/>
-      <text x="${(startX + endX)/2}" y="32" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">MTBF</text>
-      <text x="${(startX + endX)/2}" y="47" text-anchor="middle" fill="#b8c7e0" font-size="13">${mtbfValue} ${unitLabel}</text>
+      <text x="${(startX + endX)/2}" y="32" text-anchor="middle" fill="#FBF5EC" font-size="16" font-weight="bold">MTBF</text>
+      <text x="${(startX + endX)/2}" y="47" text-anchor="middle" fill="#FBF5EC" font-size="13">${mtbfValue} ${unitLabel}</text>
     `;
     
     // Timeline basis
@@ -320,12 +320,12 @@
     
     kpiBox.innerHTML = `
       <rect x="${kpiBoxX}" y="${kpiBoxY}" width="220" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 30}" fill="#b8c7e0" font-size="13">Beschikbaarheid:</text>
-      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 30}" text-anchor="end" fill="#d0dae8" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 55}" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
-      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 55}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 80}" fill="#b8c7e0" font-size="13">FIT:</text>
-      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#d0dae8" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 30}" fill="#FBF5EC" font-size="13">Beschikbaarheid:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 30}" text-anchor="end" fill="#FBF5EC" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 55}" fill="#FBF5EC" font-size="13">Failure Rate Î»:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 55}" text-anchor="end" fill="#FBF5EC" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 80}" fill="#FBF5EC" font-size="13">FIT:</text>
+      <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#FBF5EC" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
     `;
     
     // MMT bracket (tussen MTBF en MCMT - alle onderhoud) - HOGER GEPLAATST
@@ -358,32 +358,32 @@
     currentX = startX;
     markersGroup.innerHTML += `
       <line x1="${currentX}" y1="${segmentY}" x2="${currentX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
-      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
+      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#FBF5EC" font-size="13" font-weight="bold">Faalmoment</text>
     `;
     currentX += mttdWidth;
     
     markersGroup.innerHTML += `
       <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
-      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#b8c7e0" font-size="11">Start reparatie</text>
+      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#FBF5EC" font-size="11">Start reparatie</text>
     `;
     currentX += mttrWidth;
     
     markersGroup.innerHTML += `
       <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
-      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#b8c7e0" font-size="11">Start PM</text>
+      <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#FBF5EC" font-size="11">Start PM</text>
     `;
     currentX += mpmtWidth;
     
     markersGroup.innerHTML += `
       <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
-      <text x="${currentX}" y="${baseY + 55}" text-anchor="middle" fill="#b8c7e0" font-size="11">Systeem</text>
-      <text x="${currentX}" y="${baseY + 68}" text-anchor="middle" fill="#b8c7e0" font-size="11">operationeel</text>
+      <text x="${currentX}" y="${baseY + 55}" text-anchor="middle" fill="#FBF5EC" font-size="11">Systeem</text>
+      <text x="${currentX}" y="${baseY + 68}" text-anchor="middle" fill="#FBF5EC" font-size="11">operationeel</text>
     `;
     
     markersGroup.innerHTML += `
       <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
-      <text x="${endX}" y="${baseY + 55}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Volgende</text>
-      <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="13" font-weight="bold">Faalmoment</text>
+      <text x="${endX}" y="${baseY + 55}" text-anchor="middle" fill="#FBF5EC" font-size="13" font-weight="bold">Volgende</text>
+      <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#FBF5EC" font-size="13" font-weight="bold">Faalmoment</text>
     `;
   }
 
@@ -430,8 +430,8 @@
     const mttfValue = fmtNum(fromHours(results.MTTF, resultUnit), 2);
     topLineGroup.innerHTML = `
       <line x1="${startX}" y1="50" x2="${endX}" y2="50" stroke="#2A6085" stroke-width="2" stroke-dasharray="8,4" opacity="0.6"/>
-      <text x="${(startX + endX)/2}" y="32" text-anchor="middle" fill="#e0e6f0" font-size="16" font-weight="bold">MTTF (Mean Time To Failure)</text>
-      <text x="${(startX + endX)/2}" y="47" text-anchor="middle" fill="#b8c7e0" font-size="13">${mttfValue} ${unitLabel}</text>
+      <text x="${(startX + endX)/2}" y="32" text-anchor="middle" fill="#FBF5EC" font-size="16" font-weight="bold">MTTF (Mean Time To Failure)</text>
+      <text x="${(startX + endX)/2}" y="47" text-anchor="middle" fill="#FBF5EC" font-size="13">${mttfValue} ${unitLabel}</text>
     `;
     
     // Timeline basis
@@ -467,10 +467,10 @@
     // Verticale markers
     markersGroup.innerHTML = `
       <line x1="${startX}" y1="${segmentY}" x2="${startX}" y2="${baseY + 50}" stroke="#e0e6f0" stroke-width="3"/>
-      <text x="${startX}" y="${baseY + 70}" text-anchor="middle" fill="#e0e6f0" font-size="14" font-weight="bold">Start</text>
+      <text x="${startX}" y="${baseY + 70}" text-anchor="middle" fill="#FBF5EC" font-size="14" font-weight="bold">Start</text>
       
       <line x1="${startX + mpmtWidth}" y1="${segmentY + 5}" x2="${startX + mpmtWidth}" y2="${baseY + 50}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
-      <text x="${startX + mpmtWidth}" y="${baseY + 70}" text-anchor="middle" fill="#b8c7e0" font-size="11">Einde PM</text>
+      <text x="${startX + mpmtWidth}" y="${baseY + 70}" text-anchor="middle" fill="#FBF5EC" font-size="11">Einde PM</text>
       
       <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 50}" stroke="#ff4444" stroke-width="3"/>
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#ff6b35" font-size="14" font-weight="bold">Falen</text>
@@ -483,10 +483,10 @@
     
     kpiBox.innerHTML = `
       <rect x="${kpiBoxX}" y="${kpiBoxY}" width="200" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 35}" fill="#b8c7e0" font-size="13">Failure Rate λ:</text>
-      <text x="${kpiBoxX + 190}" y="${kpiBoxY + 35}" text-anchor="end" fill="#d0dae8" font-weight="bold" font-size="13">${fmtNum(results.lambda, 6)}</text>
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 60}" fill="#b8c7e0" font-size="13">FIT:</text>
-      <text x="${kpiBoxX + 190}" y="${kpiBoxY + 60}" text-anchor="end" fill="#d0dae8" font-weight="bold" font-size="13">${fmtNum(results.FIT, 0)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 35}" fill="#FBF5EC" font-size="13">Failure Rate Î»:</text>
+      <text x="${kpiBoxX + 190}" y="${kpiBoxY + 35}" text-anchor="end" fill="#FBF5EC" font-weight="bold" font-size="13">${fmtNum(results.lambda, 6)}</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 60}" fill="#FBF5EC" font-size="13">FIT:</text>
+      <text x="${kpiBoxX + 190}" y="${kpiBoxY + 60}" text-anchor="end" fill="#FBF5EC" font-weight="bold" font-size="13">${fmtNum(results.FIT, 0)}</text>
     `;
   }
 
@@ -917,7 +917,3 @@
     pdf.save(fileName);
   });
 })();
-
-
-
-
