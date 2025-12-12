@@ -1,7 +1,7 @@
 /* Donkere dashboardstijl zoals je vorige tool */
 body {
   margin: 0;
-  font-family: 'Inter', Arial, sans-serif;
+  font-family: 'Roboto', 'Inter', Arial, sans-serif;
   background: #203040;
   min-height: 100vh;
 }
@@ -54,7 +54,7 @@ body {
   flex-direction: column;
 }
 .header { text-align: center; }
-.header p { color: #b8c7e0; }
+.header p { color: #FBF5EC; }
 
 /* Definitie-sectie */
 .definitions-section {
@@ -65,7 +65,7 @@ body {
 }
 
 .definitions-title {
-  color: #e0e6f0;
+  color: #FBF5EC;
   margin: 0 0 16px 0;
   text-align: center;
   font-size: 1.2rem;
@@ -80,7 +80,7 @@ body {
 
 .def-btn {
   background: #2a3847;
-  color: #e0e6f0;
+  color: #FBF5EC;
   border: 2px solid #3a4858;
   border-radius: 8px;
   padding: 12px 16px;
@@ -122,13 +122,13 @@ body {
 }
 
 .def-content {
-  color: #d0dae8;
+  color: #FBF5EC;
   line-height: 1.7;
   font-size: 1rem;
 }
 
 .def-content strong {
-  color: #e0e6f0;
+  color: #FBF5EC;
 }
 
 /* Diagram sectie */
@@ -159,7 +159,7 @@ body {
 }
 
 #mtbfDiagram text {
-  font-family: 'Inter', Arial, sans-serif;
+  font-family: 'Roboto', 'Inter', Arial, sans-serif;
 }
 
 #mtbfDiagram rect {
@@ -198,7 +198,7 @@ body {
 }
 
 .section-title {
-  color: #e0e6f0;
+  color: #FBF5EC;
   font-size: 1.4rem;
   margin: 0 0 20px 0;
   font-weight: 600;
@@ -209,7 +209,7 @@ form label {
   margin-bottom: 6px;
   margin-top: 12px;
   font-weight: 500;
-  color: #e0e6f0;
+  color: #FBF5EC;
 }
 
 form label:first-of-type {
@@ -236,7 +236,7 @@ form label:first-of-type {
   display: block;
   font-size: 1rem;
   font-weight: 600;
-  color: #e0e6f0;
+  color: #FBF5EC;
   margin-bottom: 12px;
 }
 
@@ -266,7 +266,7 @@ form label:first-of-type {
 }
 
 .radio-text {
-  color: #d0dae8;
+  color: #FBF5EC;
   font-size: 0.95rem;
 }
 
@@ -286,7 +286,7 @@ form label:first-of-type {
 .group-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #e0e6f0;
+  color: #FBF5EC;
   margin: 0 0 16px 0;
   padding-bottom: 8px;
   border-bottom: 1px solid #2a3442;
@@ -364,7 +364,7 @@ button.export-btn:hover { background: #9a4532; }
 }
 
 .result-unit-selector label {
-  color: #b8c7e0;
+  color: #FBF5EC;
   font-size: 0.95rem;
   margin: 0;
 }
@@ -405,7 +405,7 @@ button.export-btn:hover { background: #9a4532; }
 }
 
 .result-label {
-  color: #b8c7e0;
+  color: #FBF5EC;
   font-weight: 600;
 }
 
@@ -445,7 +445,7 @@ button.export-btn:hover { background: #9a4532; }
 
 .formula-label {
   font-weight: 600;
-  color: #e0e6f0;
+  color: #FBF5EC;
   min-width: 160px;
   flex-shrink: 0;
 }
@@ -459,7 +459,7 @@ button.export-btn:hover { background: #9a4532; }
 
 .frac-num,
 .frac-den {
-  color: #d0dae8;
+  color: #FBF5EC;
   padding: 2px 8px;
   text-align: center;
   font-size: 0.9rem;
@@ -473,7 +473,7 @@ button.export-btn:hover { background: #9a4532; }
 }
 
 .formula-simple {
-  color: #d0dae8;
+  color: #FBF5EC;
   font-size: 0.95rem;
 }
 
@@ -525,7 +525,7 @@ button.export-btn:hover { background: #9a4532; }
   left: 24px;
   top: -8px;
   background: #1a2230;
-  color: #e0e6f0;
+  color: #FBF5EC;
   padding: 12px;
   border-radius: 6px;
   width: 280px;
@@ -598,13 +598,13 @@ button.export-btn:hover { background: #9a4532; }
 
 .info-panel-content {
   padding: 16px 18px;
-  color: #d0dae8;
+  color: #FBF5EC;
   font-size: 0.9rem;
   line-height: 1.7;
 }
 
 .info-panel-content strong {
-  color: #e0e6f0;
+  color: #FBF5EC;
 }
 
 @media (max-width: 768px) {
