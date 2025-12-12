@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Betrouwbaarheid - Veerenstael Tooling</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
   <link rel="icon" href="favicon.png" type="image/png"/>
 </head>
@@ -16,12 +19,12 @@
 
     <div class="main-card">
       <div class="header center-header">
-        <p>Krijg inzicht in alle verschillende termen omtrent betrouwbaarheid en onderhoudbaarheid van uw assets met deze Veerenstael-Tool. Bereken essentiële parameters zoals MTBF, MTTF, MTTR en beschikbaarheid voor zowel repareerbare systemen als niet-repareerbare componenten. Voer uw storings- en onderhoudsgegevens in, vergelijk scenario's en exporteer uw resultaten als overzichtelijk PDF-rapport.</p>
+        <p>Krijg inzicht in alle verschillende termen omtrent betrouwbaarheid en onderhoudbaarheid van uw assets met deze Veerenstael-Tool. Bereken essentiÃ«le parameters zoals MTBF, MTTF, MTTR en beschikbaarheid voor zowel repareerbare systemen als niet-repareerbare componenten. Voer uw storings- en onderhoudsgegevens in, vergelijk scenario's en exporteer uw resultaten als overzichtelijk PDF-rapport.</p>
       </div>
 
       <!-- KPI Definities -->
       <div class="definitions-section">
-        <h3 class="definitions-title">📚 Definities - Klik voor uitleg</h3>
+        <h3 class="definitions-title">Definities - Klik voor uitleg</h3>
         <div class="definitions-grid">
           <button type="button" class="def-btn" data-kpi="mttf">MTTF</button>
           <button type="button" class="def-btn" data-kpi="mtbf">MTBF</button>
@@ -32,7 +35,7 @@
           <button type="button" class="def-btn" data-kpi="mcmt">MCMT</button>
           <button type="button" class="def-btn" data-kpi="uptime">Uptime</button>
           <button type="button" class="def-btn" data-kpi="availability">Beschikbaarheid [A]</button>
-          <button type="button" class="def-btn" data-kpi="lambda">Failure Rate [λ]</button>
+          <button type="button" class="def-btn" data-kpi="lambda">Failure Rate [Î»]</button>
           <button type="button" class="def-btn" data-kpi="fit">FIT</button>
         </div>
         <div id="def-explanation" class="def-explanation" hidden>
@@ -47,7 +50,7 @@
           <div class="radio-option-wrapper">
             <label class="radio-option">
               <input type="radio" name="analysisType" value="repairable" checked>
-              <span class="radio-text">🔧 Repareerbaar (systemen/machines)</span>
+              <span class="radio-text">Repareerbaar (systemen/machines)</span>
               <button type="button" class="info-icon" data-info="repairable">i</button>
             </label>
             <div class="info-panel" id="info-repairable">
@@ -60,7 +63,7 @@
           <div class="radio-option-wrapper">
             <label class="radio-option">
               <input type="radio" name="analysisType" value="non-repairable">
-              <span class="radio-text">💡 Niet-repareerbaar (componenten)</span>
+              <span class="radio-text">Niet-repareerbaar (componenten)</span>
               <button type="button" class="info-icon" data-info="non-repairable">i</button>
             </label>
             <div class="info-panel" id="info-non-repairable">
@@ -82,7 +85,7 @@
               <div class="input-group">
                 <label for="totItemsValue">Totale bedrijfstijd van alle items</label>
                 <div class="unit-row">
-                  <input type="number" id="totItemsValue" value="200000" step="1" min="0"/>
+                  <input type="number" id="totItemsValue" value="20000" step="1" min="0"/>
                   <select id="totItemsUnit">
                     <option value="hours" selected>uren</option>
                     <option value="days">dagen</option>
@@ -113,6 +116,9 @@
                   </select>
                 </div>
                 
+                <label for="numPM">Aantal keer PM uitgevoerd</label>
+                <input type="number" id="numPM" value="10" step="1" min="1"/>
+                
                 <label for="totPMValue">Totale geplande onderhoudstijd</label>
                 <div class="unit-row">
                   <input type="number" id="totPMValue" value="30" step="0.1" min="0"/>
@@ -122,9 +128,6 @@
                     <option value="years">jaren</option>
                   </select>
                 </div>
-                
-                <label for="numPM">Aantal keer PM uitgevoerd</label>
-                <input type="number" id="numPM" value="10" step="1" min="1"/>
               </div>
 
               <div class="button-row">
@@ -186,7 +189,7 @@
               <div class="formula-item">
                 <span class="formula-label">MMT =</span>
                 <div class="fraction">
-                  <span class="frac-num">[PM + Detect + Repair tijd]</span>
+                  <span class="frac-num">[Totale Onderhoudstijd]</span>
                   <span class="frac-line"></span>
                   <span class="frac-den">[Aantal keer PM] + [Aantal falen]</span>
                 </div>
@@ -194,7 +197,7 @@
               
               <div class="formula-item">
                 <span class="formula-label">Uptime =</span>
-                <span class="formula-simple">MTBF − MCMT − MPMT</span>
+                <span class="formula-simple">MTBF âˆ’ MCMT âˆ’ MPMT</span>
               </div>
               
               <div class="formula-item">
@@ -207,7 +210,7 @@
               </div>
               
               <div class="formula-item">
-                <span class="formula-label">Failure rate [λ] =</span>
+                <span class="formula-label">Failure rate [Î»] =</span>
                 <div class="fraction">
                   <span class="frac-num">1</span>
                   <span class="frac-line"></span>
@@ -256,7 +259,7 @@
               
               <div class="formula-item">
                 <span class="formula-label">Uptime =</span>
-                <span class="formula-simple">MTTF − MPMT</span>
+                <span class="formula-simple">MTTF âˆ’ MPMT</span>
               </div>
               
               <div class="formula-item">
@@ -269,7 +272,7 @@
               </div>
               
               <div class="formula-item">
-                <span class="formula-label">Failure rate [λ] =</span>
+                <span class="formula-label">Failure rate [Î»] =</span>
                 <div class="fraction">
                   <span class="frac-num">1</span>
                   <span class="frac-line"></span>
@@ -361,55 +364,55 @@
           <!-- Repareerbaar resultaten -->
           <div class="result-row repairable-only">
             <span class="result-label">MTBF:</span>
-            <span class="result-value"><span id="outMTBF">—</span> <span id="unitMTBF">uur</span></span>
+            <span class="result-value"><span id="outMTBF">â€”</span> <span id="unitMTBF">uur</span></span>
           </div>
           <div class="result-row repairable-only">
             <span class="result-label">MTTR:</span>
-            <span class="result-value"><span id="outMTTR">—</span> <span id="unitMTTR">uur</span></span>
+            <span class="result-value"><span id="outMTTR">â€”</span> <span id="unitMTTR">uur</span></span>
           </div>
           <div class="result-row repairable-only">
             <span class="result-label">MTTD:</span>
-            <span class="result-value"><span id="outMTTD">—</span> <span id="unitMTTD">uur</span></span>
+            <span class="result-value"><span id="outMTTD">â€”</span> <span id="unitMTTD">uur</span></span>
           </div>
           <div class="result-row repairable-only">
             <span class="result-label">MCMT:</span>
-            <span class="result-value"><span id="outMCMT">—</span> <span id="unitMCMT">uur</span></span>
+            <span class="result-value"><span id="outMCMT">â€”</span> <span id="unitMCMT">uur</span></span>
           </div>
           
           <!-- Niet-repareerbaar resultaten -->
           <div class="result-row non-repairable-only" style="display: none;">
             <span class="result-label">MTTF:</span>
-            <span class="result-value"><span id="outMTTF">—</span> <span id="unitMTTF">uur</span></span>
+            <span class="result-value"><span id="outMTTF">â€”</span> <span id="unitMTTF">uur</span></span>
           </div>
           
           <!-- Gemeenschappelijke resultaten -->
           <div class="result-row">
             <span class="result-label">MPMT:</span>
-            <span class="result-value"><span id="outMPMT">—</span> <span id="unitMPMT">uur</span></span>
+            <span class="result-value"><span id="outMPMT">â€”</span> <span id="unitMPMT">uur</span></span>
           </div>
           <div class="result-row">
             <span class="result-label">MMT:</span>
-            <span class="result-value"><span id="outMMT">—</span> <span id="unitMMT">uur</span></span>
+            <span class="result-value"><span id="outMMT">â€”</span> <span id="unitMMT">uur</span></span>
           </div>
           <div class="result-row">
             <span class="result-label">Uptime:</span>
-            <span class="result-value"><span id="outUptime">—</span> <span id="unitUptime">uur</span></span>
+            <span class="result-value"><span id="outUptime">â€”</span> <span id="unitUptime">uur</span></span>
           </div>
           <div class="result-row">
             <span class="result-label">Beschikbaarheid [A]:</span>
-            <span class="result-value" id="outA">—</span>
+            <span class="result-value" id="outA">â€”</span>
           </div>
           <div class="result-row">
-            <span class="result-label">Failure Rate [λ]:</span>
-            <span class="result-value"><span id="outLambda">—</span> per uur</span>
+            <span class="result-label">Failure Rate [Î»]:</span>
+            <span class="result-value"><span id="outLambda">â€”</span> per uur</span>
           </div>
           <div class="result-row">
             <span class="result-label">FIT:</span>
-            <span class="result-value"><span id="outFIT">—</span> per 10<sup>9</sup> uur</span>
+            <span class="result-value"><span id="outFIT">â€”</span> per 10<sup>9</sup> uur</span>
           </div>
         </div>
         
-        <button type="button" class="export-btn" id="exportPDF">📄 Exporteer PDF</button>
+        <button type="button" class="export-btn" id="exportPDF">ðŸ“„ Exporteer PDF</button>
       </div>
     </div>
   </div>
@@ -419,6 +422,3 @@
   <script src="main.js"></script>
 </body>
 </html>
-
-
-
