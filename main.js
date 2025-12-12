@@ -43,8 +43,8 @@
       text: '<strong>Wat het is:</strong> Beschikbaarheid geeft aan welk percentage van de tijd een systeem operationeel is. <strong>Formule:</strong> A = Uptime / MTBF. <strong>Interpretatie:</strong> Een beschikbaarheid van 95% betekent dat de installatie 95% van de tijd productieklaar is.'
     },
     lambda: {
-      title: 'Failure Rate [Î»] - Storingsfrequentie',
-      text: '<strong>Wat het is:</strong> De failure rate geeft het aantal storingen per tijdseenheid weer. <strong>Formule:</strong> Î» = 1 / MTBF (of MTTF). <strong>Interpretatie:</strong> Een Î» van 0,0002 per uur betekent 0,02% kans op storing per uur.'
+      title: 'Failure Rate [&lambda;] - Storingsfrequentie',
+      text: '<strong>Wat het is:</strong> De failure rate geeft het aantal storingen per tijdseenheid weer. <strong>Formule:</strong> &lambda; = 1 / MTBF (of MTTF). <strong>Interpretatie:</strong> Een &lambda; van 0,0002 per uur betekent 0,02% kans op storing per uur.'
     },
     fit: {
       title: 'FIT - Failures In Time',
@@ -322,7 +322,7 @@
       <rect x="${kpiBoxX}" y="${kpiBoxY}" width="220" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
       <text x="${kpiBoxX + 10}" y="${kpiBoxY + 30}" fill="#FBF5EC" font-size="13">Beschikbaarheid:</text>
       <text x="${kpiBoxX + 210}" y="${kpiBoxY + 30}" text-anchor="end" fill="#FBF5EC" font-size="14" font-weight="bold">${fmtPct(results.availability, 2)}</text>
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 55}" fill="#FBF5EC" font-size="13">Failure Rate Î»:</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 55}" fill="#FBF5EC" font-size="13">Failure Rate &lambda;:</text>
       <text x="${kpiBoxX + 210}" y="${kpiBoxY + 55}" text-anchor="end" fill="#FBF5EC" font-size="13" font-weight="bold">${fmtNum(results.lambda, 6)}</text>
       <text x="${kpiBoxX + 10}" y="${kpiBoxY + 80}" fill="#FBF5EC" font-size="13">FIT:</text>
       <text x="${kpiBoxX + 210}" y="${kpiBoxY + 80}" text-anchor="end" fill="#FBF5EC" font-size="13" font-weight="bold">${fmtNum(results.FIT, 0)}</text>
@@ -483,7 +483,7 @@
     
     kpiBox.innerHTML = `
       <rect x="${kpiBoxX}" y="${kpiBoxY}" width="200" height="${kpiBoxHeight}" fill="#2a3442" stroke="#3a4858" stroke-width="2" rx="10" filter="url(#shadow)"/>
-      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 35}" fill="#FBF5EC" font-size="13">Failure Rate Î»:</text>
+      <text x="${kpiBoxX + 10}" y="${kpiBoxY + 35}" fill="#FBF5EC" font-size="13">Failure Rate &lambda;:</text>
       <text x="${kpiBoxX + 190}" y="${kpiBoxY + 35}" text-anchor="end" fill="#FBF5EC" font-weight="bold" font-size="13">${fmtNum(results.lambda, 6)}</text>
       <text x="${kpiBoxX + 10}" y="${kpiBoxY + 60}" fill="#FBF5EC" font-size="13">FIT:</text>
       <text x="${kpiBoxX + 190}" y="${kpiBoxY + 60}" text-anchor="end" fill="#FBF5EC" font-weight="bold" font-size="13">${fmtNum(results.FIT, 0)}</text>
