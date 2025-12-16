@@ -36,7 +36,7 @@
     },
     uptime: {
       title: 'Uptime - Beschikbare bedrijfstijd',
-      text: '<strong>Wat het is:</strong> Uptime is de tijd dat het systeem daadwerkelijk operationeel is. <strong>Formule:</strong> Uptime = MTBF âˆ’ MCMT âˆ’ MPMT (repareerbaar) of MTTF âˆ’ MPMT (niet-repareerbaar). <strong>Interpretatie:</strong> Dit geeft de netto productieve tijd weer.'
+      text: '<strong>Wat het is:</strong> Uptime is de tijd dat het systeem daadwerkelijk operationeel is. <strong>Formule:</strong> Uptime = MTBF − MCMT − MPMT (repareerbaar) of MTTF − MPMT (niet-repareerbaar). <strong>Interpretatie:</strong> Dit geeft de netto productieve tijd weer.'
     },
     availability: {
       title: 'Beschikbaarheid [A] - Availability',
@@ -55,8 +55,8 @@
   // Helpers
   const nf = (d = 2) => new Intl.NumberFormat('nl-NL', { minimumFractionDigits: d, maximumFractionDigits: d });
   const pf = (d = 4) => new Intl.NumberFormat('nl-NL', { style: 'percent', minimumFractionDigits: d, maximumFractionDigits: d });
-  const fmtNum = (x, d = 2) => (isFinite(x) ? nf(d).format(x) : 'â€”');
-  const fmtPct = (x, d = 4) => (isFinite(x) ? pf(d).format(x) : 'â€”');
+  const fmtNum = (x, d = 2) => (isFinite(x) ? nf(d).format(x) : '–');
+  const fmtPct = (x, d = 4) => (isFinite(x) ? pf(d).format(x) : '–');
   const safeDiv = (num, den) => (den > 0 ? num / den : NaN);
 
   function toHours(value, unit) {
@@ -654,7 +654,7 @@
       }
     }
     
-    yPos = 28;
+    yPos = 40;
     
     // Titel
     pdf.setFontSize(11);
