@@ -1,14 +1,14 @@
-/* Donkere dashboardstijl zoals je vorige tool */
+/* Veerenstael Bijtelling stijl */
 body {
   margin: 0;
   font-family: 'Roboto', 'Inter', Arial, sans-serif;
-  background: #203040;
+  background: #2A6085;
   min-height: 100vh;
 }
 
 .dashboard-bg {
   min-height: 100vh;
-  background: linear-gradient(180deg, #223344 0%, #1a2636 100%);
+  background: #2A6085;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,34 +41,36 @@ body {
 }
 
 .main-card {
-  background: #222c38;
+  background: #FBF5EC;
   border-radius: 18px;
-  box-shadow: 0 8px 32px #0004;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
   padding: 32px 40px;
   max-width: 1100px;
   width: 100%;
-  color: #fff;
+  color: #1D1D1B;
   margin-left: auto;
   margin-right: auto;
   display: flex;
   flex-direction: column;
 }
 .header { text-align: center; }
-.header p { color: #FBF5EC; }
+.header p { color: #1D1D1B; }
 
 /* Definitie-sectie */
 .definitions-section {
-  background: #1a2230;
+  background: #FFFFFF;
   border-radius: 12px;
   padding: 24px;
   margin: 24px 0;
+  border: 2px solid #BFD4DA;
 }
 
 .definitions-title {
-  color: #FBF5EC;
+  color: #2A6085;
   margin: 0 0 16px 0;
   text-align: center;
   font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .definitions-grid {
@@ -79,9 +81,9 @@ body {
 }
 
 .def-btn {
-  background: #2a3847;
-  color: #FBF5EC;
-  border: 2px solid #3a4858;
+  background: #FFFFFF;
+  color: #2A6085;
+  border: 2px solid #2A6085;
   border-radius: 8px;
   padding: 12px 16px;
   font-size: 1rem;
@@ -91,23 +93,24 @@ body {
 }
 
 .def-btn:hover {
-  background: #3a4858;
-  border-color: #4a5868;
+  background: #BFD4DA;
+  border-color: #2A6085;
   transform: translateY(-2px);
 }
 
 .def-btn.active {
-  background: #3e70ff;
-  border-color: #3e70ff;
+  background: #2A6085;
+  border-color: #2A6085;
   color: #fff;
 }
 
 .def-explanation {
-  background: #232b3a;
+  background: #FFFFFF;
   border-radius: 8px;
   padding: 20px;
   margin-top: 16px;
   animation: slideDown 0.3s ease;
+  border: 2px solid #BFD4DA;
 }
 
 @keyframes slideDown {
@@ -122,13 +125,13 @@ body {
 }
 
 .def-content {
-  color: #FBF5EC;
+  color: #1D1D1B;
   line-height: 1.7;
   font-size: 1rem;
 }
 
 .def-content strong {
-  color: #FBF5EC;
+  color: #2A6085;
 }
 
 /* Diagram sectie */
@@ -137,12 +140,13 @@ body {
 }
 
 .diagram-container {
-  background: #1a2230;
+  background: #FFFFFF;
   border-radius: 12px;
   padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 2px solid #BFD4DA;
 }
 
 .diagram-img {
@@ -153,7 +157,7 @@ body {
 
 /* SVG Diagram styling */
 #mtbfDiagram {
-  background: #1a2230;
+  background: #FFFFFF;
   border-radius: 8px;
   max-height: 320px;
 }
@@ -192,16 +196,17 @@ body {
 .input-section,
 .result-section,
 .formulas-section {
-  background: #232b3a;
+  background: #FFFFFF;
   border-radius: 12px;
   padding: 24px;
+  border: 2px solid #BFD4DA;
 }
 
 .section-title {
-  color: #FBF5EC;
+  color: #2A6085;
   font-size: 1.4rem;
   margin: 0 0 20px 0;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 form label {
@@ -209,7 +214,7 @@ form label {
   margin-bottom: 6px;
   margin-top: 12px;
   font-weight: 500;
-  color: #FBF5EC;
+  color: #1D1D1B;
 }
 
 form label:first-of-type {
@@ -218,7 +223,7 @@ form label:first-of-type {
 
 .input-subtitle {
   font-size: 0.85rem;
-  color: #93a4c9;
+  color: #666;
   font-style: italic;
   margin-bottom: 8px;
   margin-top: -4px;
@@ -226,17 +231,17 @@ form label:first-of-type {
 
 /* Analysis type toggle */
 .analysis-type-toggle {
-  background: #1a2230;
+  background: #FFFFFF;
   border-radius: 8px;
   padding: 16px;
-  border: 2px solid #2a3442;
+  border: 2px solid #BFD4DA;
 }
 
 .toggle-label {
   display: block;
   font-size: 1rem;
   font-weight: 600;
-  color: #FBF5EC;
+  color: #1D1D1B;
   margin-bottom: 12px;
 }
 
@@ -256,47 +261,48 @@ form label:first-of-type {
 }
 
 .radio-option:hover {
-  background: #232b3a;
+  background: #f5f5f5;
 }
 
 .radio-option input[type="radio"] {
   width: auto;
   margin-right: 10px;
   cursor: pointer;
+  accent-color: #2A6085;
 }
 
 .radio-text {
-  color: #FBF5EC;
+  color: #1D1D1B;
   font-size: 0.95rem;
 }
 
 .radio-option input[type="radio"]:checked + .radio-text {
-  color: #B0543B;
+  color: #2A6085;
   font-weight: 600;
 }
 
 /* Input groups */
 .input-group {
-  background: #1a2230;
+  background: #FFFFFF;
   border-radius: 8px;
   padding: 16px;
-  border: 2px solid #2a3442;
+  border: 2px solid #BFD4DA;
 }
 
 .group-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #FBF5EC;
+  color: #2A6085;
   margin: 0 0 16px 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid #2a3442;
+  border-bottom: 1px solid #BFD4DA;
 }
 
 form input, form select {
   width: 100%;
-  background: #0f1419;
-  color: #e0e0e0;
-  border: 1px solid #2a3442;
+  background: #FFFFFF;
+  color: #1D1D1B;
+  border: 2px solid #BFD4DA;
   border-radius: 6px;
   padding: 12px;
   margin-bottom: 6px;
@@ -305,7 +311,8 @@ form input, form select {
 }
 form input:focus, form select:focus { 
   outline: none;
-  border-color: #3e70ff; 
+  border-color: #2A6085;
+  box-shadow: 0 0 0 3px rgba(42, 96, 133, 0.1);
 }
 
 /* input + unit selector naast elkaar */
@@ -331,24 +338,35 @@ button {
   font-weight: bold;
   cursor: pointer;
   margin-bottom: 0;
+  transition: all 0.3s ease;
 }
 button.green {
-  background: #B0543B;
+  background: #2A6085;
   color: #fff;
 }
-button.green:hover { background: #954537; }
+button.green:hover { 
+  background: #1f4d6b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(42, 96, 133, 0.3);
+}
 button.reset-btn {
-  background: #23314a;
-  color: #fff;
+  background: #BFD4DA;
+  color: #1D1D1B;
 }
-button.reset-btn:hover { background: #3b4970; }
+button.reset-btn:hover { 
+  background: #a8c3ce;
+}
 button.export-btn {
-  background: #B0543B;
+  background: #2A6085;
   color: #fff;
   width: 100%;
   margin-top: 20px;
 }
-button.export-btn:hover { background: #9a4532; }
+button.export-btn:hover { 
+  background: #1f4d6b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(42, 96, 133, 0.3);
+}
 
 .result-section {
   display: flex;
@@ -364,15 +382,15 @@ button.export-btn:hover { background: #9a4532; }
 }
 
 .result-unit-selector label {
-  color: #FBF5EC;
+  color: #1D1D1B;
   font-size: 0.95rem;
   margin: 0;
 }
 
 .result-unit-selector select {
-  background: #1a2230;
-  color: #e0e0e0;
-  border: 1px solid #2a3442;
+  background: #FFFFFF;
+  color: #1D1D1B;
+  border: 2px solid #BFD4DA;
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 0.95rem;
@@ -381,7 +399,8 @@ button.export-btn:hover { background: #9a4532; }
 
 .result-unit-selector select:focus {
   outline: none;
-  border-color: #3e70ff;
+  border-color: #2A6085;
+  box-shadow: 0 0 0 3px rgba(42, 96, 133, 0.1);
 }
 
 .result-grid {
@@ -397,7 +416,7 @@ button.export-btn:hover { background: #9a4532; }
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #2a3442;
+  border-bottom: 1px solid #BFD4DA;
 }
 
 .result-row:last-child {
@@ -405,13 +424,13 @@ button.export-btn:hover { background: #9a4532; }
 }
 
 .result-label {
-  color: #FBF5EC;
+  color: #1D1D1B;
   font-weight: 600;
 }
 
 .result-value {
-  color: #e5ecff;
-  font-weight: 500;
+  color: #2A6085;
+  font-weight: 600;
   text-align: right;
 }
 
@@ -424,11 +443,12 @@ button.export-btn:hover { background: #9a4532; }
 }
 
 .info-block {
-  background: #2a3442;
+  background: #f5f5f5;
   border-radius: 8px;
   padding: 12px 16px;
   font-size: 0.95rem;
   margin-top: 12px;
+  border: 1px solid #BFD4DA;
 }
 
 .formula-item {
@@ -436,7 +456,7 @@ button.export-btn:hover { background: #9a4532; }
   align-items: center;
   gap: 8px;
   padding: 8px 0;
-  border-bottom: 1px solid #2a3442;
+  border-bottom: 1px solid #BFD4DA;
 }
 
 .formula-item:last-child {
@@ -445,7 +465,7 @@ button.export-btn:hover { background: #9a4532; }
 
 .formula-label {
   font-weight: 600;
-  color: #FBF5EC;
+  color: #1D1D1B;
   min-width: 160px;
   flex-shrink: 0;
 }
@@ -459,7 +479,7 @@ button.export-btn:hover { background: #9a4532; }
 
 .frac-num,
 .frac-den {
-  color: #FBF5EC;
+  color: #1D1D1B;
   padding: 2px 8px;
   text-align: center;
   font-size: 0.9rem;
@@ -468,16 +488,16 @@ button.export-btn:hover { background: #9a4532; }
 .frac-line {
   width: 100%;
   height: 1px;
-  background: #7a8a9e;
+  background: #2A6085;
   margin: 2px 0;
 }
 
 .formula-simple {
-  color: #FBF5EC;
+  color: #1D1D1B;
   font-size: 0.95rem;
 }
 
-.small-note { color: #93a4c9; font-size: 0.9rem; }
+.small-note { color: #666; font-size: 0.9rem; }
 
 /* Responsive aanpassingen */
 @media (max-width: 968px) {
@@ -524,8 +544,8 @@ button.export-btn:hover { background: #9a4532; }
   position: absolute;
   left: 24px;
   top: -8px;
-  background: #1a2230;
-  color: #FBF5EC;
+  background: #FFFFFF;
+  color: #1D1D1B;
   padding: 12px;
   border-radius: 6px;
   width: 280px;
@@ -569,7 +589,7 @@ button.export-btn:hover { background: #9a4532; }
 }
 
 .info-icon:hover {
-  background: #3a7095;
+  background: #1f4d6b;
 }
 
 .info-icon.active {
@@ -582,7 +602,7 @@ button.export-btn:hover { background: #9a4532; }
   overflow: hidden;
   opacity: 0;
   transition: max-height 0.3s ease, opacity 0.3s ease;
-  background: #1a2230;
+  background: #FFFFFF;
   border-left: 3px solid #2A6085;
   margin-top: 0;
   margin-left: 30px;
@@ -598,13 +618,13 @@ button.export-btn:hover { background: #9a4532; }
 
 .info-panel-content {
   padding: 16px 18px;
-  color: #FBF5EC;
+  color: #1D1D1B;
   font-size: 0.9rem;
   line-height: 1.7;
 }
 
 .info-panel-content strong {
-  color: #FBF5EC;
+  color: #2A6085;
 }
 
 @media (max-width: 768px) {
