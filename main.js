@@ -357,31 +357,31 @@
     // Verticale markers
     currentX = startX;
     markersGroup.innerHTML += `
-      <line x1="${currentX}" y1="${segmentY}" x2="${currentX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
+      <line x1="${currentX}" y1="${segmentY}" x2="${currentX}" y2="${baseY + 40}" stroke="#5a7e97" stroke-width="3"/>
       <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#FBF5EC" font-size="13" font-weight="bold">Faalmoment</text>
     `;
     currentX += mttdWidth;
     
     markersGroup.innerHTML += `
-      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#6a8a9e" stroke-width="2" stroke-dasharray="4,2"/>
       <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#FBF5EC" font-size="11">Start reparatie</text>
     `;
     currentX += mttrWidth;
     
     markersGroup.innerHTML += `
-      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#6a8a9e" stroke-width="2" stroke-dasharray="4,2"/>
       <text x="${currentX}" y="${baseY + 60}" text-anchor="middle" fill="#FBF5EC" font-size="11">Start PM</text>
     `;
     currentX += mpmtWidth;
     
     markersGroup.innerHTML += `
-      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <line x1="${currentX}" y1="${segmentY + 5}" x2="${currentX}" y2="${baseY + 40}" stroke="#6a8a9e" stroke-width="2" stroke-dasharray="4,2"/>
       <text x="${currentX}" y="${baseY + 55}" text-anchor="middle" fill="#FBF5EC" font-size="11">Systeem</text>
       <text x="${currentX}" y="${baseY + 68}" text-anchor="middle" fill="#FBF5EC" font-size="11">operationeel</text>
     `;
     
     markersGroup.innerHTML += `
-      <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 40}" stroke="#e0e6f0" stroke-width="3"/>
+      <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 40}" stroke="#5a7e97" stroke-width="3"/>
       <text x="${endX}" y="${baseY + 55}" text-anchor="middle" fill="#FBF5EC" font-size="13" font-weight="bold">Volgende</text>
       <text x="${endX}" y="${baseY + 70}" text-anchor="middle" fill="#FBF5EC" font-size="13" font-weight="bold">Faalmoment</text>
     `;
@@ -466,10 +466,10 @@
     
     // Verticale markers
     markersGroup.innerHTML = `
-      <line x1="${startX}" y1="${segmentY}" x2="${startX}" y2="${baseY + 50}" stroke="#e0e6f0" stroke-width="3"/>
+      <line x1="${startX}" y1="${segmentY}" x2="${startX}" y2="${baseY + 50}" stroke="#5a7e97" stroke-width="3"/>
       <text x="${startX}" y="${baseY + 70}" text-anchor="middle" fill="#FBF5EC" font-size="14" font-weight="bold">Start</text>
       
-      <line x1="${startX + mpmtWidth}" y1="${segmentY + 5}" x2="${startX + mpmtWidth}" y2="${baseY + 50}" stroke="#b8c7e0" stroke-width="2" stroke-dasharray="4,2"/>
+      <line x1="${startX + mpmtWidth}" y1="${segmentY + 5}" x2="${startX + mpmtWidth}" y2="${baseY + 50}" stroke="#6a8a9e" stroke-width="2" stroke-dasharray="4,2"/>
       <text x="${startX + mpmtWidth}" y="${baseY + 70}" text-anchor="middle" fill="#FBF5EC" font-size="11">Einde PM</text>
       
       <line x1="${endX}" y1="${segmentY}" x2="${endX}" y2="${baseY + 50}" stroke="#ff4444" stroke-width="3"/>
